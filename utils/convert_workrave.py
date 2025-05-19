@@ -1,139 +1,151 @@
+import os
+import sys
 import json
-import re
 
-def convert_workrave_stats_to_json(input_filepath="workrave_stats.txt"):
-    """
-    Converts WorkRave statistics from a text file to a JSON array.
+# --- Configuration ---
+workrave_txt_path = 'samples/workrave_stats.txt' # Path to your WorkRave log file
+json_output_path = 'samples/workrave_stats.json' # Desired output JSON file
 
-    Assumes the following format for lines:
-    - D: Daily statistics (e.g., D <day> <month> <year> <h_start> <m_start> <day> <month> <year> <h_end> <m_end>)
-         Parses into 'daily_stats' with start and end timestamps.
-    - B: Break statistics (e.g., B <break_type> <val1> <val2> ...)
-         Parses into 'break_stats' associated with the most recent 'D' entry.
-    - m: Mouse/keyboard activity (e.g., m <val1> <val2> ...)
-         Parses into 'activity_stats' associated with the most recent 'D' entry.
-    """
-    
-    stats_data = []
-    current_day_entry = None
+# --- IMPORTANT: Try different encodings for input if UTF-8 doesn't work ---
+# Common encodings: 'utf-8', 'latin-1', 'cp1252' (Windows ANSI)
+# If you know the exact encoding of your original .txt file, use that.
+# Otherwise, 'utf-8' is standard, but if it fails, try 'latin-1' or 'cp1252'.
+input_encoding = 'utf-8' # Start with UTF-8
+# input_encoding = 'latin-1' # Uncomment and try this if UTF-8 still gives ''
+# input_encoding = 'cp1252' # Uncomment and try this if UTF-8 still gives ''
 
-    try:
-        with open(input_filepath, 'r') as f:
-            for line_num, line in enumerate(f, 1):
-                line = line.strip()
-                if not line:
-                    continue
+# Function to parse individual lines
+def parse_line(line):
+    if line.startswith('D '):
+        parts = line.split()
+        # Expected format based on snippet and user info:
+        # D <day_s> <month_s> <year_code_s> <hour_s> <minute_s> <day_e> <month_e> <year_code_e> <hour_e> <minute_e>
+        if len(parts) >= 11:
+            try:
+                # --- Corrected Year Calculation ---
+                # Assuming year_code is 100 + (Year - 2000)
+                # So, Year = 2000 + (year_code - 100)
+                start_year_code = int(parts[4]) # Correct index based on snippet D 6 8 123 16 23...
+                start_year = 2000 + (start_year_code - 100)
 
-                parts = line.split()
-                if not parts:
-                    continue
+                end_year_code = int(parts[8]) # Correct index based on snippet
+                end_year = 2000 + (end_year_code - 100)
 
-                if parts[0] == "WorkRaveStats":
-                    # This line indicates the version, can be stored as a global metadata or ignored per daily stats
-                    # For simplicity, we'll just acknowledge it and not add to each daily entry.
-                    # Or, you could add it as a top-level key in the final JSON.
-                    # print(f"WorkRaveStats version: {parts[1]}")
-                    pass
-                elif parts[0] == "D":
-                    # Start of a new day's statistics
-                    if current_day_entry:
-                        stats_data.append(current_day_entry)
-                    
-                    # Assuming D format: D <day_s> <month_s> <year_s> <hour_s> <minute_s> <day_e> <month_e> <year_e> <hour_e> <minute_e>
-                    # Adjust parsing based on actual snippet: D <value1> <value2> ...
-                    # The snippets suggest: D <day> <month> <rest_interval> <k_start> <m_start> <day> <month> <rest_interval> <k_end> <m_end>
-                    # Given the sample, it seems to be day, month, some identifier, hour, minute, repeated for start and end times.
-                    # Let's use generic names if the exact meaning isn't clear from the 'historystats' doc.
-                    # Based on the given snippet, it looks like:
-                    # D <day_start> <month_start> <year_start> <hour_start> <minute_start> <day_end> <month_end> <year_end> <hour_end> <minute_end>
-                    # Example: D 6 8 123 16 23 7 8 123 17 34
-                    # This would mean:
-                    # D <day> <month> <something> <k_s> <m_s> <day> <month> <something> <k_e> <m_e>
-                    # From the github link it implies:
-                    # D (day_of_month) (month_of_year) (year - 1900) (keystrokes_start) (mouse_start) (day_of_month) (month_of_year) (year - 1900) (keystrokes_end) (mouse_end)
-                    try:
-                        current_day_entry = {
-                            "type": "daily",
-                            "start_date": {
-                                "day": int(parts[1]),
-                                "month": int(parts[2]),
-                                "year": int(parts[3]) + 1900 # Assuming year is offset from 1900
-                            },
-                            "start_time": {
-                                "hour": int(parts[4]),
-                                "minute": int(parts[5])
-                            },
-                            "end_date": {
-                                "day": int(parts[6]),
-                                "month": int(parts[7]),
-                                "year": int(parts[8]) + 1900
-                            },
-                            "end_time": {
-                                "hour": int(parts[9]),
-                                "minute": int(parts[10])
-                            },
-                            "break_stats": [],
-                            "activity_stats": {}
-                        }
-                    except (ValueError, IndexError) as e:
-                        print(f"Warning: Could not parse D line {line_num}: '{line}' - {e}")
-                        current_day_entry = None # Reset to avoid attaching subsequent B/m lines incorrectly
-                        continue
+                # Assuming month is 1-indexed in WorkRave stats (1=Jan, 8=Aug) based on snippet D 6 8...
+                start_month = int(parts[2]) - 1 # Convert to 0-indexed for JSON/JS Date
+                end_month = int(parts[6]) - 1   # Convert to 0-indexed for JSON/JS Date
 
-                elif parts[0] == "B" and current_day_entry:
-                    # Break statistics
-                    # B <break_type> <total_scheduled> <total_taken> <early_count> <late_count> <skipped_count> <start_total> <finish_total> <duration_total>
-                    try:
-                        break_type = int(parts[1]) # 0, 1, 2 based on snippet
-                        current_day_entry["break_stats"].append({
-                            "break_type": break_type,
-                            "values": [int(p) for p in parts[2:]]
+                start_day = int(parts[1])
+                end_day = int(parts[5])
+
+                start_hour = int(parts[5]) # Correct index based on snippet
+                start_minute = int(parts[9]) # Correct index based on snippet
+
+                end_hour = int(parts[9]) # Correct index based on snippet
+                end_minute = int(parts[10]) # Correct index based on snippet
+
+
+                return {
+                    "type": "daily",
+                    "start_date": {"day": start_day, "month": start_month, "year": start_year},
+                    "start_time": {"hour": start_hour, "minute": start_minute},
+                    "end_date": {"day": end_day, "month": end_month, "year": end_year},
+                    "end_time": {"hour": end_hour, "minute": end_minute},
+                    "break_stats": [],
+                    "activity_stats": {}
+                }
+            except (ValueError, IndexError) as e:
+                print(f"Error parsing D line date/time or structure: {line.strip()} - {e}")
+                return None # Return None for unparseable lines
+    elif line.startswith('B '):
+        parts = line.split()
+        # B <break_type> <val1> ... <val7> (8 values after B)
+        if len(parts) >= 9:
+            try:
+                return {
+                    "type": "break",
+                    "break_type": int(parts[1]),
+                    "values": [int(x) for x in parts[2:9]] # Assuming 7 values after break_type
+                }
+            except (ValueError, IndexError) as e:
+                print(f"Error parsing B line values: {line.strip()} - {e}")
+                return None
+    elif line.startswith('m '):
+        parts = line.split()
+        # m <workrave_id> <keystrokes> <mouse_movement_units> <mouse_clicks> <other1> <other2> <other3> (6 values after m)
+        if len(parts) >= 7:
+            try:
+                return {
+                    "type": "activity",
+                    "workrave_id": int(parts[1]),
+                    "keystrokes": int(parts[2]),
+                    "mouse_movement_units": int(parts[3]),
+                    "mouse_clicks": int(parts[4]),
+                    "other_metrics": [int(x) for x in parts[5:7]] # Assuming 2 other metrics based on snippet
+                }
+            except (ValueError, IndexError) as e:
+                print(f"Error parsing m line values: {line.strip()} - {e}")
+                return None
+    return None
+
+# --- Main conversion script ---
+daily_stats = []
+current_daily_entry = None
+
+try:
+    # Open the input file with the specified encoding, handling errors
+    # 'errors=ignore' can help skip bad chars if encoding is uncertain
+    with open(workrave_txt_path, 'r', encoding=input_encoding, errors='ignore') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('WorkRaveStats'): # Skip header or empty lines
+                continue
+
+            parsed_data = parse_line(line)
+
+            if parsed_data:
+                if parsed_data["type"] == "daily":
+                    if current_daily_entry: # Save the previous entry if it exists
+                        daily_stats.append(current_daily_entry)
+                    current_daily_entry = parsed_data
+                elif current_daily_entry: # Attach B or m lines to the current daily entry
+                    if parsed_data["type"] == "break":
+                        current_daily_entry.setdefault("break_stats", []).append({
+                            "break_type": parsed_data["break_type"],
+                            "values": parsed_data["values"]
                         })
-                    except (ValueError, IndexError) as e:
-                        print(f"Warning: Could not parse B line {line_num}: '{line}' - {e}")
-
-                elif parts[0] == "m" and current_day_entry:
-                    # Mouse/keyboard activity statistics
-                    # m <total_k_count> <total_m_count> <total_m_dist> <total_clicks> <left_clicks> <right_clicks>
-                    try:
-                        current_day_entry["activity_stats"] = {
-                            "total_keystrokes": int(parts[2]),
-                            "total_mouse_clicks": int(parts[5]), # Assuming parts[5] is total clicks from a common format
-                            "total_mouse_distance": int(parts[3]), # Assuming parts[3] is mouse distance
-                            "misc_values": [int(p) for p in parts[1:]] # Store all as misc for now
+                    elif parsed_data["type"] == "activity":
+                         # Overwrite activity_stats if multiple 'm' lines exist for a day (unlikely but safe)
+                        current_daily_entry["activity_stats"] = {
+                            "workrave_id": parsed_data["workrave_id"],
+                            "keystrokes": parsed_data["keystrokes"],
+                            "mouse_movement_units": parsed_data["mouse_movement_units"],
+                            "mouse_clicks": parsed_data["mouse_clicks"],
+                            "other_metrics": parsed_data["other_metrics"]
                         }
-                        # Refined parsing based on common WorkRave m line format:
-                        # m <total_keystrokes> <total_mouse_movement> <total_mouse_clicks> <total_time_on_keyboard> <total_time_on_mouse> <break_compliance_score>
-                        # Adjusting based on snippet: m 6 15917 3331728 1905193 885 1960 16878
-                        # The snippet `m 6 15917 3331728 1905193 885 1960 16878`
-                        # This appears to be `m <some_id> <keystrokes> <mouse_movement_units> <mouse_clicks> <unknown_1> <unknown_2> <unknown_3>`
-                        # Let's adapt the parsing to be more generic for now.
-                        current_day_entry["activity_stats"] = {
-                            "workrave_id": int(parts[1]),
-                            "keystrokes": int(parts[2]),
-                            "mouse_movement_units": int(parts[3]),
-                            "mouse_clicks": int(parts[4]),
-                            "other_metrics": [int(p) for p in parts[5:]]
-                        }
+            else:
+                # Log unparseable lines for debugging if needed
+                # print(f"Skipping unparseable line: {line}")
+                pass
 
-                    except (ValueError, IndexError) as e:
-                        print(f"Warning: Could not parse m line {line_num}: '{line}' - {e}")
-                else:
-                    # Optionally handle other lines or log unparsed lines
-                    # print(f"Skipping unparsed line {line_num}: '{line}'")
-                    pass
+    if current_daily_entry: # Add the last entry after loop finishes
+        daily_stats.append(current_daily_entry)
 
-        # Append the last day's entry if it exists
-        if current_day_entry:
-            stats_data.append(current_day_entry)
+    # Convert the list of dictionaries to a JSON string
+    # ensure_ascii=False for proper Unicode characters
+    json_string = json.dumps(daily_stats, indent=2, ensure_ascii=False)
 
-        return json.dumps(stats_data, indent=2)
+    # Write the JSON string to the file, explicitly UTF-8, no BOM
+    with open(json_output_path, 'w', encoding='utf-8') as json_file:
+        json_file.write(json_string)
 
-    except FileNotFoundError:
-        return f"Error: The file '{input_filepath}' was not found."
-    except Exception as e:
-        return f"An unexpected error occurred: {e}"
+    print(f"Successfully converted '{workrave_txt_path}' to '{json_output_path}'")
 
-if __name__ == "__main__":
-    json_output = convert_workrave_stats_to_json()
-    print(json_output)
+except FileNotFoundError:
+    print(f"Error: The file '{workrave_txt_path}' was not found. Please ensure it's in the same directory as the script.")
+except Exception as e:
+    # Use sys.exc_info() for more robust error reporting
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(f"An unexpected error occurred during conversion: {exc_type.__name__} - {e} at {fname} line {exc_tb.tb_lineno}")
+
