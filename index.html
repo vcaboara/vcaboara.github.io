@@ -54,7 +54,7 @@
         async function fetchWorkRaveData() {
             try {
                 // Adjust this path if your JSON file is in a different location
-                const response = await Workspace('workrave_stats.json');
+                const response = await fetch('workrave_stats.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

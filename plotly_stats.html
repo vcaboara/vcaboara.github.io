@@ -61,7 +61,7 @@
         async function fetchWorkRaveData() {
             try {
                 // Ensure this path is correct for your github.io deployment
-                const response = await Workspace('workrave_stats.json');
+                const response = await fetch('workrave_stats.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
