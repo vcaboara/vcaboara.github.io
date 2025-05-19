@@ -3,64 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkRave Activity Dashboard (Plotly.js)</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>WorkRave Activity Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.min.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #f4f4f4;
             color: #333;
-            text-align: center;
         }
         .chart-container {
-            width: 90%; /* Adjust as needed */
-            max-width: 1000px; /* Max width for readability */
-            margin: 30px auto;
-            padding: 25px;
+            width: 80%; /* Adjust as needed */
+            max-width: 900px; /* Max width for readability */
+            margin: 20px auto;
+            padding: 20px;
             background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        h1, h2 {
+        h1 {
+            text-align: center;
             color: #2c3e50;
-            margin-bottom: 25px;
         }
-        /* Style the Plotly divs if needed, though Plotly handles much of it */
-        .plotly-graph-div {
-            margin-top: 20px; /* Space between title and graph */
+        canvas {
+            display: block; /* Ensures no extra space below canvas */
         }
     </style>
 </head>
 <body>
-    <h1>WorkRave Productivity & Health Trends</h1>
+    <h1>WorkRave Daily Activity Dashboard</h1>
 
     <div class="chart-container">
-        <h2>Daily Keystrokes & Mouse Clicks</h2>
-        <div id="activityChart" style="width:100%; height:450px;"></div>
-        <p><em>Hover, pan, and zoom to explore your daily input.</em></p>
+        <h2>Daily Keystrokes</h2>
+        <canvas id="keystrokesChart"></canvas>
     </div>
 
     <div class="chart-container">
-        <h2>Break Compliance (Type 0 & 1)</h2>
-        <div id="breakComplianceChart" style="width:100%; height:450px;"></div>
-        <p><em>See how well you adhered to your primary and secondary breaks.</em></p>
+        <h2>Daily Mouse Clicks</h2>
+        <canvas id="mouseClicksChart"></canvas>
     </div>
 
     <div class="chart-container">
-        <h2>Mouse Movement vs. Keystrokes</h2>
-        <div id="scatterChart" style="width:100%; height:450px;"></div>
-        <p><em>Explore the relationship between mouse activity and keyboard usage.</em></p>
+        <h2>Break Compliance (Type 0)</h2>
+        <canvas id="breakComplianceChart"></canvas>
     </div>
-
 
     <script>
         async function fetchWorkRaveData() {
             try {
-                // Ensure this path is correct for your github.io deployment
+                // Adjust this path if your JSON file is in a different location
                 const response = await fetch('workrave_stats.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -69,15 +62,15 @@
                 return data;
             } catch (error) {
                 console.error('Error fetching WorkRave data:', error);
-                document.body.innerHTML = "<p style='text-align: center; color: red;'>Failed to load WorkRave data. Please ensure 'workrave_stats.json' is correctly deployed in the same directory.</p>";
+                document.body.innerHTML = "<p style='text-align: center; color: red;'>Failed to load WorkRave data. Please ensure 'workrave_stats.json' is correctly deployed.</p>";
                 return [];
             }
         }
 
-        async function renderPlotlyCharts() {
+        async function renderCharts() {
             const workRaveData = await fetchWorkRaveData();
 
-            // Filter for 'daily' entries and sort by date for accurate time series
+            // Filter for 'daily' entries and sort by date to ensure correct time series
             const dailyEntries = workRaveData
                 .filter(entry => entry.type === 'daily' && entry.start_date)
                 .sort((a, b) => {
@@ -91,176 +84,216 @@
                 return;
             }
 
-            // --- Data Preparation for Plotly.js ---
-            // Plotly's `x` and `y` arrays
-            const dates = dailyEntries.map(entry => {
-                // Plotly can directly interpret 'YYYY-MM-DD' or Date objects for time series
-                return `${entry.start_date.year}-${String(entry.start_date.month).padStart(2, '0')}-${String(entry.start_date.day).padStart(2, '0')}`;
+            // --- Prepare Data for Chart.js ---
+            const labels = dailyEntries.map(entry => {
+                // Chart.js `time` scale can directly use Date objects or ISO strings
+                return new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
             });
 
-            const keystrokes = dailyEntries.map(entry =>
+            const keystrokesData = dailyEntries.map(entry =>
                 entry.activity_stats ? entry.activity_stats.keystrokes : 0
             );
 
-            const mouseClicks = dailyEntries.map(entry =>
+            const mouseClicksData = dailyEntries.map(entry =>
                 entry.activity_stats ? entry.activity_stats.mouse_clicks : 0
             );
 
-            const mouseMovement = dailyEntries.map(entry =>
-                entry.activity_stats ? entry.activity_stats.mouse_movement_units : 0
-            );
-
-            // Break Compliance for Type 0 (e.g., total_taken / total_scheduled)
-            const break0Compliance = dailyEntries.map(entry => {
+            // Example for break compliance (Type 0) - assuming 'total_taken' vs 'total_scheduled'
+            const breakComplianceData = dailyEntries.map(entry => {
                 const break0 = entry.break_stats.find(b => b.break_type === 0);
-                if (break0 && break0.values && break0.values[0] > 0) {
-                    return (break0.values[1] / break0.values[0]) * 100; // values[0] is total_scheduled, values[1] is total_taken
+                if (break0 && break0.values && break0.values[0] > 0) { // values[0] is total_scheduled
+                    return (break0.values[1] / break0.values[0]) * 100; // values[1] is total_taken
                 }
-                return 0;
-            });
-
-            // Break Compliance for Type 1
-            const break1Compliance = dailyEntries.map(entry => {
-                const break1 = entry.break_stats.find(b => b.break_type === 1);
-                if (break1 && break1.values && break1.values[0] > 0) {
-                    return (break1.values[1] / break1.values[0]) * 100;
-                }
-                return 0;
+                return 0; // Default if no data or no scheduled breaks
             });
 
 
-            // --- Chart 1: Daily Keystrokes & Mouse Clicks (Line Chart) ---
-            const activityTrace1 = {
-                x: dates,
-                y: keystrokes,
-                mode: 'lines+markers', // Shows lines and points
-                name: 'Keystrokes',
-                line: { color: '#4CAF50' },
-                marker: { size: 6 }
-            };
+            // --- Render Charts ---
 
-            const activityTrace2 = {
-                x: dates,
-                y: mouseClicks,
-                mode: 'lines+markers',
-                name: 'Mouse Clicks',
-                yaxis: 'y2', // Assign to a secondary Y-axis
-                line: { color: '#FF9800' },
-                marker: { size: 6 }
-            };
-
-            const activityLayout = {
-                title: 'Daily Keystrokes and Mouse Clicks Over Time',
-                xaxis: {
-                    title: 'Date',
-                    type: 'date', // Important for time series
-                    rangeselector: { // Add a range selector for easy zooming
-                        buttons: [
-                            { count: 1, label: '1m', step: 'month', stepmode: 'backward' },
-                            { count: 6, label: '6m', step: 'month', stepmode: 'backward' },
-                            { count: 1, label: 'YTD', step: 'year', stepmode: 'todate' },
-                            { count: 1, label: '1y', step: 'year', stepmode: 'backward' },
-                            { step: 'all' }
-                        ]
+            // 1. Daily Keystrokes Chart (Line Chart)
+            new Chart(document.getElementById('keystrokesChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Keystrokes',
+                        data: keystrokesData,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1, // Smooth lines
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Daily Keystrokes Over Time'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                title: function(context) {
+                                    // Format date in tooltip title
+                                    return new Date(context[0].label).toLocaleDateString('en-US', {
+                                        year: 'numeric', month: 'long', day: 'numeric'
+                                    });
+                                }
+                            }
+                        }
                     },
-                    rangeslider: {} // Add a range slider below the chart
+                    scales: {
+                        x: {
+                            type: 'time', // Use time scale for dates
+                            time: {
+                                unit: 'day',
+                                tooltipFormat: 'MMM d, yyyy',
+                                displayFormats: {
+                                    day: 'MMM d'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Keystrokes'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Daily Mouse Clicks Chart (Bar Chart)
+            new Chart(document.getElementById('mouseClicksChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Mouse Clicks',
+                        data: mouseClicksData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
                 },
-                yaxis: {
-                    title: 'Keystrokes',
-                    automargin: true // Prevents labels from being cut off
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Daily Mouse Clicks'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                             callbacks: {
+                                title: function(context) {
+                                    return new Date(context[0].label).toLocaleDateString('en-US', {
+                                        year: 'numeric', month: 'long', day: 'numeric'
+                                    });
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                tooltipFormat: 'MMM d, yyyy',
+                                displayFormats: {
+                                    day: 'MMM d'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Clicks'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 3. Break Compliance Chart (Type 0)
+            new Chart(document.getElementById('breakComplianceChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Break 0 Compliance (%)',
+                        data: breakComplianceData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
                 },
-                yaxis2: { // Secondary Y-axis for mouse clicks
-                    title: 'Mouse Clicks',
-                    overlaying: 'y',
-                    side: 'right',
-                    automargin: true
-                },
-                hovermode: 'closest', // Show hover info for the closest point
-                // Other layout options
-                margin: { t: 50, b: 50, l: 50, r: 50 },
-                dragmode: 'zoom', // Default interaction is zooming
-                modebar: { orientation: 'v' } // Vertical mode bar (zoom, pan, etc.)
-            };
-
-            Plotly.newPlot('activityChart', [activityTrace1, activityTrace2], activityLayout, { responsive: true });
-
-
-            // --- Chart 2: Break Compliance (Line Chart with percentage Y-axis) ---
-            const breakTrace1 = {
-                x: dates,
-                y: break0Compliance,
-                mode: 'lines+markers',
-                name: 'Break Type 0 Compliance',
-                line: { color: '#2196F3' },
-                marker: { size: 6 }
-            };
-
-            const breakTrace2 = {
-                x: dates,
-                y: break1Compliance,
-                mode: 'lines+markers',
-                name: 'Break Type 1 Compliance',
-                line: { color: '#9C27B0' },
-                marker: { size: 6 }
-            };
-
-            const breakLayout = {
-                title: 'Daily Break Compliance Percentage',
-                xaxis: {
-                    title: 'Date',
-                    type: 'date',
-                    rangeselector: { buttons: [ { count: 1, label: '1m', step: 'month', stepmode: 'backward' }, { count: 6, label: '6m', step: 'month', stepmode: 'backward' }, { step: 'all' } ] },
-                    rangeslider: {}
-                },
-                yaxis: {
-                    title: 'Compliance (%)',
-                    range: [0, 100], // Set fixed range for percentage
-                    ticksuffix: '%', // Add percentage suffix
-                    automargin: true
-                },
-                hovermode: 'closest',
-                margin: { t: 50, b: 50, l: 50, r: 50 },
-                dragmode: 'zoom',
-                modebar: { orientation: 'v' }
-            };
-
-            Plotly.newPlot('breakComplianceChart', [breakTrace1, breakTrace2], breakLayout, { responsive: true });
-
-            // --- Chart 3: Mouse Movement vs. Keystrokes (Scatter Plot) ---
-            const scatterTrace = {
-                x: keystrokes,
-                y: mouseMovement,
-                mode: 'markers',
-                type: 'scatter',
-                marker: {
-                    size: 8,
-                    opacity: 0.7,
-                    color: '#FFC107' // Yellowish color
-                },
-                hoverinfo: 'x+y+text', // Show custom text on hover
-                text: dates.map(d => `Date: ${d}`) // Custom text for hover
-            };
-
-            const scatterLayout = {
-                title: 'Mouse Movement vs. Keystrokes (Per Day)',
-                xaxis: {
-                    title: 'Total Keystrokes'
-                },
-                yaxis: {
-                    title: 'Total Mouse Movement Units'
-                },
-                hovermode: 'closest',
-                margin: { t: 50, b: 50, l: 50, r: 50 },
-                dragmode: 'pan', // Default interaction is panning
-                modebar: { orientation: 'v' }
-            };
-
-            Plotly.newPlot('scatterChart', [scatterTrace], scatterLayout, { responsive: true });
-
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Daily Compliance for Break Type 0'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                             callbacks: {
+                                title: function(context) {
+                                    return new Date(context[0].label).toLocaleDateString('en-US', {
+                                        year: 'numeric', month: 'long', day: 'numeric'
+                                    });
+                                },
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toFixed(2)}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                tooltipFormat: 'MMM d, yyyy',
+                                displayFormats: {
+                                    day: 'MMM d'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Compliance Percentage'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
-        // Render charts when the DOM is ready
-        document.addEventListener('DOMContentLoaded', renderPlotlyCharts);
+        // Call the function to render charts when the page loads
+        renderCharts();
     </script>
 </body>
 </html>
