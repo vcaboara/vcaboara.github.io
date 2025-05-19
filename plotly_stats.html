@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WorkRave Activity Dashboard (Plotly.js)</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,8 +13,8 @@
             text-align: center;
         }
         .chart-container {
-            width: 90%; /* Adjust as needed */
-            max-width: 1000px; /* Max width for readability */
+            width: 90%;
+            max-width: 1000px;
             margin: 30px auto;
             padding: 25px;
             background-color: #fff;
@@ -29,9 +28,8 @@
             color: #2c3e50;
             margin-bottom: 25px;
         }
-        /* Style the Plotly divs if needed, though Plotly handles much of it */
         .plotly-graph-div {
-            margin-top: 20px; /* Space between title and graph */
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -56,11 +54,12 @@
         <p><em>Explore the relationship between mouse activity and keyboard usage.</em></p>
     </div>
 
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <script>
         async function fetchWorkRaveData() {
             try {
-                // Ensure this path is correct for your github.io deployment
+                // Corrected: Using fetch() to load the JSON file
                 const response = await fetch('workrave_stats.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,7 +76,6 @@
         async function renderPlotlyCharts() {
             const workRaveData = await fetchWorkRaveData();
 
-            // Filter for 'daily' entries and sort by date for accurate time series
             const dailyEntries = workRaveData
                 .filter(entry => entry.type === 'daily' && entry.start_date)
                 .sort((a, b) => {
@@ -91,10 +89,7 @@
                 return;
             }
 
-            // --- Data Preparation for Plotly.js ---
-            // Plotly's `x` and `y` arrays
             const dates = dailyEntries.map(entry => {
-                // Plotly can directly interpret 'YYYY-MM-DD' or Date objects for time series
                 return `${entry.start_date.year}-${String(entry.start_date.month).padStart(2, '0')}-${String(entry.start_date.day).padStart(2, '0')}`;
             });
 
@@ -110,16 +105,14 @@
                 entry.activity_stats ? entry.activity_stats.mouse_movement_units : 0
             );
 
-            // Break Compliance for Type 0 (e.g., total_taken / total_scheduled)
             const break0Compliance = dailyEntries.map(entry => {
                 const break0 = entry.break_stats.find(b => b.break_type === 0);
                 if (break0 && break0.values && break0.values[0] > 0) {
-                    return (break0.values[1] / break0.values[0]) * 100; // values[0] is total_scheduled, values[1] is total_taken
+                    return (break0.values[1] / break0.values[0]) * 100;
                 }
                 return 0;
             });
 
-            // Break Compliance for Type 1
             const break1Compliance = dailyEntries.map(entry => {
                 const break1 = entry.break_stats.find(b => b.break_type === 1);
                 if (break1 && break1.values && break1.values[0] > 0) {
@@ -129,137 +122,64 @@
             });
 
 
-            // --- Chart 1: Daily Keystrokes & Mouse Clicks (Line Chart) ---
             const activityTrace1 = {
-                x: dates,
-                y: keystrokes,
-                mode: 'lines+markers', // Shows lines and points
-                name: 'Keystrokes',
-                line: { color: '#4CAF50' },
-                marker: { size: 6 }
+                x: dates, y: keystrokes, mode: 'lines+markers', name: 'Keystrokes',
+                line: { color: '#4CAF50' }, marker: { size: 6 }
             };
 
             const activityTrace2 = {
-                x: dates,
-                y: mouseClicks,
-                mode: 'lines+markers',
-                name: 'Mouse Clicks',
-                yaxis: 'y2', // Assign to a secondary Y-axis
-                line: { color: '#FF9800' },
-                marker: { size: 6 }
+                x: dates, y: mouseClicks, mode: 'lines+markers', name: 'Mouse Clicks', yaxis: 'y2',
+                line: { color: '#FF9800' }, marker: { size: 6 }
             };
 
             const activityLayout = {
                 title: 'Daily Keystrokes and Mouse Clicks Over Time',
-                xaxis: {
-                    title: 'Date',
-                    type: 'date', // Important for time series
-                    rangeselector: { // Add a range selector for easy zooming
-                        buttons: [
-                            { count: 1, label: '1m', step: 'month', stepmode: 'backward' },
-                            { count: 6, label: '6m', step: 'month', stepmode: 'backward' },
-                            { count: 1, label: 'YTD', step: 'year', stepmode: 'todate' },
-                            { count: 1, label: '1y', step: 'year', stepmode: 'backward' },
-                            { step: 'all' }
-                        ]
-                    },
-                    rangeslider: {} // Add a range slider below the chart
-                },
-                yaxis: {
-                    title: 'Keystrokes',
-                    automargin: true // Prevents labels from being cut off
-                },
-                yaxis2: { // Secondary Y-axis for mouse clicks
-                    title: 'Mouse Clicks',
-                    overlaying: 'y',
-                    side: 'right',
-                    automargin: true
-                },
-                hovermode: 'closest', // Show hover info for the closest point
-                // Other layout options
-                margin: { t: 50, b: 50, l: 50, r: 50 },
-                dragmode: 'zoom', // Default interaction is zooming
-                modebar: { orientation: 'v' } // Vertical mode bar (zoom, pan, etc.)
+                xaxis: { title: 'Date', type: 'date', rangeselector: { buttons: [ { count: 1, label: '1m', step: 'month', stepmode: 'backward' }, { count: 6, label: '6m', step: 'month', stepmode: 'backward' }, { count: 1, label: 'YTD', step: 'year', stepmode: 'todate' }, { count: 1, label: '1y', step: 'year', stepmode: 'backward' }, { step: 'all' } ] }, rangeslider: {} },
+                yaxis: { title: 'Keystrokes', automargin: true },
+                yaxis2: { title: 'Mouse Clicks', overlaying: 'y', side: 'right', automargin: true },
+                hovermode: 'closest', margin: { t: 50, b: 50, l: 50, r: 50 }, dragmode: 'zoom', modebar: { orientation: 'v' }
             };
 
             Plotly.newPlot('activityChart', [activityTrace1, activityTrace2], activityLayout, { responsive: true });
 
 
-            // --- Chart 2: Break Compliance (Line Chart with percentage Y-axis) ---
             const breakTrace1 = {
-                x: dates,
-                y: break0Compliance,
-                mode: 'lines+markers',
-                name: 'Break Type 0 Compliance',
-                line: { color: '#2196F3' },
-                marker: { size: 6 }
+                x: dates, y: break0Compliance, mode: 'lines+markers', name: 'Break Type 0 Compliance',
+                line: { color: '#2196F3' }, marker: { size: 6 }
             };
 
             const breakTrace2 = {
-                x: dates,
-                y: break1Compliance,
-                mode: 'lines+markers',
-                name: 'Break Type 1 Compliance',
-                line: { color: '#9C27B0' },
-                marker: { size: 6 }
+                x: dates, y: break1Compliance, mode: 'lines+markers', name: 'Break Type 1 Compliance',
+                line: { color: '#9C27B0' }, marker: { size: 6 }
             };
 
             const breakLayout = {
                 title: 'Daily Break Compliance Percentage',
-                xaxis: {
-                    title: 'Date',
-                    type: 'date',
-                    rangeselector: { buttons: [ { count: 1, label: '1m', step: 'month', stepmode: 'backward' }, { count: 6, label: '6m', step: 'month', stepmode: 'backward' }, { step: 'all' } ] },
-                    rangeslider: {}
-                },
-                yaxis: {
-                    title: 'Compliance (%)',
-                    range: [0, 100], // Set fixed range for percentage
-                    ticksuffix: '%', // Add percentage suffix
-                    automargin: true
-                },
-                hovermode: 'closest',
-                margin: { t: 50, b: 50, l: 50, r: 50 },
-                dragmode: 'zoom',
-                modebar: { orientation: 'v' }
+                xaxis: { title: 'Date', type: 'date', rangeselector: { buttons: [ { count: 1, label: '1m', step: 'month', stepmode: 'backward' }, { count: 6, label: '6m', step: 'month', stepmode: 'backward' }, { step: 'all' } ] }, rangeslider: {} },
+                yaxis: { title: 'Compliance (%)', range: [0, 100], ticksuffix: '%', automargin: true },
+                hovermode: 'closest', margin: { t: 50, b: 50, l: 50, r: 50 }, dragmode: 'zoom', modebar: { orientation: 'v' }
             };
 
             Plotly.newPlot('breakComplianceChart', [breakTrace1, breakTrace2], breakLayout, { responsive: true });
 
-            // --- Chart 3: Mouse Movement vs. Keystrokes (Scatter Plot) ---
+
             const scatterTrace = {
-                x: keystrokes,
-                y: mouseMovement,
-                mode: 'markers',
-                type: 'scatter',
-                marker: {
-                    size: 8,
-                    opacity: 0.7,
-                    color: '#FFC107' // Yellowish color
-                },
-                hoverinfo: 'x+y+text', // Show custom text on hover
-                text: dates.map(d => `Date: ${d}`) // Custom text for hover
+                x: keystrokes, y: mouseMovement, mode: 'markers', type: 'scatter',
+                marker: { size: 8, opacity: 0.7, color: '#FFC107' },
+                hoverinfo: 'x+y+text', text: dates.map(d => `Date: ${d}`)
             };
 
             const scatterLayout = {
                 title: 'Mouse Movement vs. Keystrokes (Per Day)',
-                xaxis: {
-                    title: 'Total Keystrokes'
-                },
-                yaxis: {
-                    title: 'Total Mouse Movement Units'
-                },
-                hovermode: 'closest',
-                margin: { t: 50, b: 50, l: 50, r: 50 },
-                dragmode: 'pan', // Default interaction is panning
-                modebar: { orientation: 'v' }
+                xaxis: { title: 'Total Keystrokes' },
+                yaxis: { title: 'Total Mouse Movement Units' },
+                hovermode: 'closest', margin: { t: 50, b: 50, l: 50, r: 50 }, dragmode: 'pan', modebar: { orientation: 'v' }
             };
 
             Plotly.newPlot('scatterChart', [scatterTrace], scatterLayout, { responsive: true });
 
         }
 
-        // Render charts when the DOM is ready
         document.addEventListener('DOMContentLoaded', renderPlotlyCharts);
     </script>
 </body>
