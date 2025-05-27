@@ -444,7 +444,7 @@
                 </div>
 
                 <div class="stats-group">
-                    <h3>Daily Break Duration (minutes)</h3>
+                    <h3>Daily Total Break Duration (minutes)</h3>
                     <div class="stats-content">
                         <div class="stats-item">Average: <span id="avgDailyBreakDuration">N/A</span></div>
                         <div class="stats-item">Median: <span id="medianDailyBreakDuration">N/A</span></div>
@@ -453,6 +453,13 @@
                         <div class="stats-item">Min: <span id="minDailyBreakDuration">N/A</span></div>
                     </div>
                 </div>
+
+                <div class="stats-group">
+                    <h3>Daily Break Type Breakdown (minutes)</h3>
+                    <div class="stats-content" id="breakTypeSummaryContent">
+                        </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -542,11 +549,18 @@
             </div>
             <div id="breakDurationHistogram" class="chart-div collapsible-content expanded"></div>
         </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Break Duration by Type (Stacked Bar Chart)
+            </div>
+            <div id="breakTypeStackedBarChart" class="chart-div collapsible-content expanded"></div>
+        </div>
     </div>
 
     <script>
-        const DEFAULT_START_DATE = "2023-08-01";
-        const DEFAULT_END_DATE = "2025-04-30";
+        const DEFAULT_START_DATE = "2023-08-21";
+        const DEFAULT_END_DATE = "2025-04-16";
         const JSON_DATA_URL = 'https://vcaboara.github.io/workrave_stats.json';
 
         // Define outlier threshold (e.g., 24 hours in minutes)
@@ -556,7 +570,16 @@
 
         let allWorkRaveData = [];
         let currentFilteredData = []; // Store filtered data to be used by queries
+
         let lastQueryResults = []; // Store the results of the last custom query
+
+        // Mapping for WorkRave break types to human-readable names
+        const BREAK_TYPE_NAMES = {
+            0: 'Micro-break',
+            1: 'Rest Break',
+            2: 'Daily Limit Break',
+            // Add more if WorkRave introduces other types and they are found in data
+        };
 
         // Helper functions (moved to global scope)
         /**
@@ -817,6 +840,7 @@
                 Plotly.newPlot('mouseClickHistogram', [], {}); // Clear histogram as well
                 Plotly.newPlot('breakDurationChart', [], {});
                 Plotly.newPlot('breakDurationHistogram', [], {}); // Clear histogram as well
+                Plotly.newPlot('breakTypeStackedBarChart', [], {}); // Clear new break type chart
 
                 // Clear summary stats
                 updateSummaryStatistics([]);
@@ -846,14 +870,14 @@
             let totalKeystrokes = 0;
             let totalMouseMovements = 0;
             let totalMouseClicks = 0;
-            let totalBreakDurations = 0; // This will now accumulate minutes directly
+            let totalBreakDurationsMinutes = 0; // Renamed to clearly indicate units
             const daysCount = data.length;
 
             let usageValues = [];
             let keystrokeValues = [];
             let mouseMovementValues = [];
             let mouseClickValues = [];
-            let breakDurationValues = [];
+            let breakDurationValuesMinutes = []; // Renamed to clearly indicate units
 
             let maxUsage = 0;
             let minUsage = Infinity;
@@ -867,8 +891,12 @@
             let maxMouseClicks = 0;
             let minMouseClicks = Infinity;
 
-            let maxBreakDuration = 0;
-            let minBreakDuration = Infinity;
+            let maxBreakDurationMinutes = 0; // Renamed
+            let minBreakDurationMinutes = Infinity; // Renamed
+
+            // New: Data structures for break types summary
+            const breakTypeTotalsMinutes = {}; // { type: totalDurationInMinutes }
+            const breakTypeCounts = {}; // { type: countOfDaysWithThatType }
 
             data.forEach(entry => {
                 // Corrected month index: subtract 1 from month
@@ -904,11 +932,22 @@
                 }
 
                 if (entry.break_stats && Array.isArray(entry.break_stats)) {
-                    const dailyBreakDuration = entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0);
-                    breakDurationValues.push(dailyBreakDuration);
-                    totalBreakDurations += dailyBreakDuration;
-                    if (dailyBreakDuration > maxBreakDuration) maxBreakDuration = dailyBreakDuration;
-                    if (dailyBreakDuration > 0 && dailyBreakDuration < minBreakDuration) minBreakDuration = dailyBreakDuration; // Exclude 0 from min
+                    let dailyBreakDurationSeconds = 0;
+                    entry.break_stats.forEach(b => {
+                        const durationSeconds = (b.values && b.values.length > 1 ? b.values[1] : 0); // Duration is in seconds
+                        dailyBreakDurationSeconds += durationSeconds;
+
+                        // Aggregate for break type breakdown, converting to minutes here
+                        const type = b.break_type;
+                        const durationMinutes = durationSeconds / 60; // Convert to minutes
+                        breakTypeTotalsMinutes[type] = (breakTypeTotalsMinutes[type] || 0) + durationMinutes;
+                        breakTypeCounts[type] = (breakTypeCounts[type] || 0) + 1; // Count how many times this type appeared
+                    });
+                    const dailyBreakDurationMinutes = dailyBreakDurationSeconds / 60; // Convert total daily break to minutes
+                    breakDurationValuesMinutes.push(dailyBreakDurationMinutes);
+                    totalBreakDurationsMinutes += dailyBreakDurationMinutes;
+                    if (dailyBreakDurationMinutes > maxBreakDurationMinutes) maxBreakDurationMinutes = dailyBreakDurationMinutes;
+                    if (dailyBreakDurationMinutes > 0 && dailyBreakDurationMinutes < minBreakDurationMinutes) minBreakDurationMinutes = dailyBreakDurationMinutes; // Exclude 0 from min
                 }
             });
 
@@ -918,7 +957,7 @@
             const avgKeystrokes = daysCount > 0 ? (totalKeystrokes / daysCount) : 0;
             const avgMouseMovement = daysCount > 0 ? (totalMouseMovements / daysCount) : 0;
             const avgMouseClicks = daysCount > 0 ? (totalMouseClicks / daysCount) : 0;
-            const avgBreakDuration = daysCount > 0 ? (totalBreakDurations / daysCount) : 0;
+            const avgBreakDurationMinutes = daysCount > 0 ? (totalBreakDurationsMinutes / daysCount) : 0;
 
             const maxUsageHours = maxUsage / 60;
             const minUsageHours = minUsage / 60;
@@ -938,8 +977,8 @@
             const medianMouseClicks = window.calculateMedian(mouseClickValues);
             const modeMouseClicks = window.calculateMode(mouseClickValues);
 
-            const medianBreakDuration = window.calculateMedian(breakDurationValues);
-            const modeBreakDuration = window.calculateMode(breakDurationValues);
+            const medianBreakDurationMinutes = window.calculateMedian(breakDurationValuesMinutes);
+            const modeBreakDurationMinutes = window.calculateMode(breakDurationValuesMinutes);
 
             // Calculate Productivity Ratios
             const avgKeystrokesPerMinUsage = totalUsageMinutes > 0 ? (totalKeystrokes / totalUsageMinutes) : 0;
@@ -975,11 +1014,11 @@
                 ['modeDailyMouseClicks', modeMouseClicks !== 'N/A (No distinct mode)' ? modeMouseClicks.split(', ').map(m => Math.round(parseFloat(m)).toLocaleString()).join(', ') : modeMouseClicks],
                 ['maxDailyMouseClicks', maxMouseClicks.toLocaleString()],
                 ['minDailyMouseClicks', minMouseClicks !== Infinity ? minMouseClicks.toLocaleString() : '0'],
-                ['avgDailyBreakDuration', avgBreakDuration.toFixed(2)],
-                ['medianDailyBreakDuration', typeof medianBreakDuration === 'number' ? medianBreakDuration.toFixed(2) : medianBreakDuration],
-                ['modeDailyBreakDuration', modeBreakDuration],
-                ['maxDailyBreakDuration', maxBreakDuration.toFixed(2)],
-                ['minDailyBreakDuration', minBreakDuration !== Infinity ? minBreakDuration.toFixed(2) : '0.00'],
+                ['avgDailyBreakDuration', avgBreakDurationMinutes.toFixed(2)],
+                ['medianDailyBreakDuration', typeof medianBreakDurationMinutes === 'number' ? medianBreakDurationMinutes.toFixed(2) : medianBreakDurationMinutes],
+                ['modeDailyBreakDuration', modeBreakDurationMinutes],
+                ['maxDailyBreakDuration', maxBreakDurationMinutes.toFixed(2)],
+                ['minDailyBreakDuration', minBreakDurationMinutes !== Infinity ? minBreakDurationMinutes.toFixed(2) : '0.00'],
             ]);
 
             // Update text content for each element, with explicit null checks and logging
@@ -991,6 +1030,26 @@
                     console.error(`Error: HTML element with ID '${id}' not found. Cannot update summary statistics.`);
                 }
             });
+
+            // Update Break Type Breakdown summary
+            const breakTypeSummaryContent = document.getElementById('breakTypeSummaryContent');
+            breakTypeSummaryContent.innerHTML = ''; // Clear previous content
+
+            const sortedBreakTypes = Object.keys(breakTypeTotalsMinutes).sort((a, b) => parseInt(a) - parseInt(b));
+
+            if (sortedBreakTypes.length === 0) {
+                breakTypeSummaryContent.innerHTML = '<div class="stats-item">No break data available.</div>';
+            } else {
+                sortedBreakTypes.forEach(type => {
+                    const avgDuration = daysCount > 0 ? (breakTypeTotalsMinutes[type] / daysCount) : 0; // This is already in minutes
+                    const typeName = BREAK_TYPE_NAMES[type] || `Unknown Type ${type}`;
+                    const div = document.createElement('div');
+                    div.className = 'stats-item';
+                    div.innerHTML = `Avg ${typeName}: <span>${avgDuration.toFixed(2)}</span>`;
+                    breakTypeSummaryContent.appendChild(div);
+                });
+            }
+
         }
 
         window.runCustomQuery = function() { // Made global
@@ -1055,7 +1114,7 @@
                         break;
                     case 'break_duration':
                         metricValue = (entry.break_stats && Array.isArray(entry.break_stats)) ?
-                                      entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) : 0; // minutes
+                                      entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) / 60 : 0; // minutes
                         break;
                     default:
                         queryResultsDiv.textContent = `Unknown metric: '${metricName}'. Please use one of: usage, keystrokes, mouse_movement, mouse_clicks, break_duration.`;
@@ -1144,7 +1203,7 @@
             const dates = data.map(entry => {
                 // Create a Date object (month is 0-indexed for constructor)
                 const dateObj = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
-                // Format the Date object into YYYY-MM-DD string
+                // Format the Date object into ISO-MM-DD string
                 const year = dateObj.getFullYear();
                 const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-indexed, so add 1
                 const day = String(dateObj.getDate()).padStart(2, '0');
@@ -1461,18 +1520,18 @@
 
 
             // --- Daily Total Break Duration ---
-            const breakDurations = data.map(entry => {
+            const breakDurationsMinutes = data.map(entry => {
                 if (entry.break_stats && Array.isArray(entry.break_stats)) {
-                    return entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0);
+                    return entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) / 60; // Convert to minutes
                 }
                 return 0;
             });
-            const breakDurationRegression = window.calculateLinearRegression(xNumeric, breakDurations);
+            const breakDurationRegression = window.calculateLinearRegression(xNumeric, breakDurationsMinutes);
             const breakDurationTrendLineY = xNumeric.map(x => breakDurationRegression.m * x + breakDurationRegression.b);
 
             const breakDurationTrace = {
                 x: dates,
-                y: breakDurations,
+                y: breakDurationsMinutes,
                 mode: 'lines+markers',
                 name: 'Total Break Duration (minutes)',
                 line: { color: 'rgb(153, 102, 255)' },
@@ -1502,7 +1561,7 @@
 
             // --- Daily Break Duration Distribution (Histogram) ---
             const breakDurationHistogramTrace = {
-                x: breakDurations,
+                x: breakDurationsMinutes,
                 type: 'histogram',
                 name: 'Break Duration Distribution',
                 marker: { color: 'rgb(153, 102, 255)' },
@@ -1522,6 +1581,85 @@
                 showlegend: false
             };
             Plotly.newPlot('breakDurationHistogram', [breakDurationHistogramTrace], breakDurationHistogramLayout);
+
+            // --- NEW: Daily Break Duration by Type (Stacked Bar Chart) ---
+            const breakDataByTypeSeconds = {}; // { break_type: { dateKey: totalDurationForTypeOnThatDayInSeconds } }
+            const allBreakTypes = new Set();
+
+            data.forEach(entry => {
+                const entryDate = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
+                const dateKey = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}-${String(entryDate.getDate()).padStart(2, '0')}`;
+
+                if (entry.break_stats && Array.isArray(entry.break_stats)) {
+                    entry.break_stats.forEach(b => {
+                        const type = b.break_type;
+                        allBreakTypes.add(type);
+
+                        if (!breakDataByTypeSeconds[type]) {
+                            breakDataByTypeSeconds[type] = {};
+                        }
+                        const durationSeconds = (b.values && b.values.length > 1 ? b.values[1] : 0);
+                        breakDataByTypeSeconds[type][dateKey] = (breakDataByTypeSeconds[type][dateKey] || 0) + durationSeconds;
+                    });
+                }
+            });
+
+            const sortedBreakTypes = Array.from(allBreakTypes).sort((a, b) => a - b);
+            
+            // Define a set of colors to use for different break types
+            const breakTypeColors = [
+                '#1f77b4', // blue
+                '#ff7f0e', // orange
+                '#2ca02c', // green
+                '#d62728', // red
+                '#9467bd', // purple
+                '#8c564b', // brown
+                '#e377c2', // pink
+                '#7f7f7f', // gray
+                '#bcbd22', // olive
+                '#17becf'  // cyan
+            ];
+
+            const breakTypeTraces = sortedBreakTypes.map(type => {
+                const yValuesMinutes = dates.map(date => { // `dates` array is already ISO-MM-DD strings
+                    const durationSeconds = breakDataByTypeSeconds[type] ? (breakDataByTypeSeconds[type][date] || 0) : 0;
+                    return durationSeconds / 60; // Convert to minutes for the chart
+                });
+                const typeName = BREAK_TYPE_NAMES[type] || `Type ${type}`;
+                // Use the predefined colors, cycling through them
+                const traceColor = breakTypeColors[type % breakTypeColors.length]; 
+                return {
+                    x: dates,
+                    y: yValuesMinutes,
+                    name: typeName,
+                    type: 'bar',
+                    marker: { color: traceColor },
+                    hovertemplate: `<b>%{x}</b><br>${typeName}: %{y:.2f} minutes<extra></extra>`
+                };
+            });
+
+            const breakTypeLayout = {
+                title: 'Daily Break Duration by Type (Minutes)',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                yaxis: {
+                    title: 'Minutes',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true
+                },
+                barmode: 'stack', // Important for stacking bars
+                ...commonLayoutProps
+            };
+
+            Plotly.newPlot('breakTypeStackedBarChart', breakTypeTraces, breakTypeLayout);
+            document.getElementById('breakTypeStackedBarChart').dataset.plotlyInitialised = 'true';
 
             // Removed plotly_relayout event listeners from individual charts as rangesliders are removed
         }
