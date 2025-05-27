@@ -3,283 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkRave Activity Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.min.js"></script>
-
+    <title>WorkRave Statistics</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 40px;
             background-color: #f4f4f4;
             color: #333;
+            text-align: center;
         }
-        .chart-container {
-            width: 80%; /* Adjust as needed */
-            max-width: 900px; /* Max width for readability */
-            margin: 20px auto;
-            padding: 20px;
+        .container {
             background-color: #fff;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block; /* To center the block */
+            max-width: 600px;
+            width: 100%;
         }
         h1 {
-            text-align: center;
-            color: #2c3e50;
+            color: #0056b3;
+            margin-bottom: 20px;
         }
-        canvas {
-            display: block; /* Ensures no extra space below canvas */
+        p {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .button-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        .button-link:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>WorkRave Daily Activity Dashboard</h1>
-
-    <div class="chart-container">
-        <h2>Daily Keystrokes</h2>
-        <canvas id="keystrokesChart"></canvas>
+    <div class="container">
+        <h1>Welcome to this WorkRave Statistics Dashboard</h1>
+        <p>
+            Explore daily computer usage, keystrokes, mouse movements, and break statistics.
+            The data is processed from a WorkRave historystats file and visualized using Plotly.js.
+        </p>
+        <a href="plotly_stats.html" class="button-link">View Statistics</a>
     </div>
-
-    <div class="chart-container">
-        <h2>Daily Mouse Clicks</h2>
-        <canvas id="mouseClicksChart"></canvas>
-    </div>
-
-    <div class="chart-container">
-        <h2>Break Compliance (Type 0)</h2>
-        <canvas id="breakComplianceChart"></canvas>
-    </div>
-
-    <script src="data_fetcher.js"></script>
-    <script>
-
-        async function renderCharts() {
-            const workRaveData = await fetchWorkRaveData();
-
-            // Filter for 'daily' entries and sort by date to ensure correct time series
-            const dailyEntries = workRaveData
-                .filter(entry => entry.type === 'daily' && entry.start_date)
-                .sort((a, b) => {
-                    const dateA = new Date(a.start_date.year, a.start_date.month - 1, a.start_date.day);
-                    const dateB = new Date(b.start_date.year, b.start_date.month - 1, b.start_date.day);
-                    return dateA - dateB;
-                });
-
-            if (dailyEntries.length === 0) {
-                document.body.innerHTML += "<p style='text-align: center;'>No daily WorkRave data with valid dates and activity stats to display.</p>";
-                return;
-            }
-
-            // --- Prepare Data for Chart.js ---
-            const labels = dailyEntries.map(entry => {
-                // Chart.js `time` scale can directly use Date objects or ISO strings
-                return new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
-            });
-
-            const keystrokesData = dailyEntries.map(entry =>
-                entry.activity_stats ? entry.activity_stats.keystrokes : 0
-            );
-
-            const mouseClicksData = dailyEntries.map(entry =>
-                entry.activity_stats ? entry.activity_stats.mouse_clicks : 0
-            );
-
-            // Example for break compliance (Type 0) - assuming 'total_taken' vs 'total_scheduled'
-            const breakComplianceData = dailyEntries.map(entry => {
-                const break0 = entry.break_stats.find(b => b.break_type === 0);
-                if (break0 && break0.values && break0.values[0] > 0) { // values[0] is total_scheduled
-                    return (break0.values[1] / break0.values[0]) * 100; // values[1] is total_taken
-                }
-                return 0; // Default if no data or no scheduled breaks
-            });
-
-
-            // --- Render Charts ---
-
-            // 1. Daily Keystrokes Chart (Line Chart)
-            new Chart(document.getElementById('keystrokesChart'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Keystrokes',
-                        data: keystrokesData,
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        tension: 0.1, // Smooth lines
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Daily Keystrokes Over Time'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                title: function(context) {
-                                    // Format date in tooltip title
-                                    return new Date(context[0].label).toLocaleDateString('en-US', {
-                                        year: 'numeric', month: 'long', day: 'numeric'
-                                    });
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time', // Use time scale for dates
-                            time: {
-                                unit: 'day',
-                                tooltipFormat: 'MMM d, yyyy',
-                                displayFormats: {
-                                    day: 'MMM d'
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Keystrokes'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 2. Daily Mouse Clicks Chart (Bar Chart)
-            new Chart(document.getElementById('mouseClicksChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Mouse Clicks',
-                        data: mouseClicksData,
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Daily Mouse Clicks'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                             callbacks: {
-                                title: function(context) {
-                                    return new Date(context[0].label).toLocaleDateString('en-US', {
-                                        year: 'numeric', month: 'long', day: 'numeric'
-                                    });
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day',
-                                tooltipFormat: 'MMM d, yyyy',
-                                displayFormats: {
-                                    day: 'MMM d'
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Clicks'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 3. Break Compliance Chart (Type 0)
-            new Chart(document.getElementById('breakComplianceChart'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Break 0 Compliance (%)',
-                        data: breakComplianceData,
-                        borderColor: 'rgb(54, 162, 235)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        tension: 0.1,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Daily Compliance for Break Type 0'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                             callbacks: {
-                                title: function(context) {
-                                    return new Date(context[0].label).toLocaleDateString('en-US', {
-                                        year: 'numeric', month: 'long', day: 'numeric'
-                                    });
-                                },
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.raw.toFixed(2)}%`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day',
-                                tooltipFormat: 'MMM d, yyyy',
-                                displayFormats: {
-                                    day: 'MMM d'
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            title: {
-                                display: true,
-                                text: 'Compliance Percentage'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Call the function to render charts when the page loads
-        renderCharts();
-    </script>
 </body>
 </html>
