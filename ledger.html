@@ -1,133 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arboreum Sovereign Ledger</title>
     <style>
-        :root {
-            --bg: #020617;
-            --card: #0f172a;
-            --accent: #38bdf8;
-            --danger: #f87171;
-            --text: #f8fafc;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Courier New', monospace;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 650px;
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 40px;
-            background: rgba(15, 23, 42, 0.9);
-            margin: auto;
-        }
-
-        .header {
-            text-align: center;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 30px;
-            margin-bottom: 30px;
-        }
-
-        .filing-date {
-            font-size: 2.8rem;
-            font-weight: 900;
-            color: var(--accent);
-            margin: 10px 0;
-        }
-
-        .ticker-wrap {
-            text-align: center;
-            padding: 40px;
-            border: 2px solid var(--accent);
-            border-radius: 8px;
-            background: #020617;
-            margin-bottom: 30px;
-        }
-
-        .big-number {
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: var(--danger);
-            margin: 15px 0;
-        }
-
-        .auth-zone {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        input {
-            background: #020617;
-            border: 1px solid var(--accent);
-            color: white;
-            padding: 15px;
-            border-radius: 4px;
-            width: 80%;
-            text-align: center;
-            font-family: inherit;
-            font-size: 1.1rem;
-        }
-
-        button {
-            background: var(--accent);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 4px;
-            font-weight: 900;
-            cursor: pointer;
-            margin-top: 20px;
-            color: var(--bg);
-            width: 85%;
-        }
-
-        #secure-content {
-            display: none;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        .value {
-            font-size: 1.3rem;
-            font-weight: 900;
-            width: 240px;
-            text-align: right;
-        }
-
-        footer {
-            width: 100%;
-            max-width: 650px;
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            opacity: 0.5;
-        }
+        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --danger: #f87171; --text: #f8fafc; }
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 650px; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; background: rgba(15, 23, 42, 0.9); margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .header { text-align: center; border-bottom: 1px solid #334155; padding-bottom: 30px; margin-bottom: 30px; }
+        .filing-date { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin: 10px 0; }
+        .statutory-basis { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid var(--danger); text-align: left; }
+        .law-link { color: var(--accent); text-decoration: none; font-size: 0.75rem; display: block; margin: 8px 0; }
+        .ticker-wrap { text-align: center; padding: 40px; border: 2px solid var(--accent); border-radius: 8px; background: #020617; margin-bottom: 30px; }
+        .big-number { font-size: 3.2rem; font-weight: 900; color: var(--danger); margin: 15px 0; }
+        .auth-zone { text-align: center; margin: 20px 0; }
+        input { background: #020617; border: 1px solid var(--accent); color: white; padding: 15px; border-radius: 4px; width: 85%; text-align: center; font-family: inherit; font-size: 1.1rem; }
+        button { background: var(--accent); border: none; padding: 12px 30px; border-radius: 4px; font-weight: 900; cursor: pointer; margin-top: 20px; color: var(--bg); width: 90%; }
+        #secure-content { display: none; width: 100%; margin-top: 20px; }
+        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #1e293b; }
+        .value { font-size: 1.3rem; font-weight: 900; width: 240px; text-align: right; }
+        footer { width: 100%; max-width: 650px; margin-top: 40px; display: flex; justify-content: space-between; font-size: 0.65rem; opacity: 0.5; line-height: 1.6; }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -136,15 +31,20 @@
             <div id="top-serial" style="opacity: 0.2;">SERIAL: [ENCRYPTED]</div>
         </div>
 
+        <div class="statutory-basis">
+            <div style="font-size: 0.7rem; font-weight: 900; color: var(--danger); margin-bottom: 10px;">STATUTORY BASIS</div>
+            <a class="law-link" href="https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB253" target="_blank">California SB 253: Corporate Data Accountability</a>
+            <a class="law-link" href="https://www.sec.gov/news/press-release/2024-31" target="_blank">SEC Climate Risk Disclosure Rule</a>
+        </div>
+
         <div class="ticker-wrap">
             <div id="total" class="big-number">$0</div>
-            <div style="font-size: 0.7rem; color: var(--accent); font-weight: 900;">AUDIT STATUS: ACTIVE NOTICE</div>
+            <div style="font-size: 0.7rem; color: var(--accent); font-weight: 900; letter-spacing: 1px;">AUDIT STATUS: ACTIVE NOTICE</div>
         </div>
 
         <div class="auth-zone" id="auth-box">
-            <input type="password" id="entry-key" placeholder="Enter Authorization Phrase"
-                onkeypress="handleKey(event)">
-            <br><button onclick="validate()">AUTHORIZE</button>
+            <input type="password" id="entry-key" placeholder="Enter Authorization Phrase" onkeypress="handleKey(event)">
+            <br><button id="auth-btn" onclick="validate()">AUTHORIZE ACCESS</button>
         </div>
 
         <div id="secure-content">
@@ -156,35 +56,36 @@
 
     <footer>
         <div><b>Arboreum Commercial Solutions</b><br>Patent Pending</div>
-        <div style="text-align: right;"><b>SOVEREIGN STANDARD</b><br>12.17.2025<br><span id="foot-serial">REF:
-                [LOCKED]</span></div>
+        <div style="text-align: right;"><b>SOVEREIGN STANDARD</b><br>12.17.2025<br><span id="foot-serial">REF: [LOCKED]</span></div>
     </footer>
 
     <script>
-        function handleKey(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                validate();
-            }
-        }
+        function handleKey(e) { if (e.keyCode === 13) { validate(); } }
 
         async function validate() {
             const val = document.getElementById('entry-key').value;
-            const targetHash = "022f9a2e4f1ec3e9b40693655fe3f2078d4cb64f78792604042404d41bf509c9";
+            const btn = document.getElementById('auth-btn');
+            
+            // SHA-256 for: Arboreum-Waste-To-Wealth-2026
+            const targetHash = "a7e78049757754988753239a5f36e8b28f80430f808605c08643881457189178";
+            
+            try {
+                const msgUint8 = new TextEncoder().encode(val);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-            const msgUint8 = new TextEncoder().encode(val);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            if (hashHex === targetHash) {
-                document.getElementById('auth-box').style.display = 'none';
-                document.getElementById('secure-content').style.display = 'block';
-                document.getElementById('top-serial').innerText = "SERIAL: ";
-                document.getElementById('top-serial').style.opacity = "1";
-                document.getElementById('foot-serial').innerText = "REF: ";
-            } else {
-                alert("Fiduciary Authorization Required");
+                if(hashHex === targetHash) {
+                    document.getElementById('auth-box').style.display = 'none';
+                    document.getElementById('secure-content').style.display = 'block';
+                    document.getElementById('top-serial').innerText = "SERIAL: ";
+                    document.getElementById('top-serial').style.opacity = "1";
+                    document.getElementById('foot-serial').innerText = "REF: ";
+                } else {
+                    alert("Authorization Required");
+                }
+            } catch (err) {
+                alert("Security Error: Please access via HTTPS (GitHub Pages) to enable encryption.");
             }
         }
 
@@ -197,5 +98,4 @@
         }, 200);
     </script>
 </body>
-
 </html>
