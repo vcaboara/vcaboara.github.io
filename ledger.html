@@ -35,16 +35,17 @@
             <div style="font-size: 0.7rem; font-weight: 900; color: var(--danger); margin-bottom: 10px;">STATUTORY BASIS</div>
             <a class="law-link" href="https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB253" target="_blank">California SB 253: Corporate Data Accountability</a>
             <a class="law-link" href="https://www.sec.gov/news/press-release/2024-31" target="_blank">SEC Climate Risk Disclosure Rule</a>
+            <a class="law-link" href="https://finance.ec.europa.eu/capital-markets-union-and-financial-services/corporate-governance-and-editorial-policies/corporate-sustainability-due-diligence_en" target="_blank">EU Corporate Sustainability Directive</a>
         </div>
 
         <div class="ticker-wrap">
             <div id="total" class="big-number">$0</div>
-            <div style="font-size: 0.7rem; color: var(--accent); font-weight: 900; letter-spacing: 1px;">AUDIT STATUS: ACTIVE NOTICE</div>
+            <div style="font-size: 0.7rem; color: var(--accent); font-weight: 900;">AUDIT STATUS: ACTIVE NOTICE LOGGED</div>
         </div>
 
         <div class="auth-zone" id="auth-box">
             <input type="password" id="entry-key" placeholder="Enter Authorization Phrase" onkeypress="handleKey(event)">
-            <br><button id="auth-btn" onclick="validate()">AUTHORIZE ACCESS</button>
+            <br><button id="auth-btn" onclick="validate()">AUTHORIZE FIDUCIARY ACCESS</button>
         </div>
 
         <div id="secure-content">
@@ -64,9 +65,7 @@
 
         async function validate() {
             const val = document.getElementById('entry-key').value;
-            const btn = document.getElementById('auth-btn');
-            
-            // SHA-256 for: Arboreum-Waste-To-Wealth-2026
+            // SHA-256 Fingerprint for: Arboreum-Waste-To-Wealth-2026
             const targetHash = "a7e78049757754988753239a5f36e8b28f80430f808605c08643881457189178";
             
             try {
@@ -82,7 +81,7 @@
                     document.getElementById('top-serial').style.opacity = "1";
                     document.getElementById('foot-serial').innerText = "REF: ";
                 } else {
-                    alert("Authorization Required");
+                    alert("Fiduciary Authorization Required");
                 }
             } catch (err) {
                 alert("Security Error: Please access via HTTPS (GitHub Pages) to enable encryption.");
