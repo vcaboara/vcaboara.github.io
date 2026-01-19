@@ -170,8 +170,7 @@
 
         async function validate() {
             const val = document.getElementById('entry-key').value;
-            // The SHA-256 Fingerprint for "Arboreum-Waste-To-Wealth-2026"
-            const targetHash = "a7e78049757754988753239a5f36e8b28f80430f808605c08643881457189178";
+            const targetHash = "022f9a2e4f1ec3e9b40693655fe3f2078d4cb64f78792604042404d41bf509c9";
 
             const msgUint8 = new TextEncoder().encode(val);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
