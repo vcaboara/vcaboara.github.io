@@ -61,39 +61,45 @@
     </footer>
 
     <script>
-        function handleKey(e) { if (e.keyCode === 13) { validate(); } }
+    function handleKey(e) { if (e.keyCode === 13) { validate(); } }
 
-        async function validate() {
-            const val = document.getElementById('entry-key').value;
-            const targetHash = "2d06f1d2f782c5f10b7842e4313f885e783861274531980f43501f2129038456";
-            
-            try {
-                const msgUint8 = new TextEncoder().encode(val);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    async function validate() {
+        const val = document.getElementById('entry-key').value;
+        const btn = document.getElementById('auth-btn');
+        const targetHash = "57f586940026e9526e089201a4736f3312c49e2954a73752762a63289069677e";
+        
+        try {
+            const msgUint8 = new TextEncoder().encode(val);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-                if(hashHex === targetHash) {
-                    document.getElementById('auth-box').style.display = 'none';
-                    document.getElementById('secure-content').style.display = 'block';
-                    document.getElementById('top-serial').innerText = "SERIAL: ";
-                    document.getElementById('top-serial').style.opacity = "1";
-                    document.getElementById('foot-serial').innerText = "REF: ";
-                } else {
-                    alert("Authorization Required");
-                }
-            } catch (err) {
-                alert("Security Error: Access via HTTPS required.");
+            // Logging for your parallel work (F12 to see)
+            console.log("Input Hash:", hashHex);
+
+            if(hashHex === targetHash) {
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('secure-content').style.display = 'block';
+                document.getElementById('top-serial').innerText = "SERIAL: ";
+                document.getElementById('top-serial').style.opacity = "1";
+                document.getElementById('foot-serial').innerText = "REF: ";
+            } else {
+                alert("Authorization Required");
             }
+        } catch (err) {
+            console.error(err);
+            alert("Security Error: Ensure you are on HTTPS.");
         }
+    }
 
-        setInterval(() => {
-            const base = ((new Date() - new Date('2025-12-17T09:00:00')) / 1000) * 1060;
-            document.getElementById('total').innerText = "$" + Math.floor(base).toLocaleString();
-            document.getElementById('v1').innerText = "$" + Math.floor(base * 0.58).toLocaleString();
-            document.getElementById('v2').innerText = "$" + Math.floor(base * 0.22).toLocaleString();
-            document.getElementById('v3').innerText = "$" + Math.floor(base * 0.20).toLocaleString();
-        }, 200);
-    </script>
+    // The Ticker Logic (200ms Lazy Roll)
+    setInterval(() => {
+        const base = ((new Date() - new Date('2025-12-17T09:00:00')) / 1000) * 1060;
+        document.getElementById('total').innerText = "$" + Math.floor(base).toLocaleString();
+        document.getElementById('v1').innerText = "$" + Math.floor(base * 0.58).toLocaleString();
+        document.getElementById('v2').innerText = "$" + Math.floor(base * 0.22).toLocaleString();
+        document.getElementById('v3').innerText = "$" + Math.floor(base * 0.20).toLocaleString();
+    }, 200);
+</script>
 </body>
 </html>
