@@ -161,7 +161,12 @@
     </footer>
 
     <script>
-        function handleKey(e) { if (e.keyCode === 13) { validate(); } }
+        function handleKey(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                validate();
+            }
+        }
 
         async function validate() {
             const val = document.getElementById('entry-key').value;
