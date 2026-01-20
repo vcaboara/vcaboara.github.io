@@ -20,7 +20,7 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Courier New', monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -166,13 +166,33 @@
         }
 
         .section-divider {
-            color: var(--slate);
-            font-size: 0.75em;
+            color: var(--high-vis);
+            font-size: 0.8em;
             text-transform: uppercase;
             letter-spacing: 2px;
             padding: 10px 15px;
             background: #0d1117;
             border-bottom: 1px solid var(--border);
+        }
+
+        .subsection-details {
+            border: none;
+            margin: 0;
+            background: transparent;
+        }
+
+        .subsection-details summary {
+            padding: 10px 15px;
+            color: var(--high-vis);
+            font-size: 0.8em;
+            background: #0d1117;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subsection-details[open] summary {
+            border-bottom: none;
         }
 
         .patent-mark {
@@ -321,17 +341,37 @@
             document.getElementById('main-counter').innerText = "$" + totalLiability.toLocaleString('en-US');
 
             const logBody = document.getElementById('notice-log');
-            let html = '<tr class="section-divider"><td colspan="3">U.S. Federal Agencies</td></tr>';
+            let html = `
+                <tr><td colspan="3" style="padding: 0;">
+                    <details class="subsection-details" open>
+                        <summary>U.S. Federal Agencies</summary>
+                        <table style="width: 100%; border-collapse: collapse;">`;
             US_FEDERAL.forEach(e => html += createRow(e, now));
+            html += `</table></details></td></tr>`;
 
-            html += '<tr class="section-divider"><td colspan="3">U.S. Commercial Entities</td></tr>';
+            html += `
+                <tr><td colspan="3" style="padding: 0;">
+                    <details class="subsection-details" open>
+                        <summary>U.S. Commercial Entities</summary>
+                        <table style="width: 100%; border-collapse: collapse;">`;
             US_COMMERCIAL.forEach(e => html += createRow(e, now));
+            html += `</table></details></td></tr>`;
 
-            html += '<tr class="section-divider"><td colspan="3">Global & EU Entities</td></tr>';
+            html += `
+                <tr><td colspan="3" style="padding: 0;">
+                    <details class="subsection-details" open>
+                        <summary>Global & EU Entities</summary>
+                        <table style="width: 100%; border-collapse: collapse;">`;
             GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now));
+            html += `</table></details></td></tr>`;
 
-            html += '<tr class="section-divider"><td colspan="3">ACS Forensic Evidence Logs</td></tr>';
+            html += `
+                <tr><td colspan="3" style="padding: 0;">
+                    <details class="subsection-details" open>
+                        <summary>ACS Forensic Evidence Logs</summary>
+                        <table style="width: 100%; border-collapse: collapse;">`;
             ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now));
+            html += `</table></details></td></tr>`;
 
             logBody.innerHTML = html;
         }
