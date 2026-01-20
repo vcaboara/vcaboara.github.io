@@ -147,6 +147,19 @@
             color: var(--blue);
             text-transform: uppercase;
             background: rgba(88, 166, 255, 0.05);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        th .sort-indicator {
+            font-size: 0.7em;
+            margin-left: 5px;
+            color: var(--red);
         }
 
         .entity-val {
@@ -246,9 +259,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Target Entity</th>
-                        <th>Notice/Change Date</th>
-                        <th>Accrued Fine (USD)</th>
+                        <th data-sort-by="entity" onclick="sortTable('entity')">Target Entity<span class="sort-indicator"></span></th>
+                        <th data-sort-by="date" onclick="sortTable('date')">Notice/Change Date<span class="sort-indicator"></span></th>
+                        <th data-sort-by="fine" onclick="sortTable('fine')">Accrued Fine (USD)<span class="sort-indicator"></span></th>
                     </tr>
                 </thead>
                 <tbody id="notice-log">
@@ -268,6 +281,10 @@
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
 
         const GROWTH_RATE = 612.45;
+
+        // Sort state management
+        let currentSortColumn = null;
+        let sortDirection = 'asc'; // 'asc' or 'desc'
 
         const US_FEDERAL = [
             { id: 'USDA', date: JAN_1_ANCHOR, base: 250000000 },
@@ -313,7 +330,7 @@
             document.getElementById('x1-btn').classList.toggle('active', m === 1);
             document.getElementById('x3-btn').classList.toggle('active', m === 3);
             document.getElementById('liability-label').innerText = `Total Accrued Statutory Liability (${m}x)`;
-            updateLedger();
+            buildTable();
         }
 
         function createRow(e, now, section) {
@@ -340,6 +357,74 @@
             buildTable();
         };
 
+        window.sortTable = function (column) {
+            if (currentSortColumn === column) {
+                // Toggle direction if clicking the same column
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                // New column, default to ascending
+                currentSortColumn = column;
+                sortDirection = 'asc';
+            }
+            
+            // Update visual indicators
+            updateSortIndicators();
+            
+            // Rebuild table with sorting
+            buildTable();
+        };
+
+        function updateSortIndicators() {
+            // Clear all indicators
+            document.querySelectorAll('.sort-indicator').forEach(ind => ind.textContent = '');
+            
+            // Set indicator for current sort column
+            if (currentSortColumn) {
+                const header = document.querySelector(`th[data-sort-by="${currentSortColumn}"] .sort-indicator`);
+                if (header) {
+                    header.textContent = sortDirection === 'asc' ? ' ▲' : ' ▼';
+                }
+            }
+        }
+
+        function sortEntities(entities, now) {
+            if (!currentSortColumn) return entities;
+            
+            const sorted = [...entities];
+            
+            sorted.sort((a, b) => {
+                let aVal, bVal;
+                
+                if (currentSortColumn === 'entity') {
+                    // Alphabetical sort by entity id
+                    aVal = a.id.toLowerCase();
+                    bVal = b.id.toLowerCase();
+                    const comparison = aVal.localeCompare(bVal);
+                    return sortDirection === 'asc' ? comparison : -comparison;
+                } else if (currentSortColumn === 'date') {
+                    // Date sort
+                    aVal = new Date(a.date).getTime();
+                    bVal = new Date(b.date).getTime();
+                    const comparison = aVal - bVal;
+                    return sortDirection === 'asc' ? comparison : -comparison;
+                } else if (currentSortColumn === 'fine') {
+                    // Numerical sort by calculated fine
+                    const aNoticeTime = new Date(a.date).getTime();
+                    const bNoticeTime = new Date(b.date).getTime();
+                    const aElapsed = Math.max(0, (now - aNoticeTime) / 1000);
+                    const bElapsed = Math.max(0, (now - bNoticeTime) / 1000);
+                    aVal = Math.floor((a.base + (aElapsed * 50)) * multiplier);
+                    bVal = Math.floor((b.base + (bElapsed * 50)) * multiplier);
+                    const comparison = aVal - bVal;
+                    return sortDirection === 'asc' ? comparison : -comparison;
+                }
+                
+                return 0;
+            });
+            
+            return sorted;
+        }
+
         function createRow(e, now, section) {
             const noticeTime = new Date(e.date).getTime();
             const elapsed = Math.max(0, (now - noticeTime) / 1000);
@@ -362,31 +447,38 @@
             const fedCollapsed = window.collapsedSections.has('federal');
             html += `<tr class="section-divider ${fedCollapsed ? 'collapsed' : ''}" data-section-header="federal" onclick="toggleSection('federal')"><td colspan="3">U.S. Federal Agencies</td></tr>`;
             if (!fedCollapsed) {
-                US_FEDERAL.forEach(e => html += createRow(e, now, 'federal'));
+                const sortedFederal = sortEntities(US_FEDERAL, now);
+                sortedFederal.forEach(e => html += createRow(e, now, 'federal'));
             }
 
             // U.S. Commercial
             const comCollapsed = window.collapsedSections.has('commercial');
             html += `<tr class="section-divider ${comCollapsed ? 'collapsed' : ''}" data-section-header="commercial" onclick="toggleSection('commercial')"><td colspan="3">U.S. Commercial Entities</td></tr>`;
             if (!comCollapsed) {
-                US_COMMERCIAL.forEach(e => html += createRow(e, now, 'commercial'));
+                const sortedCommercial = sortEntities(US_COMMERCIAL, now);
+                sortedCommercial.forEach(e => html += createRow(e, now, 'commercial'));
             }
 
             // Global & EU
             const globalCollapsed = window.collapsedSections.has('global');
             html += `<tr class="section-divider ${globalCollapsed ? 'collapsed' : ''}" data-section-header="global" onclick="toggleSection('global')"><td colspan="3">Global & EU Entities</td></tr>`;
             if (!globalCollapsed) {
-                GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now, 'global'));
+                const sortedGlobal = sortEntities(GLOBAL_EU_ENTITIES, now);
+                sortedGlobal.forEach(e => html += createRow(e, now, 'global'));
             }
 
             // Forensic
             const forensicCollapsed = window.collapsedSections.has('forensic');
             html += `<tr class="section-divider ${forensicCollapsed ? 'collapsed' : ''}" data-section-header="forensic" onclick="toggleSection('forensic')"><td colspan="3">ACS Forensic Evidence Logs</td></tr>`;
             if (!forensicCollapsed) {
-                ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now, 'forensic'));
+                const sortedForensic = sortEntities(ACS_FORENSIC_LOGS, now);
+                sortedForensic.forEach(e => html += createRow(e, now, 'forensic'));
             }
 
             logBody.innerHTML = html;
+            
+            // Update sort indicators after table is built
+            updateSortIndicators();
         }
 
         function updateValues() {
