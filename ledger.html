@@ -25,37 +25,7 @@
             margin: 0;
         }
 
-        #auth-gate {
-            text-align: center;
-            background: var(--card);
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        input {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            width: 250px;
-            margin-bottom: 15px;
-        }
-
-        button {
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
         #ledger-content {
-            display: none;
             width: 95%;
             max-width: 900px;
             background: var(--card);
@@ -129,13 +99,6 @@
 
 <body>
 
-    <div id="auth-gate">
-        <h2 style="color: var(--blue);">ACS Sovereign Access</h2>
-        <input type="password" id="passInput" placeholder="Sovereign Key">
-        <br>
-        <button onclick="handleLogin()">Unlock Ledger</button>
-    </div>
-
     <div id="ledger-content">
         <div class="header">
             <p style="letter-spacing: 3px; font-size: 0.7em; color: #8b949e; margin: 0;">FEDERAL PRIORITY ANCHOR</p>
@@ -184,33 +147,6 @@
     </div>
 
     <script>
-        const M_H = "8ec9c4f4be2b0167c1303866416f5c5031b782970717208d2703130d7b692518";
-
-        async function h(p) {
-            const e = new TextEncoder();
-            const d = e.encode(p);
-            const b = await crypto.subtle.digest('SHA-256', d);
-            const a = Array.from(new Uint8Array(b));
-            return a.map(x => x.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function handleLogin() {
-            const p = document.getElementById('passInput').value;
-            if (await h(p) === M_H) { u(); } else { alert("Access Denied."); }
-        }
-
-        function u() {
-            document.getElementById('auth-gate').style.display = 'none';
-            document.getElementById('ledger-content').style.display = 'block';
-            s();
-        }
-
-        window.onload = async () => {
-            const params = new URLSearchParams(window.location.search);
-            const k = params.get('key');
-            if (k && await h(k) === M_H) { u(); }
-        };
-
         // Logarithmic Growth Formula Constants
         const SUPPLY_CHAIN_DELTA = 0.30; // 30% supply chain delta
         const TIMBER_DESTRUCTION_RATE = 5.42; // $5.42/second timber asset destruction
@@ -219,7 +155,7 @@
         let t = BASE_LIABILITY;
         let startTime = Date.now();
 
-        function s() {
+        function startCounter() {
             setInterval(() => {
                 // Calculate elapsed time in seconds
                 const elapsedSeconds = (Date.now() - startTime) / 1000;
@@ -234,6 +170,11 @@
                 document.getElementById('main-counter').innerText = '$' + t.toLocaleString(undefined, { minimumFractionDigits: 2 });
             }, 1000);
         }
+
+        // Start counter when page loads
+        window.onload = () => {
+            startCounter();
+        };
     </script>
 </body>
 
