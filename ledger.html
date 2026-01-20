@@ -1,28 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Arboreum Commercial Solutions | Sovereign Ledger</title>
     <style>
-        :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --blue: #58a6ff; --red: #ff7b72; --text: #c9d1d9; }
-        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        
-        #auth-gate { text-align: center; background: var(--card); padding: 40px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { background: var(--bg); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 6px; width: 250px; margin-bottom: 15px; }
-        button { background: #238636; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --blue: #58a6ff;
+            --red: #ff7b72;
+            --text: #c9d1d9;
+        }
 
-        #ledger-content { display: none; width: 95%; max-width: 900px; background: var(--card); padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-        .header { text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
-        .priority-box { border: 2px solid var(--blue); border-radius: 12px; padding: 25px; margin-bottom: 30px; text-align: center; background: rgba(88, 166, 255, 0.05); }
-        .liability-text { font-size: 3.5em; color: var(--red); font-weight: bold; font-family: 'Courier New', monospace; }
-        
-        details { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 15px; padding: 15px; }
-        summary { color: var(--blue); font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9em; color: #8b949e; }
-        .val { color: var(--text); font-family: monospace; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #auth-gate {
+            text-align: center;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            width: 250px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #ledger-content {
+            display: none;
+            width: 95%;
+            max-width: 900px;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .priority-box {
+            border: 2px solid var(--blue);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .liability-text {
+            font-size: 3.5em;
+            color: var(--red);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        details {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+
+        summary {
+            color: var(--blue);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9em;
+            color: #8b949e;
+        }
+
+        .val {
+            color: var(--text);
+            font-family: monospace;
+        }
     </style>
 </head>
+
 <body>
 
     <div id="auth-gate">
@@ -48,22 +152,40 @@
         <details>
             <summary>DETAILED ENTITY INVENTORY & NOTICE LOG <span>[+]</span></summary>
             <table>
-                <tr><th>Entity ID</th><th>Notice Date</th><th>Liability Status</th></tr>
-                <tr><td>Timber Corp A</td><td>PENDING</td><td class="val" id="timber-count">$0.00</td></tr>
-                <tr><td>Waste Mgmt B</td><td>PENDING</td><td class="val" id="waste-count">$0.00</td></tr>
-                <tr><td>Local Rep A</td><td>Jan 13, 2026</td><td class="val">$3,500,000.00</td></tr>
+                <tr>
+                    <th>Entity ID</th>
+                    <th>Notice Date</th>
+                    <th>Liability Status</th>
+                </tr>
+                <tr>
+                    <td>Timber Corp A</td>
+                    <td>PENDING</td>
+                    <td class="val" id="timber-count">$0.00</td>
+                </tr>
+                <tr>
+                    <td>Waste Mgmt B</td>
+                    <td>PENDING</td>
+                    <td class="val" id="waste-count">$0.00</td>
+                </tr>
+                <tr>
+                    <td>Local Rep A</td>
+                    <td>Jan 13, 2026</td>
+                    <td class="val">$3,500,000.00</td>
+                </tr>
             </table>
         </details>
 
-        <div style="font-size: 0.8em; color: #8b949e; margin-top: 30px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
+        <div
+            style="font-size: 0.8em; color: #8b949e; margin-top: 30px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
             <p>Arboreum Commercial Solutions | Arboreum Impact Foundation</p>
-            <p>Patent Pending | Data-Backed Restoration Mandate</p>
+            <p><a href="legal.html" style="color: var(--blue); text-decoration: none;">Patent Pending</a> | Data-Backed
+                Restoration Mandate</p>
         </div>
     </div>
 
     <script>
-        const M_H = "8ec9c4f4be2b0167c1303866416f5c5031b782970717208d2703130d7b692518"; 
-        
+        const M_H = "8ec9c4f4be2b0167c1303866416f5c5031b782970717208d2703130d7b692518";
+
         async function h(p) {
             const e = new TextEncoder();
             const d = e.encode(p);
@@ -89,13 +211,30 @@
             if (k && await h(k) === M_H) { u(); }
         };
 
-        let t = 3101490187.00;
+        // Logarithmic Growth Formula Constants
+        const SUPPLY_CHAIN_DELTA = 0.30; // 30% supply chain delta
+        const TIMBER_DESTRUCTION_RATE = 5.42; // $5.42/second timber asset destruction
+        const BASE_LIABILITY = 3101490187.00;
+
+        let t = BASE_LIABILITY;
+        let startTime = Date.now();
+
         function s() {
             setInterval(() => {
-                t += 1.47; 
-                document.getElementById('main-counter').innerText = '$' + t.toLocaleString(undefined, {minimumFractionDigits: 2});
+                // Calculate elapsed time in seconds
+                const elapsedSeconds = (Date.now() - startTime) / 1000;
+
+                // Logarithmic growth formula:
+                // Total = Base × (1 + delta × ln(1 + time)) + (destruction_rate × time)
+                const logarithmicGrowth = BASE_LIABILITY * (1 + SUPPLY_CHAIN_DELTA * Math.log(1 + elapsedSeconds));
+                const timberDestruction = TIMBER_DESTRUCTION_RATE * elapsedSeconds;
+
+                t = logarithmicGrowth + timberDestruction;
+
+                document.getElementById('main-counter').innerText = '$' + t.toLocaleString(undefined, { minimumFractionDigits: 2 });
             }, 1000);
         }
     </script>
 </body>
+
 </html>
