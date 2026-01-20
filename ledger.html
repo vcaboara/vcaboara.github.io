@@ -82,12 +82,13 @@
             border: 1px solid var(--border);
             border-left: 4px solid var(--blue);
             border-radius: 8px;
-            padding: 15px;
-            font-size: 0.85em;
+            padding: 20px;
+            font-size: 0.9em;
+            line-height: 1.4;
         }
 
-        .stat-basis-card b { color: var(--blue); display: block; margin-bottom: 5px; }
-        .stat-basis-card a { color: var(--blue); text-decoration: underline; }
+        .stat-basis-card b { color: var(--blue); display: block; margin-bottom: 8px; font-size: 1.1em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+        .stat-basis-card a { color: var(--blue); text-decoration: underline; font-weight: bold; }
 
         .eu-fine-box {
             background: rgba(188, 140, 255, 0.05);
@@ -169,17 +170,18 @@
         <div class="stat-grid">
             <div class="stat-basis-card">
                 <b>Provisional Rights</b>
-                <a href="https://www.law.cornell.edu/uscode/text/35/154" target="_blank">35 U.S.C. § 154(d)</a>
-                Liability begins at Actual Notice of published claims. 
+                <a href="https://www.law.cornell.edu/uscode/text/35/154" target="_blank">35 U.S.C. § 154(d)</a><br>
+                Grants right to reasonable royalties from publication date. Notice triggers liability for all "substantially identical" infringing acts.
             </div>
             <div class="stat-basis-card">
                 <b>Bioeconomy Mandate</b>
-                <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO Directive</a>
-                Compliance required for federal grant/license recipients.
+                <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO FY2026</a><br>
+                Mandates 1B+ tons of biomass production. Failure to adopt carbon-negative standards constitutes a breach of federal sustainability directives.
             </div>
             <div class="stat-basis-card">
                 <b>Sovereign Assignment</b>
-                85% of ACS Licensing proceeds are irrevocably assigned to the Arboreum Impact Foundation.
+                <b>Irrevocable Trust</b><br>
+                85% of ACS Licensing proceeds are assigned to the Arboreum Impact Foundation for the benefit of Sacred Land, Veterans, and Orphans.
             </div>
         </div>
 
@@ -235,10 +237,9 @@
     <script>
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
-        const GROWTH_RATE = 54245; // Global entropy rate per second
-        const EU_GROWTH_RATE = 12450; // EU-specific ESG penalties per second
+        const GROWTH_RATE = 54245; 
+        const EU_GROWTH_RATE = 12450; 
 
-        // Comprehensive Entity Notice Data (BCCs + Bounces Included)
         const entities = [
             { id: 'USDA', date: JAN_1_ANCHOR, base: 50000000 },
             { id: 'DOE', date: JAN_1_ANCHOR, base: 75000000 },
@@ -252,18 +253,20 @@
             { id: 'CSO - GSK', date: '2026-01-16T09:00:00Z', base: 72000000 },
             { id: 'CSO - Novartis', date: '2026-01-16T11:00:00Z', base: 88000000 },
             { id: 'CSO - Roche', date: '2026-01-17T08:00:00Z', base: 92000000 },
-            { id: 'CSO - Sanofi (Bounce Back)', date: '2026-01-17T08:15:00Z', base: 55000000, bounce: true },
+            { id: 'CSO - Sanofi', date: '2026-01-17T08:15:00Z', base: 55000000, bounce: true },
             { id: 'CSO - AstraZ', date: '2026-01-18T12:00:00Z', base: 105000000 },
             { id: 'CSO - Bayer', date: '2026-01-18T13:00:00Z', base: 60000000 },
             { id: 'CSO - Amgen', date: '2026-01-19T10:00:00Z', base: 40000000 },
             { id: 'CSO - Eli Lilly', date: '2026-01-19T14:00:00Z', base: 130000000 },
+            { id: 'CSO - Johnson & Johnson', date: '2026-01-14T09:00:00Z', base: 125000000 },
+            { id: 'CSO - Bristol Myers Squibb', date: '2026-01-14T11:30:00Z', base: 82000000 },
+            { id: 'CSO - Gilead Sciences', date: '2026-01-14T15:45:00Z', base: 48000000 },
+            { id: 'CSO - Moderna', date: '2026-01-14T16:20:00Z', base: 38000000 },
             { id: 'Local Rep', date: '2026-01-13T09:00:00Z', base: 3500000 }
         ];
 
         function updateLedger() {
             const now = Date.now();
-            
-            // Global Liabilities
             const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
             const aggregateLiability = Math.floor(secondsSincePriority * GROWTH_RATE);
             const euLiability = Math.floor(secondsSincePriority * EU_GROWTH_RATE);
@@ -284,7 +287,7 @@
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${e.id} ${e.bounce ? '<span class="bounce-pill">RE-SEND REQ</span>' : ''}</td>
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-pill">BOUNCE - RE-SEND</span>' : ''}</td>
                     <td>${new Date(noticeTime).toLocaleDateString()}</td>
                     <td>
                         ${e.status ? `<span class="status-pill">${e.status}</span>` : 
