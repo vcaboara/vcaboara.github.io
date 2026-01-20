@@ -1,105 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arboreum Sovereign Ledger</title>
-    <style>
-        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --danger: #f87171; --text: #f8fafc; }
-        body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 650px; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; background: rgba(15, 23, 42, 0.9); margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        .header { text-align: center; border-bottom: 1px solid #334155; padding-bottom: 30px; margin-bottom: 30px; }
-        .filing-date { font-size: 2.8rem; font-weight: 900; color: var(--accent); margin: 10px 0; }
-        .statutory-basis { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid var(--danger); text-align: left; }
-        .law-link { color: var(--accent); text-decoration: none; font-size: 0.75rem; display: block; margin: 8px 0; }
-        .ticker-wrap { text-align: center; padding: 40px; border: 2px solid var(--accent); border-radius: 8px; background: #020617; margin-bottom: 30px; }
-        .big-number { font-size: 3.5rem; font-weight: 900; color: var(--danger); margin: 15px 0; }
-        .auth-zone { text-align: center; margin: 20px 0; }
-        input { background: #020617; border: 1px solid var(--accent); color: white; padding: 15px; border-radius: 4px; width: 85%; text-align: center; font-family: inherit; font-size: 1.1rem; }
-        button { background: var(--accent); border: none; padding: 12px 30px; border-radius: 4px; font-weight: 900; cursor: pointer; margin-top: 20px; color: var(--bg); width: 90%; }
-        #secure-content { display: none; width: 100%; margin-top: 20px; }
-        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #1e293b; }
-        .value { font-size: 1.35rem; font-weight: 900; width: 260px; text-align: right; }
-        footer { width: 100%; max-width: 650px; margin-top: 40px; display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.5; line-height: 1.6; }
-    </style>
+<style>
+  table { width: 100%; border-collapse: collapse; font-family: sans-serif; }
+  th, td { border: 1px solid #333; padding: 12px; text-align: left; }
+  th { background-color: #f2f2f2; }
+  .willful { background-color: #ffcccc; color: #900; font-weight: bold; }
+  .pending { background-color: #fffde0; }
+  .sovereign { background-color: #e0f7fa; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div style="font-size: 0.75rem; letter-spacing: 5px; opacity: 0.6;">FEDERAL PRIORITY ANCHOR</div>
-            <div class="filing-date">FILED: 12/17/2025</div>
-            <div id="top-serial" style="opacity: 0.2;">SERIAL: [ENCRYPTED]</div>
-        </div>
 
-        <div class="statutory-basis">
-            <div style="font-size: 0.7rem; font-weight: 900; color: var(--danger); margin-bottom: 10px; letter-spacing: 1px;">STATUTORY BASIS</div>
-            <a class="law-link" href="https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB253" target="_blank">California SB 253: Corporate Data Accountability</a>
-            <a class="law-link" href="https://www.sec.gov/news/press-release/2024-31" target="_blank">SEC Climate Risk Disclosure Rule</a>
-            <a class="law-link" href="https://finance.ec.europa.eu/capital-markets-union-and-financial-services/corporate-governance-and-editorial-policies/corporate-sustainability-due-diligence_en" target="_blank">EU Corporate Sustainability Directive</a>
-        </div>
+<h2>ACS / AIF Global Liability Ledger (2026)</h2>
 
-        <div class="ticker-wrap">
-            <div id="total" class="big-number">$0</div>
-            <div style="font-size: 0.8rem; color: var(--accent); font-weight: 900; letter-spacing: 1px;">AUDIT STATUS: ACTIVE NOTICE</div>
-        </div>
+<table>
+  <tr>
+    <th>Entity ID</th>
+    <th>Category</th>
+    <th>Notice Date</th>
+    <th>Current Status</th>
+    <th>Liability Delta</th>
+  </tr>
+  <tr class="willful">
+    <td>Target-A1</td>
+    <td>Local Representative</td>
+    <td>Jan 13, 2026</td>
+    <td>Evasion / Fire Alarm</td>
+    <td>$500k/day (Accumulating)</td>
+  </tr>
+  <tr class="pending">
+    <td>Target-A2</td>
+    <td>Regional Banking</td>
+    <td>Jan 13, 2026</td>
+    <td>Constructive Notice (CBB)</td>
+    <td>TBD (Verification Stage)</td>
+  </tr>
+  <tr class="sovereign">
+    <td>Target-B1</td>
+    <td>Timber Corp (Lumber)</td>
+    <td>Jan 20, 2026</td>
+    <td>Actual Notice Sent</td>
+    <td>15% Licensing / 70% AIF</td>
+  </tr>
+  <tr class="sovereign">
+    <td>Target-B2</td>
+    <td>Waste Mgmt (Headend)</td>
+    <td>Jan 20, 2026</td>
+    <td>Actual Notice Sent</td>
+    <td>15% Licensing / 70% AIF</td>
+  </tr>
+  <tr class="pending">
+    <td>Target-C1</td>
+    <td>Debt Servicer</td>
+    <td>Jan 20, 2026</td>
+    <td>Actual Notice Sent</td>
+    <td>Debt-for-License Offset</td>
+  </tr>
+</table>
 
-        <div class="auth-zone" id="auth-box">
-            <input type="password" id="entry-key" placeholder="Enter Authorization Phrase" onkeypress="handleKey(event)">
-            <br><button id="auth-btn" onclick="validate()">AUTHORIZE FIDUCIARY ACCESS</button>
-        </div>
+<p><em>*All entries subject to 70% persistence penalty upon secondary notice.</em></p>
+<p>Patent Pending</p>
 
-        <div id="secure-content">
-            <div class="data-row"><span>Industrial Timber Fines</span><span class="value" id="v1">$0</span></div>
-            <div class="data-row"><span>Municipal Waste Penalties</span><span class="value" id="v2">$0</span></div>
-            <div class="data-row"><span>Compliance Leakage</span><span class="value" id="v3">$0</span></div>
-        </div>
-    </div>
-
-    <footer>
-        <div><b>Arboreum Commercial Solutions</b><br>Patent Pending</div>
-        <div style="text-align: right;"><b>SOVEREIGN STANDARD</b><br>12.17.2025<br><span id="foot-serial">REF: [LOCKED]</span></div>
-    </footer>
-
-    <script>
-    function handleKey(e) { if (e.keyCode === 13) { validate(); } }
-
-    async function validate() {
-        const val = document.getElementById('entry-key').value;
-        const btn = document.getElementById('auth-btn');
-        const targetHash = "57f586940026e9526e089201a4736f3312c49e2954a73752762a63289069677e";
-        
-        try {
-            const msgUint8 = new TextEncoder().encode(val);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            // Logging for your parallel work (F12 to see)
-            console.log("Input Hash:", hashHex);
-
-            if(hashHex === targetHash) {
-                document.getElementById('auth-box').style.display = 'none';
-                document.getElementById('secure-content').style.display = 'block';
-                document.getElementById('top-serial').innerText = "SERIAL: ";
-                document.getElementById('top-serial').style.opacity = "1";
-                document.getElementById('foot-serial').innerText = "REF: ";
-            } else {
-                alert("Authorization Required");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Security Error: Ensure you are on HTTPS.");
-        }
-    }
-
-    // The Ticker Logic (200ms Lazy Roll)
-    setInterval(() => {
-        const base = ((new Date() - new Date('2025-12-17T09:00:00')) / 1000) * 1060;
-        document.getElementById('total').innerText = "$" + Math.floor(base).toLocaleString();
-        document.getElementById('v1').innerText = "$" + Math.floor(base * 0.58).toLocaleString();
-        document.getElementById('v2').innerText = "$" + Math.floor(base * 0.22).toLocaleString();
-        document.getElementById('v3').innerText = "$" + Math.floor(base * 0.20).toLocaleString();
-    }, 200);
-</script>
 </body>
 </html>
