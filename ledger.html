@@ -331,13 +331,13 @@
             `;
         }
 
-        const collapsedSections = new Set();
+        window.collapsedSections = new Set();
 
         window.toggleSection = function (section) {
-            if (collapsedSections.has(section)) {
-                collapsedSections.delete(section);
+            if (window.collapsedSections.has(section)) {
+                window.collapsedSections.delete(section);
             } else {
-                collapsedSections.add(section);
+                window.collapsedSections.add(section);
             }
             buildTable();
         };
@@ -361,28 +361,28 @@
             let html = '';
 
             // U.S. Federal
-            const fedCollapsed = collapsedSections.has('federal');
+            const fedCollapsed = window.collapsedSections.has('federal');
             html += `<tr class="section-divider ${fedCollapsed ? 'collapsed' : ''}" data-section-header="federal" onclick="toggleSection('federal')"><td colspan="3">U.S. Federal Agencies</td></tr>`;
             if (!fedCollapsed) {
                 US_FEDERAL.forEach(e => html += createRow(e, now, 'federal'));
             }
 
             // U.S. Commercial
-            const comCollapsed = collapsedSections.has('commercial');
+            const comCollapsed = window.collapsedSections.has('commercial');
             html += `<tr class="section-divider ${comCollapsed ? 'collapsed' : ''}" data-section-header="commercial" onclick="toggleSection('commercial')"><td colspan="3">U.S. Commercial Entities</td></tr>`;
             if (!comCollapsed) {
                 US_COMMERCIAL.forEach(e => html += createRow(e, now, 'commercial'));
             }
 
             // Global & EU
-            const globalCollapsed = collapsedSections.has('global');
+            const globalCollapsed = window.collapsedSections.has('global');
             html += `<tr class="section-divider ${globalCollapsed ? 'collapsed' : ''}" data-section-header="global" onclick="toggleSection('global')"><td colspan="3">Global & EU Entities</td></tr>`;
             if (!globalCollapsed) {
                 GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now, 'global'));
             }
 
             // Forensic
-            const forensicCollapsed = collapsedSections.has('forensic');
+            const forensicCollapsed = window.collapsedSections.has('forensic');
             html += `<tr class="section-divider ${forensicCollapsed ? 'collapsed' : ''}" data-section-header="forensic" onclick="toggleSection('forensic')"><td colspan="3">ACS Forensic Evidence Logs</td></tr>`;
             if (!forensicCollapsed) {
                 ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now, 'forensic'));
