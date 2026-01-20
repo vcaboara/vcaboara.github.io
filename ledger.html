@@ -30,12 +30,12 @@
 
         #ledger-content {
             width: 95%;
-            max-width: 850px;
+            max-width: 900px;
             background: var(--card);
             padding: 40px;
             border-radius: 20px;
             border: 1px solid var(--border);
-            box-shadow: 0 0 50px rgba(255, 123, 114, 0.1);
+            box-shadow: 0 0 60px rgba(255, 123, 114, 0.2);
         }
 
         .header {
@@ -51,7 +51,7 @@
             padding: 30px;
             margin-bottom: 30px;
             text-align: center;
-            background: rgba(88, 166, 255, 0.02);
+            background: rgba(88, 166, 255, 0.05);
         }
 
         .liability-text {
@@ -69,84 +69,90 @@
             margin-bottom: 10px;
         }
 
+        .stat-basis-box {
+            background: rgba(210, 153, 34, 0.05);
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .stat-basis-box b { color: var(--blue); }
+
         .split-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-top: 20px;
+            margin-bottom: 30px;
         }
 
         .split-card {
             background: #161b22;
-            padding: 15px;
+            padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border);
+            text-align: center;
         }
 
         .split-val {
-            font-size: 1.2em;
+            font-size: 1.6em;
             color: var(--blue);
+            font-weight: bold;
         }
 
-        details {
+        .table-container {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            margin-top: 20px;
-            padding: 15px;
+            overflow: hidden;
         }
-
-        summary {
-            color: var(--gold);
-            font-weight: bold;
-            cursor: pointer;
-            padding: 5px;
-            outline: none;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        summary::-webkit-details-marker { display: none; }
 
         table {
             width: 100%;
-            margin-top: 15px;
             border-collapse: collapse;
         }
 
         th, td {
             text-align: left;
-            padding: 12px;
+            padding: 15px;
             border-bottom: 1px solid var(--border);
-            font-size: 0.85em;
+            font-size: 0.9em;
         }
 
-        .stat-basis {
-            font-size: 0.8em;
-            color: #8b949e;
-            line-height: 1.6;
+        th { 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            background: rgba(210, 153, 34, 0.05);
         }
 
-        .stat-basis b { color: var(--blue); }
+        .entity-val {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .status-pill {
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(63, 185, 80, 0.1);
+            color: var(--green);
+            border: 1px solid var(--green);
+            font-weight: bold;
+        }
 
         .patent-mark {
             margin-top: 40px;
             text-align: center;
             border-top: 1px solid var(--border);
             padding-top: 20px;
-            font-size: 0.8em;
+            font-size: 0.85em;
             color: #8b949e;
         }
 
-        .status-pill {
-            font-size: 0.7em;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: rgba(63, 185, 80, 0.1);
-            color: var(--green);
-            border: 1px solid var(--green);
-        }
+        a { color: var(--blue); text-decoration: none; }
     </style>
 </head>
 <body>
@@ -154,105 +160,111 @@
     <div id="ledger-content">
         <div class="header">
             <div class="label">Priority Anchor: 12/17/2025</div>
-            <h1 style="color: var(--gold); margin: 10px 0; font-size: 1.8em;">ARBOREUM COMMERCIAL SOLUTIONS</h1>
-            <p style="color: var(--blue); font-size: 0.8em;">Managing Member: Vincent [REDACTED]</p>
+            <h1 style="color: var(--gold); margin: 10px 0; font-size: 2.2em;">ARBOREUM COMMERCIAL SOLUTIONS</h1>
+            <p style="color: var(--blue); font-size: 1em;">Managing Member: Vincent Caboara</p>
+        </div>
+
+        <div class="stat-basis-box">
+            <b>Statutory Basis:</b> 35 U.S.C. § 154(d) Provisional Rights. Liability accrues upon <b>Actual Notice</b>.
+            <br><b>Mandate:</b> 30% Efficiency/Revenue Delta. 85% of Licensing Irrevocably Assigned to <b>Arboreum Impact Foundation (AIF)</b>.
         </div>
 
         <div class="priority-box">
-            <div class="label">Total Aggregate Sovereign Liability</div>
-            <div id="main-counter" class="liability-text">$3,101,490,187</div>
-            <div style="color: var(--blue); font-size: 0.7em; margin-top: 10px; font-weight: bold;">
-                REAL-TIME PERSISTENCE PENALTY: 30% DELTA ACTIVE
+            <div class="label">Aggregate Sovereign Liability (Accrued Since 12/17)</div>
+            <div id="main-counter" class="liability-text">$0</div>
+            <div style="color: var(--blue); font-size: 0.8em; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">
+                DYNAMICAL ENTROPY TAX ACTIVE
             </div>
         </div>
 
         <div class="split-grid">
             <div class="split-card">
-                <div class="label" style="font-size: 0.5em;">AIF Restoration (85%)</div>
+                <div class="label" style="font-size: 0.65em;">AIF Restoration (85%)</div>
                 <div id="aif-val" class="split-val">$0</div>
             </div>
             <div class="split-card">
-                <div class="label" style="font-size: 0.5em;">ACS Licensing (15%)</div>
+                <div class="label" style="font-size: 0.65em;">ACS Licensing (15%)</div>
                 <div id="acs-val" class="split-val">$0</div>
             </div>
         </div>
 
-        <details open>
-            <summary>STATUTORY BASIS & RECOVERY METRICS <span>[−]</span></summary>
-            <div class="stat-basis">
-                <p><b>Statutory Basis:</b> 35 U.S.C. § 154(d) - Provisional Rights to Reasonable Royalty post-publication of 12/17 priority filing. Liability accrues upon <b>Actual Notice</b>.</p>
-                <p><b>Supply Chain Delta:</b> 30% (15% Efficiency Savings + 15% Integrated Revenue Streams). Persistence in virgin timber usage incurs a daily <b>Entropy Tax</b>.</p>
-                <p><b>Recovery Mandate:</b> 85% of net licensing proceeds are irrevocably assigned to the <b>Arboreum Impact Foundation (AIF)</b> for sacred land restoration and orphan support.</p>
-            </div>
-        </details>
-
-        <details>
-            <summary>VERIFIED NOTICE LOG <span>[+]</span></summary>
+        <div class="label" style="margin-left: 15px; margin-bottom: 5px;">Verified Notice Log & Recovery Tracking</div>
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Target Entity</th>
-                        <th>Notice Date</th>
-                        <th>Status</th>
+                        <th>Entity</th>
+                        <th>Notice / Anchor</th>
+                        <th>Accrued Liability</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Local Rep [REDACTED]</td>
-                        <td>01/13/2026</td>
-                        <td style="color: var(--gold);">NOTICE SERVED</td>
-                    </tr>
-                    <tr>
-                        <td>E*TRADE Financial</td>
-                        <td>01/20/2026</td>
-                        <td><span class="status-pill">FILES VERIFIED</span></td>
-                    </tr>
+                <tbody id="notice-log">
+                    <!-- Dynamic Data -->
                 </tbody>
             </table>
-        </details>
+        </div>
 
         <div class="patent-mark">
-            <p>Arboreum Impact Foundation | Restoration of Sacred Lands</p>
-            <p>
-                <a href="#">Patent Pending</a> | 
-                Legacy Anchor for <strong>Aiden Robert Atlas Caboara</strong>
-            </p>
+            <p>Arboreum Impact Foundation | Legacy Brief: <strong>Aiden Robert Atlas Caboara</strong></p>
+            <p><strong>Patent Pending</strong> | Sacred Land Restoration Mandate</p>
         </div>
     </div>
 
     <script>
-        const BASE_LIABILITY = 3101490187.00;
-        const GROWTH_PER_SECOND = 5.42;
-        const startTime = Date.now();
+        // Anchors
+        const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
+        const GROWTH_RATE = 5.4245; // Base rate scaled
+
+        // Notice Data based on your logs
+        const entities = [
+            { id: 'USDA', date: '2026-01-01T00:00:00Z', base: 50000000 },
+            { id: 'DOE', date: '2026-01-01T00:00:00Z', base: 75000000 },
+            { id: 'BETO', date: '2026-01-01T00:00:00Z', base: 25000000 },
+            { id: 'Local Rep', date: '2026-01-13T09:00:00Z', base: 3500000 },
+            { id: 'E*TRADE / MS', date: '2026-01-20T12:00:00Z', base: 0, status: 'FILES VERIFIED' }
+        ];
 
         function updateLedger() {
             const now = Date.now();
-            const elapsed = (now - startTime) / 1000;
-            const currentTotal = BASE_LIABILITY + (GROWTH_PER_SECOND * elapsed);
-            const aifRestoration = currentTotal * 0.85;
-            const acsLicensing = currentTotal * 0.15;
-
+            
+            // Global Aggregate (From 12/17)
+            const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
+            const aggregateLiability = Math.floor(secondsSincePriority * GROWTH_RATE * 10000);
+            
             document.getElementById('main-counter').innerText = 
-                currentTotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                "$" + aggregateLiability.toLocaleString('en-US');
             
             document.getElementById('aif-val').innerText = 
-                aifRestoration.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+                "$" + Math.floor(aggregateLiability * 0.85).toLocaleString('en-US');
             
             document.getElementById('acs-val').innerText = 
-                acsLicensing.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+                "$" + Math.floor(aggregateLiability * 0.15).toLocaleString('en-US');
+
+            // Log Body
+            const logBody = document.getElementById('notice-log');
+            logBody.innerHTML = '';
+
+            entities.forEach(e => {
+                const noticeTime = new Date(e.date).getTime();
+                const elapsed = Math.max(0, (now - noticeTime) / 1000);
+                // Individual liability calculation (Base + dynamic accrual)
+                const currentLiability = Math.floor(e.base + (elapsed * (e.base * 0.0000002))); 
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${e.id}</td>
+                    <td>${new Date(e.date).toLocaleDateString()}</td>
+                    <td>
+                        ${e.status ? `<span class="status-pill">${e.status}</span>` : 
+                        `<span class="entity-val">$${currentLiability.toLocaleString('en-US')}</span>`}
+                    </td>
+                `;
+                logBody.appendChild(row);
+            });
         }
 
         setInterval(updateLedger, 100);
         updateLedger();
-
-        // Toggle symbols on click
-        document.querySelectorAll('summary').forEach(summary => {
-            summary.addEventListener('click', () => {
-                const span = summary.querySelector('span');
-                const isOpen = summary.parentElement.hasAttribute('open');
-                span.innerText = isOpen ? '[+]' : '[−]';
-            });
-        });
     </script>
 </body>
 </html>
