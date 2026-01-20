@@ -208,10 +208,11 @@
         <div class="header">
             <div class="label" style="color: var(--blue);">Priority Filing: 12/17/2025 | Patent Pending</div>
             <h1 style="color: var(--high-vis); margin: 10px 0; font-size: 2.2em;">SOVEREIGN COMPLIANCE LEDGER</h1>
-            <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Caboara (Arboreum Commercial Solutions)</p>
+            <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Caboara (Arboreum
+                Commercial Solutions)</p>
         </div>
 
-        <div class="label" style="margin-left: 5px; color: var(--slate);">Statutory Basis for Fines</div>
+        <div class="label" style="color: var(--slate); text-align: center;">Statutory Basis for Fines</div>
         <div class="stat-links">
             <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank"
                 title="Compensation for patent infringement - includes lost profits and reasonable royalties">35 U.S.C.
@@ -330,41 +331,90 @@
             `;
         }
 
-        function toggleSection(section) {
-            const header = document.querySelector(`[data-section-header="${section}"]`);
-            const rows = document.querySelectorAll(`[data-section="${section}"]`);
-            const isCollapsed = header.classList.contains('collapsed');
-            
-            header.classList.toggle('collapsed');
-            rows.forEach(row => {
-                row.style.display = isCollapsed ? '' : 'none';
-            });
+        const collapsedSections = new Set();
+
+        window.toggleSection = function (section) {
+            if (collapsedSections.has(section)) {
+                collapsedSections.delete(section);
+            } else {
+                collapsedSections.add(section);
+            }
+            buildTable();
+        };
+
+        function createRow(e, now, section) {
+            const noticeTime = new Date(e.date).getTime();
+            const elapsed = Math.max(0, (now - noticeTime) / 1000);
+            const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
+            return `
+                <tr class="section-row" data-section="${section}">
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">BOUNCE LOG</span>' : ''}</td>
+                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
+                    <td><span class="entity-val" data-value-id="${e.id}">$${currentFine.toLocaleString('en-US')}</span></td>
+                </tr>
+            `;
         }
 
-        function updateLedger() {
+        function buildTable() {
+            const now = Date.now();
+            const logBody = document.getElementById('notice-log');
+            let html = '';
+
+            // U.S. Federal
+            const fedCollapsed = collapsedSections.has('federal');
+            html += `<tr class="section-divider ${fedCollapsed ? 'collapsed' : ''}" data-section-header="federal" onclick="toggleSection('federal')"><td colspan="3">U.S. Federal Agencies</td></tr>`;
+            if (!fedCollapsed) {
+                US_FEDERAL.forEach(e => html += createRow(e, now, 'federal'));
+            }
+
+            // U.S. Commercial
+            const comCollapsed = collapsedSections.has('commercial');
+            html += `<tr class="section-divider ${comCollapsed ? 'collapsed' : ''}" data-section-header="commercial" onclick="toggleSection('commercial')"><td colspan="3">U.S. Commercial Entities</td></tr>`;
+            if (!comCollapsed) {
+                US_COMMERCIAL.forEach(e => html += createRow(e, now, 'commercial'));
+            }
+
+            // Global & EU
+            const globalCollapsed = collapsedSections.has('global');
+            html += `<tr class="section-divider ${globalCollapsed ? 'collapsed' : ''}" data-section-header="global" onclick="toggleSection('global')"><td colspan="3">Global & EU Entities</td></tr>`;
+            if (!globalCollapsed) {
+                GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now, 'global'));
+            }
+
+            // Forensic
+            const forensicCollapsed = collapsedSections.has('forensic');
+            html += `<tr class="section-divider ${forensicCollapsed ? 'collapsed' : ''}" data-section-header="forensic" onclick="toggleSection('forensic')"><td colspan="3">ACS Forensic Evidence Logs</td></tr>`;
+            if (!forensicCollapsed) {
+                ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now, 'forensic'));
+            }
+
+            logBody.innerHTML = html;
+        }
+
+        function updateValues() {
             const now = Date.now();
             const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
             const totalLiability = Math.floor(secondsSincePriority * GROWTH_RATE) * multiplier;
             document.getElementById('main-counter').innerText = "$" + totalLiability.toLocaleString('en-US');
 
-            const logBody = document.getElementById('notice-log');
-            let html = '<tr class="section-divider" data-section-header="federal" onclick="toggleSection(\'federal\')"><td colspan="3">U.S. Federal Agencies</td></tr>';
-            US_FEDERAL.forEach(e => html += createRow(e, now, 'federal'));
-
-            html += '<tr class="section-divider" data-section-header="commercial" onclick="toggleSection(\'commercial\')"><td colspan="3">U.S. Commercial Entities</td></tr>';
-            US_COMMERCIAL.forEach(e => html += createRow(e, now, 'commercial'));
-
-            html += '<tr class="section-divider" data-section-header="global" onclick="toggleSection(\'global\')"><td colspan="3">Global & EU Entities</td></tr>';
-            GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now, 'global'));
-
-            html += '<tr class="section-divider" data-section-header="forensic" onclick="toggleSection(\'forensic\')"><td colspan="3">ACS Forensic Evidence Logs</td></tr>';
-            ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now, 'forensic'));
-
-            logBody.innerHTML = html;
+            // Update individual entity values without rebuilding table
+            const allEntities = [...US_FEDERAL, ...US_COMMERCIAL, ...GLOBAL_EU_ENTITIES, ...ACS_FORENSIC_LOGS];
+            allEntities.forEach(e => {
+                const cell = document.querySelector(`[data-value-id="${e.id}"]`);
+                if (cell) {
+                    const noticeTime = new Date(e.date).getTime();
+                    const elapsed = Math.max(0, (now - noticeTime) / 1000);
+                    const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
+                    cell.innerText = '$' + currentFine.toLocaleString('en-US');
+                }
+            });
         }
 
-        setInterval(updateLedger, 100);
-        updateLedger();
+        // Build table once on load
+        buildTable();
+
+        // Only update values, not structure
+        setInterval(updateValues, 200);
     </script>
 </body>
 
