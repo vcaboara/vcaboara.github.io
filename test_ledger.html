@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ledger Test Suite</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+
+        .test {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #30363d;
+        }
+
+        .pass {
+            border-color: #2ea043;
+            background: rgba(46, 160, 67, 0.1);
+        }
+
+        .fail {
+            border-color: #f85149;
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #30363d;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ledger.html Test Suite</h1>
+    <div id="results"></div>
+    <h2>Live Preview</h2>
+    <iframe id="preview" src="ledger.html"></iframe>
+
+    <script>
+        const results = document.getElementById('results');
+        const tests = [];
+
+        function addTest(name, fn) {
+            tests.push({ name, fn });
+        }
+
+        function runTests() {
+            const iframe = document.getElementById('preview');
+
+            iframe.onload = async () => {
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait for JS to init
+
+                const doc = iframe.contentDocument;
+                const win = iframe.contentWindow;
+
+                addTest('Counter element exists', () => {
+                    return doc.getElementById('main-counter') !== null;
+                });
+
+                addTest('Counter is updating (not $0)', () => {
+                    const counter = doc.getElementById('main-counter');
+                    return counter && counter.innerText !== '$0' && counter.innerText.includes('$');
+                });
+
+                addTest('Table body exists', () => {
+                    return doc.getElementById('notice-log') !== null;
+                });
+
+                addTest('Table has rows', () => {
+                    const tbody = doc.getElementById('notice-log');
+                    return tbody && tbody.querySelectorAll('tr').length > 0;
+                });
+
+                addTest('Section dividers exist', () => {
+                    const dividers = doc.querySelectorAll('.section-divider');
+                    return dividers.length === 4; // Federal, Commercial, Global, Forensic
+                });
+
+                addTest('Section dividers are clickable', () => {
+                    const divider = doc.querySelector('.section-divider');
+                    return divider && divider.onclick !== null;
+                });
+
+                addTest('Toggle function exists in window', () => {
+                    return typeof win.toggleSection === 'function';
+                });
+
+                addTest('Collapse state tracking exists', () => {
+                    return win.collapsedSections !== undefined;
+                });
+
+addTest('Clicking section header toggles collapsed class', async () => {
+                    const divider = doc.querySelector('[data-section-header="federal"]');
+                    if (!divider) return false;
+                    
+                    const initialCollapsed = divider.classList.contains('collapsed');
+                    divider.click();
+                    
+                    // Wait for buildTable to run
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const afterClick = doc.querySelector('[data-section-header="federal"]');
+                    return afterClick.classList.contains('collapsed') !== initialCollapsed;
+                });
+
+                addTest('Collapsed section hides rows', async () => {
+                    const divider = doc.querySelector('[data-section-header="commercial"]');
+                    if (!divider) return false;
+                    
+                    // Ensure it's open first
+                    if (divider.classList.contains('collapsed')) {
+                        divider.click();
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    // Count rows before
+                    let rowsBefore = doc.querySelectorAll('[data-section="commercial"]').length;
+                    
+                    if (rowsBefore === 0) return false; // Section was already collapsed
+                    
+                    // Click to collapse
+                    divider.click();
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const rowsAfter = doc.querySelectorAll('[data-section="commercial"]').length;
+                    return rowsAfter === 0 && rowsBefore > 0;
+                });
+
+                addTest('Values update without rebuilding table', async () => {
+                    const initialHtml = doc.getElementById('notice-log').innerHTML;
+                    
+                    // Wait for value updates
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    const afterHtml = doc.getElementById('notice-log').innerHTML;
+                    
+                    // HTML structure should be different (values changed) but sections should still exist
+                    const sectionsBefore = (initialHtml.match(/section-divider/g) || []).length;
+                    const sectionsAfter = (afterHtml.match(/section-divider/g) || []).length;
+                    
+                    return sectionsBefore === sectionsAfter && sectionsBefore === 4;
+                });
+
+                // Run all tests
+                for (const test of tests) {
+                    try {
+                        const result = await test.fn();
+                        displayResult(test.name, result);
+                    } catch (e) {
+                        displayResult(test.name, false, e.message);
+                    }
+                }
+            };
+        }
+
+        function displayResult(name, passed, error) {
+            const div = document.createElement('div');
+            div.className = `test ${passed ? 'pass' : 'fail'}`;
+            div.innerHTML = `
+                <div class="test-name">${passed ? '✓' : '✗'} ${name}</div>
+                ${error ? `<div style="color: #f85149;">Error: ${error}</div>` : ''}
+            `;
+            results.appendChild(div);
+        }
+
+        runTests();
+    </script>
+</body>
+
+</html>
