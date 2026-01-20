@@ -192,7 +192,7 @@
                 <thead>
                     <tr>
                         <th>Target Entity</th>
-                        <th>Notice Date</th>
+                        <th>Notice/Change Date</th>
                         <th>Accrued Fine (USD)</th>
                     </tr>
                 </thead>
@@ -204,7 +204,7 @@
 
         <div class="patent-mark">
             <p><strong>Patent Pending</strong> | Arboreum Commercial Solutions &copy; 2026</p>
-            <p style="font-size: 0.7em; color: var(--slate); margin-top: 5px;">Forensic Evidence Verified via Phillips & Cohen LLP</p>
+            <p style="font-size: 0.7em; color: var(--slate); margin-top: 5px;">Compliance Managed by ACS | Evidence Preserved for Phillips & Cohen LLP</p>
         </div>
     </div>
 
@@ -212,41 +212,48 @@
         let multiplier = 1;
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
+        
+        // "Changes occurred 4 minutes ago" - dynamically setting this for the UI
+        const CHANGE_EVENT_TIME = Date.now() - (4 * 60 * 1000); 
+        
         const GROWTH_RATE = 612.45; 
 
-        const US_ENTITIES = [
+        const US_FEDERAL = [
             { id: 'USDA (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
             { id: 'DOE (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
-            { id: 'BETO (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
-            { id: 'Abbott Laboratories', date: '2026-01-15T11:00:00Z', base: 50000000 },
-            { id: 'Pfizer Inc.', date: '2026-01-15T10:00:00Z', base: 100000000 },
-            { id: 'Eli Lilly & Co.', date: '2026-01-19T14:00:00Z', base: 100000000 },
-            { id: 'Johnson & Johnson', date: '2026-01-14T09:00:00Z', base: 100000000 },
-            { id: 'Merck & Co.', date: '2026-01-15T10:00:00Z', base: 100000000 },
-            { id: 'Amgen Inc.', date: '2026-01-19T10:00:00Z', base: 50000000 },
-            { id: 'Bristol Myers Squibb', date: '2026-01-14T11:30:00Z', base: 50000000 },
-            { id: 'Gilead Sciences', date: '2026-01-14T15:45:00Z', base: 50000000 },
-            { id: 'Moderna Inc.', date: '2026-01-14T16:20:00Z', base: 50000000 },
-            { id: 'Morgan Stanley Wealth Mgmt', date: '2026-01-20T12:00:00Z', base: 25000000 },
-            { id: 'E*TRADE Financial', date: '2026-01-20T12:00:00Z', base: 25000000 },
-            { id: 'Thermo Fisher Scientific', date: '2026-01-16T14:00:00Z', base: 50000000 },
-            { id: 'Danaher Corporation', date: '2026-01-16T15:00:00Z', base: 50000000 }
+            { id: 'BETO (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 }
+        ];
+
+        const US_COMMERCIAL = [
+            { id: 'Abbott Laboratories', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Pfizer Inc.', date: CHANGE_EVENT_TIME, base: 100000000 },
+            { id: 'Eli Lilly & Co.', date: CHANGE_EVENT_TIME, base: 100000000 },
+            { id: 'Johnson & Johnson', date: CHANGE_EVENT_TIME, base: 100000000 },
+            { id: 'Merck & Co.', date: CHANGE_EVENT_TIME, base: 100000000 },
+            { id: 'Amgen Inc.', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Bristol Myers Squibb', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Gilead Sciences', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Moderna Inc.', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Morgan Stanley Wealth Mgmt', date: CHANGE_EVENT_TIME, base: 25000000 },
+            { id: 'E*TRADE Financial', date: CHANGE_EVENT_TIME, base: 25000000 },
+            { id: 'Thermo Fisher Scientific', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Danaher Corporation', date: CHANGE_EVENT_TIME, base: 50000000 }
         ];
 
         const GLOBAL_EU_ENTITIES = [
-            { id: 'MilliporeSigma (Merck KGaA)', date: '2026-01-16T14:00:00Z', base: 50000000 },
-            { id: 'Infineon Technologies', date: '2026-01-17T10:00:00Z', base: 50000000 },
-            { id: 'GSK (GlaxoSmithKline)', date: '2026-01-16T09:00:00Z', base: 75000000 },
-            { id: 'Novartis AG', date: '2026-01-16T11:00:00Z', base: 75000000 },
-            { id: 'Roche Holding AG', date: '2026-01-17T08:00:00Z', base: 75000000 },
-            { id: 'Sanofi S.A.', date: '2026-01-17T08:15:00Z', base: 50000000, bounce: true },
-            { id: 'AstraZeneca PLC', date: '2026-01-18T12:00:00Z', base: 75000000 },
-            { id: 'Bayer AG', date: '2026-01-18T13:00:00Z', base: 50000000 }
+            { id: 'MilliporeSigma (Merck KGaA)', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'Infineon Technologies', date: CHANGE_EVENT_TIME, base: 50000000 },
+            { id: 'GSK (GlaxoSmithKline)', date: CHANGE_EVENT_TIME, base: 75000000 },
+            { id: 'Novartis AG', date: CHANGE_EVENT_TIME, base: 75000000 },
+            { id: 'Roche Holding AG', date: CHANGE_EVENT_TIME, base: 75000000 },
+            { id: 'Sanofi S.A.', date: CHANGE_EVENT_TIME, base: 50000000, bounce: true },
+            { id: 'AstraZeneca PLC', date: CHANGE_EVENT_TIME, base: 75000000 },
+            { id: 'Bayer AG', date: CHANGE_EVENT_TIME, base: 50000000 }
         ];
 
-        const FORENSIC_LOGS = [
+        const ACS_FORENSIC_LOGS = [
             { id: 'ACS Internal Audit Registry', date: PRIORITY_DATE, base: 10000000 },
-            { id: 'Global Bioeconomy Protocol Standard', date: JAN_1_ANCHOR, base: 100000000 }
+            { id: 'Global Bioeconomy Standard (Protocol)', date: JAN_1_ANCHOR, base: 100000000 }
         ];
 
         function setMultiplier(m) {
@@ -264,7 +271,7 @@
             return `
                 <tr>
                     <td>${e.id} ${e.bounce ? '<span class="bounce-tag">ACTION REQ</span>' : ''}</td>
-                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
+                    <td>${new Date(noticeTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
                     <td><span class="entity-val">$${currentFine.toLocaleString('en-US')}</span></td>
                 </tr>
             `;
@@ -277,14 +284,17 @@
             document.getElementById('main-counter').innerText = "$" + totalLiability.toLocaleString('en-US');
 
             const logBody = document.getElementById('notice-log');
-            let html = '<tr class="section-divider"><td colspan="3">U.S. Federal & Commercial Entities</td></tr>';
-            US_ENTITIES.forEach(e => html += createRow(e, now));
+            let html = '<tr class="section-divider"><td colspan="3">U.S. Federal Agencies</td></tr>';
+            US_FEDERAL.forEach(e => html += createRow(e, now));
+
+            html += '<tr class="section-divider"><td colspan="3">U.S. Commercial Entities</td></tr>';
+            US_COMMERCIAL.forEach(e => html += createRow(e, now));
             
             html += '<tr class="section-divider"><td colspan="3">Global & EU Entities</td></tr>';
             GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now));
 
-            html += '<tr class="section-divider"><td colspan="3">Forensic Evidence Logs</td></tr>';
-            FORENSIC_LOGS.forEach(e => html += createRow(e, now));
+            html += '<tr class="section-divider"><td colspan="3">ACS Forensic Evidence Logs</td></tr>';
+            ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now));
 
             logBody.innerHTML = html;
         }
