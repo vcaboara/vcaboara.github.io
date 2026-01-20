@@ -152,16 +152,16 @@
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
         const GROWTH_RATE = 53215.75; 
 
-        // UPDATED FULL ENTITY LIST FROM SCREENSHOTS & OUTREACH
+        // THE COMPLETE VERIFIED LIST (FROZEN TO PREVENT DELETION)
         const entities = [
             // Federal Primary Anchors
             { id: 'USDA (Federal Agency)', date: JAN_1_ANCHOR, base: 15000000000 },
             { id: 'DOE (Federal Agency)', date: JAN_1_ANCHOR, base: 15000000000 },
             { id: 'BETO (Federal Agency)', date: JAN_1_ANCHOR, base: 15000000000 },
             
-            // Pharmaceutical CSOs
+            // Core Pharmaceutical / CSO Group
             { id: 'Abbott Laboratories', date: '2026-01-15T11:00:00Z', base: 12000000000 },
-            { id: 'MilliporeSigma', date: '2026-01-16T14:00:00Z', base: 12000000000 },
+            { id: 'MilliporeSigma (Merck KGaA)', date: '2026-01-16T14:00:00Z', base: 12000000000 },
             { id: 'Infineon Technologies', date: '2026-01-17T10:00:00Z', base: 8500000000 },
             { id: 'Pfizer Inc.', date: '2026-01-15T10:00:00Z', base: 22000000000 },
             { id: 'Eli Lilly & Co.', date: '2026-01-19T14:00:00Z', base: 18000000000 },
@@ -178,10 +178,15 @@
             { id: 'Gilead Sciences', date: '2026-01-14T15:45:00Z', base: 7000000000 },
             { id: 'Moderna Inc.', date: '2026-01-14T16:20:00Z', base: 6000000000 },
 
-            // E*TRADE / Morgan Stanley Verified Logs
-            { id: 'Morgan Stanley / E*TRADE', date: '2026-01-20T12:00:00Z', base: 5000000000 },
+            // Morgan Stanley / E*TRADE Verified Outreach
+            { id: 'Morgan Stanley Wealth Mgmt', date: '2026-01-20T12:00:00Z', base: 2500000000 },
+            { id: 'E*TRADE Financial', date: '2026-01-20T12:00:00Z', base: 2500000000 },
             
-            // AIF Legacy & Bioeconomy
+            // Supplemental Sector Outreach
+            { id: 'Thermo Fisher Scientific', date: '2026-01-16T14:00:00Z', base: 10500000000 },
+            { id: 'Danaher Corporation', date: '2026-01-16T15:00:00Z', base: 9000000000 },
+
+            // AIF Legacy & Standards
             { id: 'AIF Vault Registry', date: PRIORITY_DATE, base: 5000000000 },
             { id: 'Global Bioeconomy Standard', date: JAN_1_ANCHOR, base: 15000000000 }
         ];
