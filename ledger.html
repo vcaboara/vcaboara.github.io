@@ -103,11 +103,31 @@
             font-weight: bold;
         }
 
-        .table-container {
-            background: var(--bg);
+        details {
+            margin-top: 20px;
             border: 1px solid var(--border);
             border-radius: 12px;
-            overflow: hidden;
+            background: var(--bg);
+        }
+
+        summary {
+            padding: 15px;
+            cursor: pointer;
+            color: var(--blue);
+            font-weight: bold;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::after {
+            content: "▼";
+            font-size: 0.8em;
+        }
+
+        details[open] summary::after {
+            content: "▲";
         }
 
         table {
@@ -165,7 +185,7 @@
 
         <div class="stat-basis-box">
             <b>Statutory Basis:</b> <a href="https://www.law.cornell.edu/uscode/text/35/154" target="_blank">35 U.S.C. § 154(d)</a> Provisional Rights. Liability accrues upon <b>Actual Notice</b> of Published Claims.
-            <br><b>Mandate:</b> <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO Bioeconomy Directive</a> compliance. 85% of ACS profits are irrevocably assigned to the <b>Arboreum Impact Foundation (AIF)</b>.
+            <br><b>Mandate:</b> <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO Bioeconomy Directive</a> compliance. 85% of ACS profits are irrevocably assigned to the <b>Arboreum Impact Foundation</b>.
         </div>
 
         <div class="priority-box">
@@ -178,7 +198,7 @@
 
         <div class="split-grid">
             <div class="split-card">
-                <div class="label" style="font-size: 0.65em;">AIF Restoration (85%)</div>
+                <div class="label" style="font-size: 0.65em;">Arboreum Impact Foundation (85%)</div>
                 <div id="aif-val" class="split-val">$0</div>
             </div>
             <div class="split-card">
@@ -187,8 +207,8 @@
             </div>
         </div>
 
-        <div class="label" style="margin-left: 15px; margin-bottom: 5px;">Verified Notice Log & Recovery Tracking</div>
-        <div class="table-container">
+        <details open>
+            <summary>VERIFIED NOTICE LOG & RECOVERY TRACKING</summary>
             <table>
                 <thead>
                     <tr>
@@ -201,7 +221,7 @@
                     <!-- Dynamic Data -->
                 </tbody>
             </table>
-        </div>
+        </details>
 
         <div class="patent-mark">
             <p>Arboreum Impact Foundation | Legacy Brief: <strong>Aiden Robert Atlas Caboara</strong></p>
@@ -212,7 +232,7 @@
     <script>
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
-        const GROWTH_RATE = 54245; // Global entropy rate
+        const GROWTH_RATE = 54245; // Global entropy rate per second
 
         // Verified Notice Data
         const entities = [
@@ -248,7 +268,9 @@
             entities.forEach(e => {
                 const noticeTime = typeof e.date === 'number' ? e.date : new Date(e.date).getTime();
                 const elapsed = Math.max(0, (now - noticeTime) / 1000);
-                const currentLiability = Math.floor(e.base + (elapsed * (e.base * 0.0000002))); 
+                
+                // Individual liability calculation (Base + daily accumulation)
+                const currentLiability = Math.floor(e.base + (elapsed * (e.base * 0.00000025))); 
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
