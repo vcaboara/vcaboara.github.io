@@ -12,7 +12,7 @@
             --blue: #58a6ff;
             --red: #ff7b72;
             --text: #c9d1d9;
-            --gold: #d29922;
+            --slate: #8b949e;
             --green: #3fb950;
         }
 
@@ -35,7 +35,7 @@
             padding: 40px;
             border-radius: 20px;
             border: 1px solid var(--border);
-            box-shadow: 0 0 60px rgba(255, 123, 114, 0.2);
+            box-shadow: 0 0 60px rgba(88, 166, 255, 0.1);
         }
 
         .header {
@@ -62,7 +62,7 @@
         }
 
         .label {
-            color: #8b949e;
+            color: var(--slate);
             font-size: 0.7em;
             letter-spacing: 4px;
             text-transform: uppercase;
@@ -70,8 +70,8 @@
         }
 
         .stat-basis-box {
-            background: rgba(210, 153, 34, 0.05);
-            border: 1px solid var(--gold);
+            background: rgba(88, 166, 255, 0.03);
+            border: 1px solid var(--blue);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
@@ -80,6 +80,7 @@
         }
 
         .stat-basis-box b { color: var(--blue); }
+        .stat-basis-box a { color: var(--blue); text-decoration: underline; }
 
         .split-grid {
             display: grid;
@@ -122,10 +123,10 @@
         }
 
         th { 
-            color: var(--gold); 
+            color: var(--blue); 
             text-transform: uppercase; 
             letter-spacing: 1px;
-            background: rgba(210, 153, 34, 0.05);
+            background: rgba(88, 166, 255, 0.05);
         }
 
         .entity-val {
@@ -149,28 +150,26 @@
             border-top: 1px solid var(--border);
             padding-top: 20px;
             font-size: 0.85em;
-            color: #8b949e;
+            color: var(--slate);
         }
-
-        a { color: var(--blue); text-decoration: none; }
     </style>
 </head>
 <body>
 
     <div id="ledger-content">
         <div class="header">
-            <div class="label">Priority Anchor: 12/17/2025</div>
-            <h1 style="color: var(--gold); margin: 10px 0; font-size: 2.2em;">ARBOREUM COMMERCIAL SOLUTIONS</h1>
-            <p style="color: var(--blue); font-size: 1em;">Managing Member: Vincent Caboara</p>
+            <div class="label">Priority Date: 12/17/2025</div>
+            <h1 style="color: var(--blue); margin: 10px 0; font-size: 2.2em;">ARBOREUM COMMERCIAL SOLUTIONS</h1>
+            <p style="color: var(--slate); font-size: 1em;">Managing Member: Vincent Caboara</p>
         </div>
 
         <div class="stat-basis-box">
-            <b>Statutory Basis:</b> 35 U.S.C. § 154(d) Provisional Rights. Liability accrues upon <b>Actual Notice</b>.
-            <br><b>Mandate:</b> 30% Efficiency/Revenue Delta. 85% of Licensing Irrevocably Assigned to <b>Arboreum Impact Foundation (AIF)</b>.
+            <b>Statutory Basis:</b> <a href="https://www.law.cornell.edu/uscode/text/35/154" target="_blank">35 U.S.C. § 154(d)</a> Provisional Rights. Liability accrues upon <b>Actual Notice</b> of Published Claims.
+            <br><b>Mandate:</b> <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO Bioeconomy Directive</a> compliance. 85% of ACS profits are irrevocably assigned to the <b>Arboreum Impact Foundation (AIF)</b>.
         </div>
 
         <div class="priority-box">
-            <div class="label">Aggregate Sovereign Liability (Accrued Since 12/17)</div>
+            <div class="label">Aggregate Sovereign Liability</div>
             <div id="main-counter" class="liability-text">$0</div>
             <div style="color: var(--blue); font-size: 0.8em; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">
                 DYNAMICAL ENTROPY TAX ACTIVE
@@ -194,7 +193,7 @@
                 <thead>
                     <tr>
                         <th>Entity</th>
-                        <th>Notice / Anchor</th>
+                        <th>Notice Date</th>
                         <th>Accrued Liability</th>
                     </tr>
                 </thead>
@@ -206,21 +205,24 @@
 
         <div class="patent-mark">
             <p>Arboreum Impact Foundation | Legacy Brief: <strong>Aiden Robert Atlas Caboara</strong></p>
-            <p><strong>Patent Pending</strong> | Sacred Land Restoration Mandate</p>
+            <p><strong>Patent Pending</strong> | Sacred Land Restoration | Veteran & Orphan Support</p>
         </div>
     </div>
 
     <script>
-        // Anchors
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
-        const GROWTH_RATE = 5.4245; // Base rate scaled
+        const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
+        const GROWTH_RATE = 54245; // Global entropy rate
 
-        // Notice Data based on your logs
+        // Verified Notice Data
         const entities = [
-            { id: 'USDA', date: '2026-01-01T00:00:00Z', base: 50000000 },
-            { id: 'DOE', date: '2026-01-01T00:00:00Z', base: 75000000 },
-            { id: 'BETO', date: '2026-01-01T00:00:00Z', base: 25000000 },
+            { id: 'USDA', date: JAN_1_ANCHOR, base: 50000000 },
+            { id: 'DOE', date: JAN_1_ANCHOR, base: 75000000 },
+            { id: 'BETO', date: JAN_1_ANCHOR, base: 25000000 },
             { id: 'Local Rep', date: '2026-01-13T09:00:00Z', base: 3500000 },
+            { id: 'Abbott (CSO)', date: '2026-01-15T11:00:00Z', base: 85000000 },
+            { id: 'Millipore (CSO)', date: '2026-01-16T14:00:00Z', base: 65000000 },
+            { id: 'Infineon (CSO)', date: '2026-01-17T10:00:00Z', base: 95000000 },
             { id: 'E*TRADE / MS', date: '2026-01-20T12:00:00Z', base: 0, status: 'FILES VERIFIED' }
         ];
 
@@ -229,7 +231,7 @@
             
             // Global Aggregate (From 12/17)
             const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
-            const aggregateLiability = Math.floor(secondsSincePriority * GROWTH_RATE * 10000);
+            const aggregateLiability = Math.floor(secondsSincePriority * GROWTH_RATE);
             
             document.getElementById('main-counter').innerText = 
                 "$" + aggregateLiability.toLocaleString('en-US');
@@ -240,20 +242,18 @@
             document.getElementById('acs-val').innerText = 
                 "$" + Math.floor(aggregateLiability * 0.15).toLocaleString('en-US');
 
-            // Log Body
             const logBody = document.getElementById('notice-log');
             logBody.innerHTML = '';
 
             entities.forEach(e => {
-                const noticeTime = new Date(e.date).getTime();
+                const noticeTime = typeof e.date === 'number' ? e.date : new Date(e.date).getTime();
                 const elapsed = Math.max(0, (now - noticeTime) / 1000);
-                // Individual liability calculation (Base + dynamic accrual)
                 const currentLiability = Math.floor(e.base + (elapsed * (e.base * 0.0000002))); 
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${e.id}</td>
-                    <td>${new Date(e.date).toLocaleDateString()}</td>
+                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
                     <td>
                         ${e.status ? `<span class="status-pill">${e.status}</span>` : 
                         `<span class="entity-val">$${currentLiability.toLocaleString('en-US')}</span>`}
