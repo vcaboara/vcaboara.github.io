@@ -13,6 +13,7 @@
             --red: #ff7b72;
             --text: #c9d1d9;
             --gold: #d29922;
+            --green: #3fb950;
         }
 
         body {
@@ -32,7 +33,7 @@
             max-width: 850px;
             background: var(--card);
             padding: 40px;
-            border-radius: 12px;
+            border-radius: 20px;
             border: 1px solid var(--border);
             box-shadow: 0 0 50px rgba(255, 123, 114, 0.1);
         }
@@ -46,7 +47,7 @@
 
         .priority-box {
             border: 2px solid var(--blue);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 30px;
             margin-bottom: 30px;
             text-align: center;
@@ -78,7 +79,7 @@
         .split-card {
             background: #161b22;
             padding: 15px;
-            border-radius: 6px;
+            border-radius: 12px;
             border: 1px solid var(--border);
         }
 
@@ -90,17 +91,23 @@
         details {
             background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            margin-top: 30px;
-            padding: 10px;
+            border-radius: 12px;
+            margin-top: 20px;
+            padding: 15px;
         }
 
         summary {
             color: var(--gold);
             font-weight: bold;
             cursor: pointer;
-            padding: 10px;
+            padding: 5px;
+            outline: none;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
         }
+
+        summary::-webkit-details-marker { display: none; }
 
         table {
             width: 100%;
@@ -110,10 +117,18 @@
 
         th, td {
             text-align: left;
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid var(--border);
-            font-size: 0.8em;
+            font-size: 0.85em;
         }
+
+        .stat-basis {
+            font-size: 0.8em;
+            color: #8b949e;
+            line-height: 1.6;
+        }
+
+        .stat-basis b { color: var(--blue); }
 
         .patent-mark {
             margin-top: 40px;
@@ -124,8 +139,14 @@
             color: #8b949e;
         }
 
-        a { color: var(--blue); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        .status-pill {
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(63, 185, 80, 0.1);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
     </style>
 </head>
 <body>
@@ -156,8 +177,17 @@
             </div>
         </div>
 
+        <details open>
+            <summary>STATUTORY BASIS & RECOVERY METRICS <span>[−]</span></summary>
+            <div class="stat-basis">
+                <p><b>Statutory Basis:</b> 35 U.S.C. § 154(d) - Provisional Rights to Reasonable Royalty post-publication of 12/17 priority filing. Liability accrues upon <b>Actual Notice</b>.</p>
+                <p><b>Supply Chain Delta:</b> 30% (15% Efficiency Savings + 15% Integrated Revenue Streams). Persistence in virgin timber usage incurs a daily <b>Entropy Tax</b>.</p>
+                <p><b>Recovery Mandate:</b> 85% of net licensing proceeds are irrevocably assigned to the <b>Arboreum Impact Foundation (AIF)</b> for sacred land restoration and orphan support.</p>
+            </div>
+        </details>
+
         <details>
-            <summary>VERIFIED NOTICE LOG</summary>
+            <summary>VERIFIED NOTICE LOG <span>[+]</span></summary>
             <table>
                 <thead>
                     <tr>
@@ -172,40 +202,33 @@
                         <td>01/13/2026</td>
                         <td style="color: var(--gold);">NOTICE SERVED</td>
                     </tr>
-                    <!-- Add Sony/Amazon only after you hit 'Send' -->
+                    <tr>
+                        <td>E*TRADE Financial</td>
+                        <td>01/20/2026</td>
+                        <td><span class="status-pill">FILES VERIFIED</span></td>
+                    </tr>
                 </tbody>
             </table>
         </details>
 
         <div class="patent-mark">
-            <p>Arboreum Impact Foundation Mandates: Veterans, Orphans, Sacred Land Restoration</p>
+            <p>Arboreum Impact Foundation | Restoration of Sacred Lands</p>
             <p>
-                <a href="legal.html">Patent Pending</a> | 
+                <a href="#">Patent Pending</a> | 
                 Legacy Anchor for <strong>Aiden Robert Atlas Caboara</strong>
             </p>
         </div>
     </div>
 
     <script>
-        // The "Grip" Math: Linear Growth reflecting constant industrial destruction
-        // $3.1B Baseline.
-        // Growth: ~$5.42 per second (Reflecting the cost of inaction & timber loss)
         const BASE_LIABILITY = 3101490187.00;
         const GROWTH_PER_SECOND = 5.42;
-        
-        // Start time anchored to your deployment
         const startTime = Date.now();
 
         function updateLedger() {
             const now = Date.now();
             const elapsed = (now - startTime) / 1000;
-            
-            // Total Liability = Base + (Rate * Time)
             const currentTotal = BASE_LIABILITY + (GROWTH_PER_SECOND * elapsed);
-            
-            // The Split: ACS takes 15% of the total revenue/savings generated
-            // Then 85% of THAT profit goes to AIF. 
-            // For visual impact, we show the 85/15 split of the total recovery target.
             const aifRestoration = currentTotal * 0.85;
             const acsLicensing = currentTotal * 0.15;
 
@@ -219,8 +242,17 @@
                 acsLicensing.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
         }
 
-        setInterval(updateLedger, 100); // 10fps update for smooth "Machine" pressure
+        setInterval(updateLedger, 100);
         updateLedger();
+
+        // Toggle symbols on click
+        document.querySelectorAll('summary').forEach(summary => {
+            summary.addEventListener('click', () => {
+                const span = summary.querySelector('span');
+                const isOpen = summary.parentElement.hasAttribute('open');
+                span.innerText = isOpen ? '[+]' : '[−]';
+            });
+        });
     </script>
 </body>
 </html>
