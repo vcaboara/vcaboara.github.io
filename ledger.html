@@ -70,6 +70,23 @@
             font-weight: bold;
         }
 
+        .stat-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-links a {
+            color: var(--blue);
+            text-decoration: underline;
+            font-size: 0.85em;
+        }
+
         .multiplier-toggle {
             display: flex;
             justify-content: center;
@@ -119,6 +136,16 @@
         .entity-val { color: var(--red); font-weight: bold; }
         .bounce-tag { color: var(--red); font-size: 0.7em; border: 1px solid var(--red); padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
 
+        .section-divider {
+            color: var(--slate);
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 10px 15px;
+            background: #0d1117;
+            border-bottom: 1px solid var(--border);
+        }
+
         .patent-mark {
             margin-top: 40px;
             text-align: center;
@@ -138,6 +165,14 @@
             <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Caboara (ACS)</p>
         </div>
 
+        <div class="label" style="margin-left: 5px; color: var(--slate);">Statutory Basis for Fines</div>
+        <div class="stat-links">
+            <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank">35 U.S.C. § 284 (Damages)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/285" target="_blank">35 U.S.C. § 285 (Attorney Fees)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/271" target="_blank">35 U.S.C. § 271 (Infringement)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/287" target="_blank">35 U.S.C. § 287 (Notice)</a>
+        </div>
+
         <div class="multiplier-toggle">
             <button id="x1-btn" class="toggle-btn active" onclick="setMultiplier(1)">BASE FINES (1x)</button>
             <button id="x3-btn" class="toggle-btn" onclick="setMultiplier(3)">TREBLED DAMAGES (3x)</button>
@@ -151,7 +186,7 @@
             </div>
         </div>
 
-        <details>
+        <details open>
             <summary>VERIFIED ENTITY LOGS (STATUTORY DELTA)</summary>
             <table>
                 <thead>
@@ -161,13 +196,15 @@
                         <th>Accrued Fine (USD)</th>
                     </tr>
                 </thead>
-                <tbody id="notice-log"></tbody>
+                <tbody id="notice-log">
+                    <!-- JS will inject sections here -->
+                </tbody>
             </table>
         </details>
 
         <div class="patent-mark">
-            <p><strong>Patent Pending</strong> | Arboreum Impact Foundation &copy; 2026</p>
-            <p style="font-size: 0.7em; color: var(--slate); margin-top: 5px;">Strict Enforcement of 35 U.S.C. § 284</p>
+            <p><strong>Patent Pending</strong> | Arboreum Commercial Solutions &copy; 2026</p>
+            <p style="font-size: 0.7em; color: var(--slate); margin-top: 5px;">Forensic Evidence Verified via Phillips & Cohen LLP</p>
         </div>
     </div>
 
@@ -175,27 +212,17 @@
         let multiplier = 1;
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
-        
-        // Revised Growth Rate reflecting STATUTORY FINES ONLY (Penalty per second for bioeconomy infringement)
         const GROWTH_RATE = 612.45; 
 
-        const entities = [
+        const US_ENTITIES = [
             { id: 'USDA (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
             { id: 'DOE (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
             { id: 'BETO (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
             { id: 'Abbott Laboratories', date: '2026-01-15T11:00:00Z', base: 50000000 },
-            { id: 'MilliporeSigma (Merck KGaA)', date: '2026-01-16T14:00:00Z', base: 50000000 },
-            { id: 'Infineon Technologies', date: '2026-01-17T10:00:00Z', base: 50000000 },
             { id: 'Pfizer Inc.', date: '2026-01-15T10:00:00Z', base: 100000000 },
             { id: 'Eli Lilly & Co.', date: '2026-01-19T14:00:00Z', base: 100000000 },
             { id: 'Johnson & Johnson', date: '2026-01-14T09:00:00Z', base: 100000000 },
             { id: 'Merck & Co.', date: '2026-01-15T10:00:00Z', base: 100000000 },
-            { id: 'GSK (GlaxoSmithKline)', date: '2026-01-16T09:00:00Z', base: 75000000 },
-            { id: 'Novartis AG', date: '2026-01-16T11:00:00Z', base: 75000000 },
-            { id: 'Roche Holding AG', date: '2026-01-17T08:00:00Z', base: 75000000 },
-            { id: 'Sanofi S.A.', date: '2026-01-17T08:15:00Z', base: 50000000, bounce: true },
-            { id: 'AstraZeneca PLC', date: '2026-01-18T12:00:00Z', base: 75000000 },
-            { id: 'Bayer AG', date: '2026-01-18T13:00:00Z', base: 50000000 },
             { id: 'Amgen Inc.', date: '2026-01-19T10:00:00Z', base: 50000000 },
             { id: 'Bristol Myers Squibb', date: '2026-01-14T11:30:00Z', base: 50000000 },
             { id: 'Gilead Sciences', date: '2026-01-14T15:45:00Z', base: 50000000 },
@@ -203,9 +230,23 @@
             { id: 'Morgan Stanley Wealth Mgmt', date: '2026-01-20T12:00:00Z', base: 25000000 },
             { id: 'E*TRADE Financial', date: '2026-01-20T12:00:00Z', base: 25000000 },
             { id: 'Thermo Fisher Scientific', date: '2026-01-16T14:00:00Z', base: 50000000 },
-            { id: 'Danaher Corporation', date: '2026-01-16T15:00:00Z', base: 50000000 },
-            { id: 'AIF Vault Registry', date: PRIORITY_DATE, base: 10000000 },
-            { id: 'Global Bioeconomy Standard', date: JAN_1_ANCHOR, base: 100000000 }
+            { id: 'Danaher Corporation', date: '2026-01-16T15:00:00Z', base: 50000000 }
+        ];
+
+        const GLOBAL_EU_ENTITIES = [
+            { id: 'MilliporeSigma (Merck KGaA)', date: '2026-01-16T14:00:00Z', base: 50000000 },
+            { id: 'Infineon Technologies', date: '2026-01-17T10:00:00Z', base: 50000000 },
+            { id: 'GSK (GlaxoSmithKline)', date: '2026-01-16T09:00:00Z', base: 75000000 },
+            { id: 'Novartis AG', date: '2026-01-16T11:00:00Z', base: 75000000 },
+            { id: 'Roche Holding AG', date: '2026-01-17T08:00:00Z', base: 75000000 },
+            { id: 'Sanofi S.A.', date: '2026-01-17T08:15:00Z', base: 50000000, bounce: true },
+            { id: 'AstraZeneca PLC', date: '2026-01-18T12:00:00Z', base: 75000000 },
+            { id: 'Bayer AG', date: '2026-01-18T13:00:00Z', base: 50000000 }
+        ];
+
+        const FORENSIC_LOGS = [
+            { id: 'ACS Internal Audit Registry', date: PRIORITY_DATE, base: 10000000 },
+            { id: 'Global Bioeconomy Protocol Standard', date: JAN_1_ANCHOR, base: 100000000 }
         ];
 
         function setMultiplier(m) {
@@ -216,6 +257,19 @@
             updateLedger();
         }
 
+        function createRow(e, now) {
+            const noticeTime = new Date(e.date).getTime();
+            const elapsed = Math.max(0, (now - noticeTime) / 1000);
+            const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
+            return `
+                <tr>
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">ACTION REQ</span>' : ''}</td>
+                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
+                    <td><span class="entity-val">$${currentFine.toLocaleString('en-US')}</span></td>
+                </tr>
+            `;
+        }
+
         function updateLedger() {
             const now = Date.now();
             const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
@@ -223,22 +277,16 @@
             document.getElementById('main-counter').innerText = "$" + totalLiability.toLocaleString('en-US');
 
             const logBody = document.getElementById('notice-log');
-            logBody.innerHTML = '';
+            let html = '<tr class="section-divider"><td colspan="3">U.S. Federal & Commercial Entities</td></tr>';
+            US_ENTITIES.forEach(e => html += createRow(e, now));
+            
+            html += '<tr class="section-divider"><td colspan="3">Global & EU Entities</td></tr>';
+            GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now));
 
-            entities.forEach(e => {
-                const noticeTime = new Date(e.date).getTime();
-                const elapsed = Math.max(0, (now - noticeTime) / 1000);
-                // Each entity accrues a penalty of $50/sec on top of their base fine
-                const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">ACTION REQ</span>' : ''}</td>
-                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
-                    <td><span class="entity-val">$${currentFine.toLocaleString('en-US')}</span></td>
-                `;
-                logBody.appendChild(row);
-            });
+            html += '<tr class="section-divider"><td colspan="3">Forensic Evidence Logs</td></tr>';
+            FORENSIC_LOGS.forEach(e => html += createRow(e, now));
+
+            logBody.innerHTML = html;
         }
 
         setInterval(updateLedger, 100);
