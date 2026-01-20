@@ -2,65 +2,70 @@
 <html>
 <head>
 <style>
-  table { width: 100%; border-collapse: collapse; font-family: sans-serif; }
-  th, td { border: 1px solid #333; padding: 12px; text-align: left; }
-  th { background-color: #f2f2f2; }
-  .willful { background-color: #ffcccc; color: #900; font-weight: bold; }
-  .pending { background-color: #fffde0; }
-  .sovereign { background-color: #e0f7fa; }
+  body { background-color: #1a1a1a; color: #e0e0e0; font-family: 'Courier New', Courier, monospace; }
+  .container { padding: 20px; border: 1px solid #444; border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { border: 1px solid #444; padding: 15px; text-align: left; }
+  th { background-color: #333; color: #00ff41; text-transform: uppercase; }
+  .willful { color: #ff4d4d; font-weight: bold; }
+  details { cursor: pointer; color: #00ff41; margin-top: 5px; }
+  summary { font-weight: bold; }
+  .legal-note { font-size: 0.8em; color: #888; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<h2>ACS / AIF Global Liability Ledger (2026)</h2>
+<div class="container">
+  <h2>ARBOREUM GLOBAL LIABILITY LEDGER</h2>
+  <p>Status: ACTIVE | Priority Date: 12/17/25 | Patent Pending</p>
 
-<table>
-  <tr>
-    <th>Entity ID</th>
-    <th>Category</th>
-    <th>Notice Date</th>
-    <th>Current Status</th>
-    <th>Liability Delta</th>
-  </tr>
-  <tr class="willful">
-    <td>Target-A1</td>
-    <td>Local Representative</td>
-    <td>Jan 13, 2026</td>
-    <td>Evasion / Fire Alarm</td>
-    <td>$500k/day (Accumulating)</td>
-  </tr>
-  <tr class="pending">
-    <td>Target-A2</td>
-    <td>Regional Banking</td>
-    <td>Jan 13, 2026</td>
-    <td>Constructive Notice (CBB)</td>
-    <td>TBD (Verification Stage)</td>
-  </tr>
-  <tr class="sovereign">
-    <td>Target-B1</td>
-    <td>Timber Corp (Lumber)</td>
-    <td>Jan 20, 2026</td>
-    <td>Actual Notice Sent</td>
-    <td>15% Licensing / 70% AIF</td>
-  </tr>
-  <tr class="sovereign">
-    <td>Target-B2</td>
-    <td>Waste Mgmt (Headend)</td>
-    <td>Jan 20, 2026</td>
-    <td>Actual Notice Sent</td>
-    <td>15% Licensing / 70% AIF</td>
-  </tr>
-  <tr class="pending">
-    <td>Target-C1</td>
-    <td>Debt Servicer</td>
-    <td>Jan 20, 2026</td>
-    <td>Actual Notice Sent</td>
-    <td>Debt-for-License Offset</td>
-  </tr>
-</table>
+  <table>
+    <tr>
+      <th>Entity ID</th>
+      <th>Category</th>
+      <th>Notice Sent</th>
+      <th>Liability Status</th>
+    </tr>
+    <tr>
+      <td>Target-A1</td>
+      <td>Local Rep</td>
+      <td>Jan 13</td>
+      <td class="willful">$500k/day
+        <details>
+          <summary>Audit Log</summary>
+          Evasion documented at City Hall. Fire alarm interruption noted. Actual Notice provided via follow-up email 1/13.
+        </details>
+      </td>
+    </tr>
+    <tr>
+      <td>Target-B1</td>
+      <td>Timber (Lumber)</td>
+      <td>Jan 20</td>
+      <td>15% Revenue
+        <details>
+          <summary>Audit Log</summary>
+          Direct Notice sent to HQ/Legal today. Damages clock initiated under 35 U.S.C. § 287.
+        </details>
+      </td>
+    </tr>
+    <tr>
+      <td>Target-C1</td>
+      <td>Debt Servicer</td>
+      <td>Jan 20</td>
+      <td>Debt-Wipe Offset
+        <details>
+          <summary>Audit Log</summary>
+          AIF strategy: Negotiated debt-for-license swap pending settlement.
+        </details>
+      </td>
+    </tr>
+  </table>
 
-<p><em>*All entries subject to 70% persistence penalty upon secondary notice.</em></p>
-<p>Patent Pending</p>
+  <div class="legal-note">
+    * 70% of all recovered liabilities directed to AIF Foundation.
+    * ACS (Arboreum Commercial Solutions) is 100% licensing.
+  </div>
+</div>
 
 </body>
 </html>
