@@ -11,17 +11,18 @@
             --border: #30363d;
             --blue: #58a6ff;
             --red: #ff7b72;
-            --text: #e6edf3;
+            --text: #c9d1d9;
             --high-vis: #f0f6fc;
-            --green: #3fb950;
+            --slate: #8b949e;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', monospace;
             display: flex;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -29,42 +30,43 @@
 
         #ledger-content {
             width: 100%;
-            max-width: 1100px;
+            max-width: 950px;
             background: var(--card);
             padding: 40px;
             border-radius: 12px;
             border: 1px solid var(--border);
+            box-shadow: 0 0 60px rgba(255, 123, 114, 0.05);
         }
 
         .header {
             text-align: center;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 1px solid var(--border);
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
 
         .priority-box {
-            border: 4px solid var(--red);
-            border-radius: 16px;
-            padding: 40px;
+            border: 2px solid var(--red);
+            border-radius: 12px;
+            padding: 30px;
             margin-bottom: 30px;
             text-align: center;
             background: rgba(255, 123, 114, 0.05);
         }
 
         .liability-text {
-            font-size: clamp(3.5em, 10vw, 6em);
+            font-size: clamp(2.5em, 6vw, 4.5em);
             color: var(--red);
             font-weight: 900;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
+            letter-spacing: -2px;
         }
 
         .label {
             color: var(--high-vis);
-            font-size: 1.1em;
-            letter-spacing: 2px;
+            font-size: 0.8em;
+            letter-spacing: 4px;
             text-transform: uppercase;
+            margin-bottom: 10px;
             font-weight: bold;
         }
 
@@ -72,41 +74,58 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .toggle-btn {
-            background: #161b22;
-            border: 2px solid var(--border);
+            background: transparent;
+            border: 1px solid var(--border);
             color: var(--high-vis);
-            padding: 15px 30px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1.2em;
+            font-size: 0.8em;
             font-weight: bold;
         }
 
         .toggle-btn.active {
-            border-color: var(--blue);
-            color: var(--blue);
-            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(255, 123, 114, 0.1);
         }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 1.1em; }
+        details {
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+        }
+
+        summary {
+            padding: 15px;
+            cursor: pointer;
+            color: var(--blue);
+            font-weight: bold;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
         th { color: var(--blue); text-transform: uppercase; background: rgba(88, 166, 255, 0.05); }
-        
-        .entity-name { font-weight: bold; color: var(--high-vis); }
-        .entity-val { color: var(--red); font-weight: bold; font-family: 'Courier New', monospace; }
-        .bounce-tag { color: var(--red); font-size: 0.7em; border: 1px solid var(--red); padding: 2px 5px; border-radius: 4px; margin-left: 10px; }
+
+        .entity-val { color: var(--red); font-weight: bold; }
+        .bounce-tag { color: var(--red); font-size: 0.7em; border: 1px solid var(--red); padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
 
         .patent-mark {
             margin-top: 40px;
             text-align: center;
-            font-size: 1.2em;
-            color: var(--high-vis);
             border-top: 1px solid var(--border);
             padding-top: 20px;
+            font-size: 0.85em;
+            color: var(--high-vis);
         }
     </style>
 </head>
@@ -114,14 +133,9 @@
 
     <div id="ledger-content">
         <div class="header">
-            <h1 style="color: var(--high-vis); margin: 0; font-size: 2.5em;">AIF SOVEREIGN COMPLIANCE LEDGER</h1>
-            <p style="color: var(--blue); font-size: 1.3em; margin-top: 10px;">Managing Member: Vincent Caboara (ACS)</p>
-        </div>
-
-        <div class="priority-box">
-            <div id="liability-label" class="label">Total Accrued Liability (Commercial + Statutory)</div>
-            <div id="main-counter" class="liability-text">$0</div>
-            <div style="color: var(--blue); font-weight: bold; font-size: 1.2em;">STATUS: ACTUAL NOTICE VERIFIED</div>
+            <div class="label" style="color: var(--blue);">Priority Filing: 12/17/2025</div>
+            <h1 style="color: var(--high-vis); margin: 10px 0; font-size: 2.2em;">SOVEREIGN COMPLIANCE LEDGER</h1>
+            <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Caboara (ACS)</p>
         </div>
 
         <div class="multiplier-toggle">
@@ -129,20 +143,30 @@
             <button id="x3-btn" class="toggle-btn" onclick="setMultiplier(3)">TREBLED DAMAGES (3x)</button>
         </div>
 
-        <h2 style="color: var(--blue); border-left: 5px solid var(--blue); padding-left: 15px;">Verified Entity Logs</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Target Entity</th>
-                    <th>Notice Date</th>
-                    <th>Accrued Fine (USD)</th>
-                </tr>
-            </thead>
-            <tbody id="notice-log"></tbody>
-        </table>
+        <div class="priority-box">
+            <div id="liability-label" class="label">Total Accrued Liability</div>
+            <div id="main-counter" class="liability-text">$0</div>
+            <div style="color: var(--red); font-size: 0.8em; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">
+                DYNAMICAL ENTROPY TAX ACTIVE
+            </div>
+        </div>
+
+        <details>
+            <summary>VERIFIED ENTITY LOGS (STATUTORY DELTA)</summary>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target Entity</th>
+                        <th>Notice Date</th>
+                        <th>Accrued Fine (USD)</th>
+                    </tr>
+                </thead>
+                <tbody id="notice-log"></tbody>
+            </table>
+        </details>
 
         <div class="patent-mark">
-            <strong>Patent Pending</strong> | Arboreum Impact Foundation &copy; 2026
+            <p><strong>Patent Pending</strong> | Arboreum Impact Foundation &copy; 2026</p>
         </div>
     </div>
 
@@ -152,14 +176,10 @@
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
         const GROWTH_RATE = 53215.75; 
 
-        // THE COMPLETE VERIFIED LIST (FROZEN TO PREVENT DELETION)
         const entities = [
-            // Federal Primary Anchors
             { id: 'USDA (Federal Agency)', date: JAN_1_ANCHOR, base: 15000000000 },
             { id: 'DOE (Federal Agency)', date: JAN_1_ANCHOR, base: 15000000000 },
             { id: 'BETO (Federal Agency)', date: JAN_1_ANCHOR, base: 15000000000 },
-            
-            // Core Pharmaceutical / CSO Group
             { id: 'Abbott Laboratories', date: '2026-01-15T11:00:00Z', base: 12000000000 },
             { id: 'MilliporeSigma (Merck KGaA)', date: '2026-01-16T14:00:00Z', base: 12000000000 },
             { id: 'Infineon Technologies', date: '2026-01-17T10:00:00Z', base: 8500000000 },
@@ -177,16 +197,10 @@
             { id: 'Bristol Myers Squibb', date: '2026-01-14T11:30:00Z', base: 10000000000 },
             { id: 'Gilead Sciences', date: '2026-01-14T15:45:00Z', base: 7000000000 },
             { id: 'Moderna Inc.', date: '2026-01-14T16:20:00Z', base: 6000000000 },
-
-            // Morgan Stanley / E*TRADE Verified Outreach
             { id: 'Morgan Stanley Wealth Mgmt', date: '2026-01-20T12:00:00Z', base: 2500000000 },
             { id: 'E*TRADE Financial', date: '2026-01-20T12:00:00Z', base: 2500000000 },
-            
-            // Supplemental Sector Outreach
             { id: 'Thermo Fisher Scientific', date: '2026-01-16T14:00:00Z', base: 10500000000 },
             { id: 'Danaher Corporation', date: '2026-01-16T15:00:00Z', base: 9000000000 },
-
-            // AIF Legacy & Standards
             { id: 'AIF Vault Registry', date: PRIORITY_DATE, base: 5000000000 },
             { id: 'Global Bioeconomy Standard', date: JAN_1_ANCHOR, base: 15000000000 }
         ];
@@ -214,9 +228,9 @@
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="entity-name">${e.id} ${e.bounce ? '<span class="bounce-tag">BOUNCE - ACTION REQ</span>' : ''}</td>
-                    <td style="color: var(--blue); font-size: 0.9em;">${new Date(noticeTime).toLocaleDateString()}</td>
-                    <td class="entity-val">$${currentFine.toLocaleString('en-US')}</td>
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">ACTION REQ</span>' : ''}</td>
+                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
+                    <td><span class="entity-val">$${currentFine.toLocaleString('en-US')}</span></td>
                 `;
                 logBody.appendChild(row);
             });
