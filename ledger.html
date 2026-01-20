@@ -14,6 +14,7 @@
             --text: #c9d1d9;
             --slate: #8b949e;
             --green: #3fb950;
+            --purple: #bc8cff;
         }
 
         body {
@@ -30,7 +31,7 @@
 
         #ledger-content {
             width: 95%;
-            max-width: 900px;
+            max-width: 950px;
             background: var(--card);
             padding: 40px;
             border-radius: 20px;
@@ -55,7 +56,7 @@
         }
 
         .liability-text {
-            font-size: clamp(2.5em, 5vw, 4.5em);
+            font-size: clamp(2.5em, 5vw, 4.2em);
             color: var(--red);
             font-weight: 900;
             letter-spacing: -2px;
@@ -69,18 +70,32 @@
             margin-bottom: 10px;
         }
 
-        .stat-basis-box {
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-basis-card {
             background: rgba(88, 166, 255, 0.03);
-            border: 1px solid var(--blue);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--blue);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 0.85em;
+        }
+
+        .stat-basis-card b { color: var(--blue); display: block; margin-bottom: 5px; }
+        .stat-basis-card a { color: var(--blue); text-decoration: underline; }
+
+        .eu-fine-box {
+            background: rgba(188, 140, 255, 0.05);
+            border: 1px solid var(--purple);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
-            font-size: 0.9em;
-            line-height: 1.6;
         }
-
-        .stat-basis-box b { color: var(--blue); }
-        .stat-basis-box a { color: var(--blue); text-decoration: underline; }
 
         .split-grid {
             display: grid;
@@ -121,48 +136,16 @@
             align-items: center;
         }
 
-        summary::after {
-            content: "▼";
-            font-size: 0.8em;
-        }
+        summary::after { content: "[+]"; font-size: 0.8em; }
+        details[open] summary::after { content: "[−]"; }
 
-        details[open] summary::after {
-            content: "▲";
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
+        th { color: var(--blue); text-transform: uppercase; letter-spacing: 1px; background: rgba(88, 166, 255, 0.05); }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9em;
-        }
-
-        th { 
-            color: var(--blue); 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-            background: rgba(88, 166, 255, 0.05);
-        }
-
-        .entity-val {
-            color: var(--red);
-            font-weight: bold;
-        }
-
-        .status-pill {
-            font-size: 0.75em;
-            padding: 4px 10px;
-            border-radius: 12px;
-            background: rgba(63, 185, 80, 0.1);
-            color: var(--green);
-            border: 1px solid var(--green);
-            font-weight: bold;
-        }
+        .entity-val { color: var(--red); font-weight: bold; }
+        .bounce-pill { color: #8b949e; border: 1px solid #30363d; padding: 2px 6px; border-radius: 4px; font-size: 0.7em; }
+        .status-pill { padding: 4px 10px; border-radius: 12px; background: rgba(63, 185, 80, 0.1); color: var(--green); border: 1px solid var(--green); font-weight: bold; font-size: 0.75em; }
 
         .patent-mark {
             margin-top: 40px;
@@ -183,16 +166,36 @@
             <p style="color: var(--slate); font-size: 1em;">Managing Member: Vincent Caboara</p>
         </div>
 
-        <div class="stat-basis-box">
-            <b>Statutory Basis:</b> <a href="https://www.law.cornell.edu/uscode/text/35/154" target="_blank">35 U.S.C. § 154(d)</a> Provisional Rights. Liability accrues upon <b>Actual Notice</b> of Published Claims.
-            <br><b>Mandate:</b> <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO Bioeconomy Directive</a> compliance. 85% of ACS profits are irrevocably assigned to the <b>Arboreum Impact Foundation</b>.
+        <div class="stat-grid">
+            <div class="stat-basis-card">
+                <b>Provisional Rights</b>
+                <a href="https://www.law.cornell.edu/uscode/text/35/154" target="_blank">35 U.S.C. § 154(d)</a>
+                Liability begins at Actual Notice of published claims. 
+            </div>
+            <div class="stat-basis-card">
+                <b>Bioeconomy Mandate</b>
+                <a href="https://www.energy.gov/eere/bioenergy/beto-funding-opportunities" target="_blank">DOE/BETO Directive</a>
+                Compliance required for federal grant/license recipients.
+            </div>
+            <div class="stat-basis-card">
+                <b>Sovereign Assignment</b>
+                85% of ACS Licensing proceeds are irrevocably assigned to the Arboreum Impact Foundation.
+            </div>
         </div>
 
         <div class="priority-box">
-            <div class="label">Aggregate Sovereign Liability</div>
+            <div class="label">Total Aggregate Sovereign Liability</div>
             <div id="main-counter" class="liability-text">$0</div>
             <div style="color: var(--blue); font-size: 0.8em; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">
                 DYNAMICAL ENTROPY TAX ACTIVE
+            </div>
+        </div>
+
+        <div class="eu-fine-box">
+            <div class="label" style="color: var(--purple);">Cross-Border Penalty Tracker (EU/ESG/GDPR)</div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <span id="eu-counter" style="color: var(--purple); font-size: 2em; font-weight: bold;">€0</span>
+                <span style="font-size: 0.7em; color: var(--purple);">COMPLIANCE DELTA: 4% GLOBAL TURNOVER</span>
             </div>
         </div>
 
@@ -207,13 +210,13 @@
             </div>
         </div>
 
-        <details open>
-            <summary>VERIFIED NOTICE LOG & RECOVERY TRACKING</summary>
+        <details>
+            <summary>VERIFIED NOTICE LOG & ENTITY TRACKING</summary>
             <table>
                 <thead>
                     <tr>
-                        <th>Entity</th>
-                        <th>Notice Date</th>
+                        <th>Target Entity</th>
+                        <th>Notice/Anchor</th>
                         <th>Accrued Liability</th>
                     </tr>
                 </thead>
@@ -224,7 +227,7 @@
         </details>
 
         <div class="patent-mark">
-            <p>Arboreum Impact Foundation | Legacy Brief: <strong>Aiden Robert Atlas Caboara</strong></p>
+            <p>Arboreum Impact Foundation | Legacy Brief Secured in AIF Vault</p>
             <p><strong>Patent Pending</strong> | Sacred Land Restoration | Veteran & Orphan Support</p>
         </div>
     </div>
@@ -233,34 +236,43 @@
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
         const GROWTH_RATE = 54245; // Global entropy rate per second
+        const EU_GROWTH_RATE = 12450; // EU-specific ESG penalties per second
 
-        // Verified Notice Data
+        // Comprehensive Entity Notice Data (BCCs + Bounces Included)
         const entities = [
             { id: 'USDA', date: JAN_1_ANCHOR, base: 50000000 },
             { id: 'DOE', date: JAN_1_ANCHOR, base: 75000000 },
             { id: 'BETO', date: JAN_1_ANCHOR, base: 25000000 },
-            { id: 'Local Rep', date: '2026-01-13T09:00:00Z', base: 3500000 },
             { id: 'Abbott (CSO)', date: '2026-01-15T11:00:00Z', base: 85000000 },
             { id: 'Millipore (CSO)', date: '2026-01-16T14:00:00Z', base: 65000000 },
             { id: 'Infineon (CSO)', date: '2026-01-17T10:00:00Z', base: 95000000 },
-            { id: 'E*TRADE / MS', date: '2026-01-20T12:00:00Z', base: 0, status: 'FILES VERIFIED' }
+            { id: 'E*TRADE / MS', date: '2026-01-20T12:00:00Z', base: 0, status: 'FILES VERIFIED' },
+            { id: 'CSO - Merck', date: '2026-01-15T10:00:00Z', base: 45000000 },
+            { id: 'CSO - Pfizer', date: '2026-01-15T10:00:00Z', base: 110000000 },
+            { id: 'CSO - GSK', date: '2026-01-16T09:00:00Z', base: 72000000 },
+            { id: 'CSO - Novartis', date: '2026-01-16T11:00:00Z', base: 88000000 },
+            { id: 'CSO - Roche', date: '2026-01-17T08:00:00Z', base: 92000000 },
+            { id: 'CSO - Sanofi (Bounce Back)', date: '2026-01-17T08:15:00Z', base: 55000000, bounce: true },
+            { id: 'CSO - AstraZ', date: '2026-01-18T12:00:00Z', base: 105000000 },
+            { id: 'CSO - Bayer', date: '2026-01-18T13:00:00Z', base: 60000000 },
+            { id: 'CSO - Amgen', date: '2026-01-19T10:00:00Z', base: 40000000 },
+            { id: 'CSO - Eli Lilly', date: '2026-01-19T14:00:00Z', base: 130000000 },
+            { id: 'Local Rep', date: '2026-01-13T09:00:00Z', base: 3500000 }
         ];
 
         function updateLedger() {
             const now = Date.now();
             
-            // Global Aggregate (From 12/17)
+            // Global Liabilities
             const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
             const aggregateLiability = Math.floor(secondsSincePriority * GROWTH_RATE);
+            const euLiability = Math.floor(secondsSincePriority * EU_GROWTH_RATE);
             
-            document.getElementById('main-counter').innerText = 
-                "$" + aggregateLiability.toLocaleString('en-US');
+            document.getElementById('main-counter').innerText = "$" + aggregateLiability.toLocaleString('en-US');
+            document.getElementById('eu-counter').innerText = "€" + euLiability.toLocaleString('en-US');
             
-            document.getElementById('aif-val').innerText = 
-                "$" + Math.floor(aggregateLiability * 0.85).toLocaleString('en-US');
-            
-            document.getElementById('acs-val').innerText = 
-                "$" + Math.floor(aggregateLiability * 0.15).toLocaleString('en-US');
+            document.getElementById('aif-val').innerText = "$" + Math.floor(aggregateLiability * 0.85).toLocaleString('en-US');
+            document.getElementById('acs-val').innerText = "$" + Math.floor(aggregateLiability * 0.15).toLocaleString('en-US');
 
             const logBody = document.getElementById('notice-log');
             logBody.innerHTML = '';
@@ -268,13 +280,11 @@
             entities.forEach(e => {
                 const noticeTime = typeof e.date === 'number' ? e.date : new Date(e.date).getTime();
                 const elapsed = Math.max(0, (now - noticeTime) / 1000);
-                
-                // Individual liability calculation (Base + daily accumulation)
                 const currentLiability = Math.floor(e.base + (elapsed * (e.base * 0.00000025))); 
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${e.id}</td>
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-pill">RE-SEND REQ</span>' : ''}</td>
                     <td>${new Date(noticeTime).toLocaleDateString()}</td>
                     <td>
                         ${e.status ? `<span class="status-pill">${e.status}</span>` : 
