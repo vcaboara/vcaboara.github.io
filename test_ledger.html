@@ -139,6 +139,193 @@ addTest('Clicking section header toggles collapsed class', async () => {
                     return rowsAfter === 0 && rowsBefore > 0;
                 });
 
+                addTest('Sort headers have click handlers', () => {
+                    const headers = doc.querySelectorAll('th[data-sort-by]');
+                    return headers.length === 3 && Array.from(headers).every(h => h.onclick !== null);
+                });
+
+                addTest('Sort indicators exist in headers', () => {
+                    const indicators = doc.querySelectorAll('th .sort-indicator');
+                    return indicators.length === 3;
+                });
+
+                addTest('Clicking entity header sorts alphabetically (asc)', async () => {
+                    const entityHeader = doc.querySelector('th[data-sort-by="entity"]');
+                    if (!entityHeader) return false;
+                    
+                    // Open all sections first
+                    const dividers = doc.querySelectorAll('.section-divider');
+                    for (const divider of dividers) {
+                        if (divider.classList.contains('collapsed')) {
+                            divider.click();
+                            await new Promise(resolve => setTimeout(resolve, 50));
+                        }
+                    }
+                    
+                    // Click to sort
+                    entityHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Check indicator
+                    const indicator = entityHeader.querySelector('.sort-indicator');
+                    if (!indicator || !indicator.textContent.includes('▲')) return false;
+                    
+                    // Get first section's entities
+                    const federalRows = doc.querySelectorAll('[data-section="federal"]');
+                    if (federalRows.length < 2) return true; // Not enough to test
+                    
+                    const firstEntity = federalRows[0].querySelector('td').textContent.trim();
+                    const secondEntity = federalRows[1].querySelector('td').textContent.trim();
+                    
+                    return firstEntity.localeCompare(secondEntity) <= 0;
+                });
+
+                addTest('Clicking entity header twice sorts descending', async () => {
+                    const entityHeader = doc.querySelector('th[data-sort-by="entity"]');
+                    if (!entityHeader) return false;
+                    
+                    // First, sort by date to reset entity column state
+                    const dateHeader = doc.querySelector('th[data-sort-by="date"]');
+                    if (dateHeader) {
+                        dateHeader.click();
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                    
+                    // Click entity header once for ascending
+                    entityHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    
+                    // Click again for descending
+                    entityHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Check indicator
+                    const indicator = entityHeader.querySelector('.sort-indicator');
+                    return indicator && indicator.textContent.includes('▼');
+                });
+
+                addTest('Date sorting works (ascending)', async () => {
+                    const dateHeader = doc.querySelector('th[data-sort-by="date"]');
+                    if (!dateHeader) return false;
+                    
+                    // Open commercial section (has multiple dates)
+                    const commercialDivider = doc.querySelector('[data-section-header="commercial"]');
+                    if (commercialDivider && commercialDivider.classList.contains('collapsed')) {
+                        commercialDivider.click();
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                    
+                    // Click to sort by date
+                    dateHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Check indicator
+                    const indicator = dateHeader.querySelector('.sort-indicator');
+                    if (!indicator || !indicator.textContent.includes('▲')) return false;
+                    
+                    // Get commercial section's dates
+                    const commercialRows = doc.querySelectorAll('[data-section="commercial"]');
+                    if (commercialRows.length < 2) return true;
+                    
+                    const firstDate = new Date(commercialRows[0].querySelectorAll('td')[1].textContent);
+                    const secondDate = new Date(commercialRows[1].querySelectorAll('td')[1].textContent);
+                    
+                    return firstDate <= secondDate;
+                });
+
+                addTest('Fine sorting works (ascending)', async () => {
+                    const fineHeader = doc.querySelector('th[data-sort-by="fine"]');
+                    if (!fineHeader) return false;
+                    
+                    // Open commercial section
+                    const commercialDivider = doc.querySelector('[data-section-header="commercial"]');
+                    if (commercialDivider && commercialDivider.classList.contains('collapsed')) {
+                        commercialDivider.click();
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                    
+                    // Click to sort by fine
+                    fineHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Check indicator
+                    const indicator = fineHeader.querySelector('.sort-indicator');
+                    if (!indicator || !indicator.textContent.includes('▲')) return false;
+                    
+                    // Get commercial section's fines
+                    const commercialRows = doc.querySelectorAll('[data-section="commercial"]');
+                    if (commercialRows.length < 2) return true;
+                    
+                    const firstFine = parseInt(commercialRows[0].querySelectorAll('td')[2].textContent.replace(/[$,]/g, ''));
+                    const secondFine = parseInt(commercialRows[1].querySelectorAll('td')[2].textContent.replace(/[$,]/g, ''));
+                    
+                    return firstFine <= secondFine;
+                });
+
+                addTest('Section dividers remain after sorting', async () => {
+                    const entityHeader = doc.querySelector('th[data-sort-by="entity"]');
+                    if (!entityHeader) return false;
+                    
+                    // Sort
+                    entityHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Check that all 4 section dividers still exist
+                    const dividers = doc.querySelectorAll('.section-divider');
+                    return dividers.length === 4;
+                });
+
+                addTest('Sorting persists when toggling sections', async () => {
+                    const dateHeader = doc.querySelector('th[data-sort-by="date"]');
+                    if (!dateHeader) return false;
+                    
+                    // Sort by date
+                    dateHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Collapse a section
+                    const commercialDivider = doc.querySelector('[data-section-header="commercial"]');
+                    if (commercialDivider) {
+                        commercialDivider.click();
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                        // Expand it again
+                        commercialDivider.click();
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                        // Check indicator is still there
+                        const indicator = dateHeader.querySelector('.sort-indicator');
+                        return indicator && indicator.textContent.includes('▲');
+                    }
+                    return false;
+                });
+
+                addTest('Sorting works with multiplier toggle', async () => {
+                    const fineHeader = doc.querySelector('th[data-sort-by="fine"]');
+                    if (!fineHeader) return false;
+                    
+                    // Sort by fine with 1x
+                    fineHeader.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Toggle to 3x
+                    const x3Btn = doc.getElementById('x3-btn');
+                    if (x3Btn) {
+                        x3Btn.click();
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                        // Check that order is still maintained
+                        const commercialRows = doc.querySelectorAll('[data-section="commercial"]');
+                        if (commercialRows.length < 2) return true;
+                        
+                        const firstFine = parseInt(commercialRows[0].querySelectorAll('td')[2].textContent.replace(/[$,]/g, ''));
+                        const secondFine = parseInt(commercialRows[1].querySelectorAll('td')[2].textContent.replace(/[$,]/g, ''));
+                        
+                        return firstFine <= secondFine;
+                    }
+                    return false;
+                });
+
                 addTest('Values update without rebuilding table', async () => {
                     const initialHtml = doc.getElementById('notice-log').innerHTML;
                     
