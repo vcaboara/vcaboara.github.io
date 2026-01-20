@@ -333,19 +333,6 @@
             buildTable();
         }
 
-        function createRow(e, now, section) {
-            const noticeTime = new Date(e.date).getTime();
-            const elapsed = Math.max(0, (now - noticeTime) / 1000);
-            const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
-            return `
-                <tr class="section-row" data-section="${section}">
-                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">BOUNCE LOG</span>' : ''}</td>
-                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
-                    <td><span class="entity-val">$${currentFine.toLocaleString('en-US')}</span></td>
-                </tr>
-            `;
-        }
-
         window.collapsedSections = new Set();
 
         window.toggleSection = function (section) {
