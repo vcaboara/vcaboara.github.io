@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -129,12 +130,40 @@
             align-items: center;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
-        th { color: var(--blue); text-transform: uppercase; background: rgba(88, 166, 255, 0.05); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-        .entity-val { color: var(--red); font-weight: bold; }
-        .bounce-tag { color: var(--red); font-size: 0.65em; border: 1px solid var(--red); padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold; white-space: nowrap; }
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+        }
+
+        th {
+            color: var(--blue);
+            text-transform: uppercase;
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .entity-val {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .bounce-tag {
+            color: var(--red);
+            font-size: 0.65em;
+            border: 1px solid var(--red);
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
 
         .section-divider {
             color: var(--slate);
@@ -156,21 +185,30 @@
         }
     </style>
 </head>
+
 <body>
 
     <div id="ledger-content">
         <div class="header">
             <div class="label" style="color: var(--blue);">Priority Filing: 12/17/2025 | Patent Pending</div>
             <h1 style="color: var(--high-vis); margin: 10px 0; font-size: 2.2em;">SOVEREIGN COMPLIANCE LEDGER</h1>
-            <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Caboara (ACS)</p>
+            <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Caboara (Arboreum Commercial Solutions)</p>
         </div>
 
         <div class="label" style="margin-left: 5px; color: var(--slate);">Statutory Basis for Fines</div>
         <div class="stat-links">
-            <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank">35 U.S.C. § 284 (Damages)</a>
-            <a href="https://www.law.cornell.edu/uscode/text/35/285" target="_blank">35 U.S.C. § 285 (Attorney Fees)</a>
-            <a href="https://www.law.cornell.edu/uscode/text/35/271" target="_blank">35 U.S.C. § 271 (Infringement)</a>
-            <a href="https://www.law.cornell.edu/uscode/text/35/287" target="_blank">35 U.S.C. § 287 (Notice)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank"
+                title="Compensation for patent infringement - includes lost profits and reasonable royalties">35 U.S.C.
+                § 284 (Damages)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/285" target="_blank"
+                title="Court may award attorney fees to prevailing party in exceptional cases">35 U.S.C. § 285 (Attorney
+                Fees)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/271" target="_blank"
+                title="Defines acts constituting patent infringement - making, using, selling, or importing">35 U.S.C. §
+                271 (Infringement)</a>
+            <a href="https://www.law.cornell.edu/uscode/text/35/287" target="_blank"
+                title="Patentee must provide notice to infringer to recover damages - virtual marking allowed">35 U.S.C.
+                § 287 (Notice)</a>
         </div>
 
         <div class="multiplier-toggle">
@@ -186,7 +224,7 @@
             </div>
         </div>
 
-        <details open>
+        <details>
             <summary>VERIFIED ENTITY LOGS (STATUTORY DELTA)</summary>
             <table>
                 <thead>
@@ -204,7 +242,8 @@
 
         <div class="patent-mark">
             <p><strong>Patent Pending</strong> | Arboreum Commercial Solutions &copy; 2026</p>
-            <p style="font-size: 0.7em; color: var(--slate); margin-top: 5px;">Compliance Managed by ACS | Evidence Preserved for Phillips & Cohen LLP</p>
+            <p style="font-size: 0.7em; color: var(--slate); margin-top: 5px;">Compliance Managed by ACS | Evidence
+                Preserved for Phillips & Cohen LLP</p>
         </div>
     </div>
 
@@ -212,13 +251,13 @@
         let multiplier = 1;
         const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
         const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
-        
-        const GROWTH_RATE = 612.45; 
+
+        const GROWTH_RATE = 612.45;
 
         const US_FEDERAL = [
-            { id: 'USDA (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
-            { id: 'DOE (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 },
-            { id: 'BETO (Federal Agency)', date: JAN_1_ANCHOR, base: 250000000 }
+            { id: 'USDA', date: JAN_1_ANCHOR, base: 250000000 },
+            { id: 'DOE', date: JAN_1_ANCHOR, base: 250000000 },
+            { id: 'BETO', date: JAN_1_ANCHOR, base: 250000000 }
         ];
 
         const US_COMMERCIAL = [
@@ -287,7 +326,7 @@
 
             html += '<tr class="section-divider"><td colspan="3">U.S. Commercial Entities</td></tr>';
             US_COMMERCIAL.forEach(e => html += createRow(e, now));
-            
+
             html += '<tr class="section-divider"><td colspan="3">Global & EU Entities</td></tr>';
             GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now));
 
@@ -301,4 +340,5 @@
         updateLedger();
     </script>
 </body>
+
 </html>
