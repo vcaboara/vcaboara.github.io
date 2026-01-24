@@ -88,6 +88,42 @@
             font-size: 0.85em;
         }
 
+        .mandate-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .mandate-section {
+            background: #161b22;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .mandate-section .label {
+            font-size: 0.7em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .mandate-section a {
+            display: block;
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 0.75em;
+            padding: 6px 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .mandate-section a:hover {
+            background: rgba(88, 166, 255, 0.1);
+            text-decoration: underline;
+        }
+
         .multiplier-toggle {
             display: flex;
             justify-content: center;
@@ -110,6 +146,12 @@
             border-color: var(--red);
             color: var(--red);
             background: rgba(255, 123, 114, 0.1);
+        }
+
+        .status-delivered {
+            color: #26a641;
+            font-size: 0.85em;
+            font-weight: 500;
         }
 
         details {
@@ -215,55 +257,6 @@
                 12/30/2025</p>
         </div>
 
-        <div class="label" style="color: var(--slate); text-align: center;">Statutory Basis for Fines</div>
-        <div class="stat-links">
-            <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank"
-                title="Compensation for patent infringement - includes lost profits and reasonable royalties">35 U.S.C.
-                § 284 (Damages)</a>
-            <a href="https://www.law.cornell.edu/uscode/text/35/285" target="_blank"
-                title="Court may award attorney fees to prevailing party in exceptional cases">35 U.S.C. § 285 (Attorney
-                Fees)</a>
-            <a href="https://www.law.cornell.edu/uscode/text/35/271" target="_blank"
-                title="Defines acts constituting patent infringement - making, using, selling, or importing">35 U.S.C. §
-                271 (Infringement)</a>
-            <a href="https://www.law.cornell.edu/uscode/text/35/287" target="_blank"
-                title="Patentee must provide notice to infringer to recover damages - virtual marking allowed">35 U.S.C.
-                § 287 (Notice)</a>
-        </div>
-
-        <div class="label" style="color: var(--slate); text-align: center; margin-top: 30px;">Contributing State
-            Mandates (Post-12/30/25)</div>
-        <div class="stat-links">
-            <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB253"
-                target="_blank"
-                title="Climate Corporate Data Accountability Act - $500k/yr penalty for >$1B revenue companies">CA SB
-                253 (Climate Data)</a>
-            <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB261"
-                target="_blank"
-                title="Climate-Related Financial Risk Act - $50k/yr penalty for >$500M revenue companies">CA SB 261
-                (Financial Risk)</a>
-            <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202120220SB54"
-                target="_blank"
-                title="Plastic Pollution Prevention Act - $500M/yr collective + $50k/day per violation">CA SB 54
-                (Plastic/Packaging)</a>
-            <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB308"
-                target="_blank"
-                title="Carbon Dioxide Removal Market Development Act - Net Negative by 2045, criminal non-compliance">CA
-                SB 308 (Net Negative)</a>
-        </div>
-
-        <div class="label" style="color: var(--slate); text-align: center; margin-top: 30px;">Federal Mandates (USDA/DOE/BETO)</div>
-        <div class="stat-links">
-            <a href="https://www.energy.gov/eere/bioenergy" target="_blank"
-                title="Bioenergy Technologies Office - Advanced biofuels and bioproducts mandate">DOE BETO Bioeconomy</a>
-            <a href="https://www.usda.gov/topics/farming/biopreferred-program" target="_blank"
-                title="BioPreferred Program - Federal procurement preference for bio-based products">USDA BioPreferred</a>
-            <a href="https://www.federalregister.gov/d/2023-28700" target="_blank"
-                title="Sustainable Aviation Fuel Credit - $1.25-$1.75/gal tax credit, requires 50% emissions reduction">SAF Tax Credit (IRA)</a>
-            <a href="https://www.energy.gov/bil/energy-infrastructure-act" target="_blank"
-                title="Infrastructure Investment and Jobs Act - Bioenergy funding and mandates">IIJA Bioenergy</a>
-        </div>
-
         <div class="multiplier-toggle">
             <button id="x1-btn" class="toggle-btn active" onclick="setMultiplier(1)">BASE FINES (1x)</button>
             <button id="x3-btn" class="toggle-btn" onclick="setMultiplier(3)">TREBLED DAMAGES (3x)</button>
@@ -276,6 +269,60 @@
                 DYNAMICAL ENTROPY TAX ACTIVE
             </div>
         </div>
+
+        <div class="mandate-grid">
+            <div class="mandate-section">
+                <div class="label" style="color: var(--high-vis);">Patent Statutes</div>
+                <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank"
+                    title="Compensation for patent infringement - includes lost profits and reasonable royalties">35 U.S.C. § 284 (Damages)</a>
+                <a href="https://www.law.cornell.edu/uscode/text/35/285" target="_blank"
+                    title="Court may award attorney fees to prevailing party in exceptional cases">35 U.S.C. § 285 (Attorney Fees)</a>
+                <a href="https://www.law.cornell.edu/uscode/text/35/271" target="_blank"
+                    title="Defines acts constituting patent infringement - making, using, selling, or importing">35 U.S.C. § 271 (Infringement)</a>
+                <a href="https://www.law.cornell.edu/uscode/text/35/287" target="_blank"
+                    title="Patentee must provide notice to infringer to recover damages - virtual marking allowed">35 U.S.C. § 287 (Notice)</a>
+            </div>
+
+            <div class="mandate-section">
+                <div class="label" style="color: var(--high-vis);">CA State Mandates</div>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB253"
+                    target="_blank" title="Climate Corporate Data Accountability Act - $500k/yr penalty">SB 253 (Climate Data)</a>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB261"
+                    target="_blank" title="Climate-Related Financial Risk Act - $50k/yr penalty">SB 261 (Financial Risk)</a>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202120220SB54"
+                    target="_blank" title="Plastic Pollution Prevention Act - $500M/yr + $50k/day">SB 54 (Plastic/Packaging)</a>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB308"
+                    target="_blank" title="Net Negative by 2045, criminal non-compliance">SB 308 (Net Negative)</a>
+            </div>
+
+            <div class="mandate-section">
+                <div class="label" style="color: var(--high-vis);">Federal Programs</div>
+                <a href="https://www.energy.gov/eere/bioenergy" target="_blank"
+                    title="Bioenergy Technologies Office - Advanced biofuels mandate">DOE BETO Bioeconomy</a>
+                <a href="https://www.usda.gov/topics/farming/biopreferred-program" target="_blank"
+                    title="Federal procurement preference for bio-based products">USDA BioPreferred</a>
+                <a href="https://www.federalregister.gov/d/2023-28700" target="_blank"
+                    title="$1.25-$1.75/gal tax credit, 50% emissions reduction">SAF Tax Credit (IRA)</a>
+                <a href="https://www.energy.gov/bil/energy-infrastructure-act" target="_blank"
+                    title="Infrastructure Investment and Jobs Act - Bioenergy funding">IIJA Bioenergy</a>
+            </div>
+        </div>
+
+        <div class="label" style="color: var(--high-vis); margin-top: 30px; text-align: center;">
+            📧 Documented Notices & Delivery Status
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; background: #161b22; border: 1px solid var(--border);">
+            <thead>
+                <tr style="background: #0d1117;">
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Entity</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Subject</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Recipient</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Date Sent</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Status</th>
+                </tr>
+            </thead>
+            <tbody id="notices-table"></tbody>
+        </table>
 
         <details>
             <summary>VERIFIED ENTITY LOGS (STATUTORY DELTA)</summary>
@@ -343,6 +390,38 @@
             { id: 'ACS Internal Audit Registry', date: PRIORITY_DATE, base: 10000000 },
             { id: 'Global Bioeconomy Standard (Protocol)', date: JAN_1_ANCHOR, base: 100000000 }
         ];
+
+        const DOCUMENTED_NOTICES = [
+            { entity: 'USDA', subject: 'Technical Response: 12/30 Memorandum (Patent App 19/424,106)', to: 'OES@usda.gov', date: '2025-12-31 18:36', bounced: false },
+            { entity: 'USDA', subject: 'PRIORITY: Domestic Tech Disclosure - Patent 19/424,106 (Filed 12/17)', to: 'CFIUS@treasury.gov', date: '2026-01-01 08:28', bounced: false },
+            { entity: 'DOE/BETO', subject: 'Technical Implementation: 12/30 USDA Mandate / Patent 19/424,106', to: 'BETO@ee.doe.gov', date: '2026-01-01 08:30', bounced: false },
+            { entity: 'Riverside County', subject: 'FORMAL NOTIFICATION - USPTO 19/424,106 TECHNICAL STANDARDS', to: 'DGause@riversideca.gov', date: '2026-01-05 14:14', bounced: false },
+            { entity: 'Riverside County', subject: 'URGENT BRIEF: 2026 Carbon-Negative Mandates & Arboreum Impact Fund', to: '2mayor@riversideca.gov', date: '2026-01-05 14:14', bounced: false },
+            { entity: 'Riverside County', subject: 'Technical Brief Follow-up: Patent 19/424,106', to: 'rmoran@rivco.org', date: '2026-01-05 15:59', bounced: false },
+            { entity: 'Riverside County', subject: 'FOLLOW-UP: Physical Inquiry (1/5/26) - Patent Pending 19/424,106', to: 'agdept@rivco.org', date: '2026-01-05 16:24', bounced: false },
+            { entity: 'Riverside County', subject: 'FORMAL NOTICE: Priority Federal Filing (12/17) & Industrial Service Report', to: 'stacy@blendedimpact.com, jlilley@riversideca.gov', date: '2026-01-07 18:56', bounced: false },
+            { entity: 'Rep. Calvert', subject: 'CONSTITUENT CASEWORK: Vincent Pietro Caboara – USDA/CARB Verification', to: 'CalvertConstituentServices@mail.house.gov', date: '2026-01-12 14:16', bounced: false },
+            { entity: 'Riverside County', subject: 'Re: [EXTERNAL] URGENT BRIEF: 2026 Carbon-Negative Mandates & Arboreum Impact Fund', to: '2MAYOR@riversideca.gov', date: '2026-01-13 13:01', bounced: false }
+        ];
+
+        function populateNoticesTable() {
+            const tbody = document.getElementById('notices-table');
+            let html = '';
+            for (const notice of DOCUMENTED_NOTICES) {
+                const statusClass = notice.bounced ? 'bounce-tag' : 'status-delivered';
+                const statusText = notice.bounced ? '❌ BOUNCED/EVASION' : '✓ Delivered';
+                html += `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26;">${notice.entity}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26; font-size: 0.85em;">${notice.subject}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26; font-size: 0.8em; color: var(--slate);">${notice.to}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26; font-size: 0.85em;">${notice.date}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26;"><span class="${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
 
         function setMultiplier(m) {
             multiplier = m;
@@ -446,6 +525,7 @@
 
         // Build table once on load
         buildTable();
+        populateNoticesTable();
 
         // Only update values, not structure
         setInterval(updateValues, 200);
