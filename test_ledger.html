@@ -101,16 +101,16 @@
                     return win.collapsedSections !== undefined;
                 });
 
-addTest('Clicking section header toggles collapsed class', async () => {
+                addTest('Clicking section header toggles collapsed class', async () => {
                     const divider = doc.querySelector('[data-section-header="federal"]');
                     if (!divider) return false;
-                    
+
                     const initialCollapsed = divider.classList.contains('collapsed');
                     divider.click();
-                    
+
                     // Wait for buildTable to run
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    
+
                     const afterClick = doc.querySelector('[data-section-header="federal"]');
                     return afterClick.classList.contains('collapsed') !== initialCollapsed;
                 });
@@ -118,39 +118,39 @@ addTest('Clicking section header toggles collapsed class', async () => {
                 addTest('Collapsed section hides rows', async () => {
                     const divider = doc.querySelector('[data-section-header="commercial"]');
                     if (!divider) return false;
-                    
+
                     // Ensure it's open first
                     if (divider.classList.contains('collapsed')) {
                         divider.click();
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
-                    
+
                     // Count rows before
                     let rowsBefore = doc.querySelectorAll('[data-section="commercial"]').length;
-                    
+
                     if (rowsBefore === 0) return false; // Section was already collapsed
-                    
+
                     // Click to collapse
                     divider.click();
-                    
+
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    
+
                     const rowsAfter = doc.querySelectorAll('[data-section="commercial"]').length;
                     return rowsAfter === 0 && rowsBefore > 0;
                 });
 
                 addTest('Values update without rebuilding table', async () => {
                     const initialHtml = doc.getElementById('notice-log').innerHTML;
-                    
+
                     // Wait for value updates
                     await new Promise(resolve => setTimeout(resolve, 300));
-                    
+
                     const afterHtml = doc.getElementById('notice-log').innerHTML;
-                    
+
                     // HTML structure should be different (values changed) but sections should still exist
                     const sectionsBefore = (initialHtml.match(/section-divider/g) || []).length;
                     const sectionsAfter = (afterHtml.match(/section-divider/g) || []).length;
-                    
+
                     return sectionsBefore === sectionsAfter && sectionsBefore === 4;
                 });
 
