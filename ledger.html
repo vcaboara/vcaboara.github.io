@@ -270,6 +270,14 @@
             </div>
         </div>
 
+        <div
+            style="background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 20px 0; text-align: center;">
+            <p style="color: var(--slate); font-size: 0.9em; margin: 0;">
+                This real-time compliance ledger tracks statutory patent infringement damages under <strong
+                    style="color: var(--blue);">35 U.S.C. § 284</strong>.
+            </p>
+        </div>
+
         <div class="mandate-grid">
             <div class="mandate-section">
                 <div class="label" style="color: var(--high-vis);">Patent Statutes</div>
@@ -315,9 +323,37 @@
             </div>
         </div>
 
+        <div
+            style="background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 20px 0; text-align: center;">
+            <p style="color: var(--slate); font-size: 0.85em; line-height: 1.6; margin: 0;">
+                Documented notices were sent to all listed entities (see below). Fines accrue from notice date at base
+                liability + $50/second.
+                <span style="color: var(--red); font-weight: 600;">BOUNCE LOG</span> indicates entities that
+                rejected/blocked notice delivery.
+            </p>
+        </div>
+
+        <div
+            style="background: #0d1117; padding: 20px; border-radius: 8px; border: 2px solid var(--blue); margin: 20px 0;">
+            <h3 style="color: var(--high-vis); margin: 0 0 15px 0; text-align: center; font-size: 1.1em;">🛡️ Path to
+                Compliance</h3>
+            <p style="color: var(--slate); font-size: 0.9em; line-height: 1.6; margin: 0 0 10px 0; text-align: center;">
+                Any entity currently listed below and in violation of <strong style="color: var(--blue);">CA SB
+                    54</strong>
+                (Plastic Pollution Prevention) or <strong style="color: var(--blue);">CA SB 261</strong>
+                (Climate-Related Financial Risk) can resolve their <strong style="color: var(--red);">Willful
+                    Blindness</strong>
+                status by entering into a provisional licensing agreement with Arboreum Commercial Solutions LLC.
+            </p>
+            <p style="color: var(--high-vis); font-size: 0.85em; text-align: center; margin: 10px 0 0 0;">
+                Contact: <a href="mailto:vcaboara@gmail.com"
+                    style="color: var(--blue); text-decoration: underline;">vcaboara@gmail.com</a>
+            </p>
+        </div>
+
         <details style="margin-top: 30px; margin-bottom: 30px;">
-            <summary style="color: var(--high-vis); text-align: center;">
-                📧 Documented Notices & Delivery Status (Click to Expand)
+            <summary style="color: var(--high-vis); text-align: center; font-size: 1.1em; padding: 15px;">
+                📧 Documented Notices and Delivery Status — Click to Expand
             </summary>
             <table
                 style="width: 100%; border-collapse: collapse; margin-top: 15px; background: #161b22; border: 1px solid var(--border);">
@@ -338,7 +374,16 @@
         </details>
 
         <details>
-            <summary>VERIFIED ENTITY LOGS (STATUTORY DELTA)</summary>
+            <summary style="color: var(--high-vis); text-align: center; font-size: 1.1em; padding: 15px;">⚖️ Verified
+                Entity Logs and Statutory Delta — Click to Expand</summary>
+            <div
+                style="padding: 15px; font-size: 0.85em; color: var(--slate); background: #0d1117; border-bottom: 1px solid var(--border);">
+                <strong style="color: var(--blue);">Categories:</strong>
+                <span style="color: var(--slate);">U.S. Federal Agencies</span> (USDA/DOE/BETO mandate compliance) •
+                <span style="color: var(--slate);">U.S. Commercial Entities</span> (pharma, biotech, financial) •
+                <span style="color: var(--slate);">Global & EU Entities</span> (international corporations) •
+                <span style="color: var(--slate);">ACS Forensic Evidence</span> (audit registry)
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -405,9 +450,9 @@
         ];
 
         const DOCUMENTED_NOTICES = [
-            { entity: 'USDA', subject: 'Technical Response: 12/30 Memorandum (Patent App [REDACTED])', to: 'OES@usda.gov', date: '2025-12-31 18:36', bounced: false },
-            { entity: 'USDA', subject: 'PRIORITY: Domestic Tech Disclosure - Patent [REDACTED] (Filed 12/17)', to: 'CFIUS@treasury.gov', date: '2026-01-01 08:28', bounced: false },
-            { entity: 'DOE/BETO', subject: 'Technical Implementation: 12/30 USDA Mandate / Patent [REDACTED]', to: 'BETO@ee.doe.gov', date: '2026-01-01 08:30', bounced: false },
+            { entity: 'USDA', subject: 'Technical Response: 12/30 Memorandum (Patent App [REDACTED])', to: 'OES@usda.gov', date: '2025-12-31 18:36', bounced: true },
+            { entity: 'USDA', subject: 'PRIORITY: Domestic Tech Disclosure - Patent [REDACTED] (Filed 12/17)', to: 'CFIUS@treasury.gov', date: '2026-01-01 08:28', bounced: true },
+            { entity: 'DOE/BETO', subject: 'Technical Implementation: 12/30 USDA Mandate / Patent [REDACTED]', to: 'BETO@ee.doe.gov', date: '2026-01-01 08:30', bounced: true },
             { entity: 'Riverside County', subject: 'FORMAL NOTIFICATION - USPTO [REDACTED] TECHNICAL STANDARDS', to: '[REDACTED]@riversideca.gov', date: '2026-01-05 14:14', bounced: false },
             { entity: 'Riverside County', subject: 'URGENT BRIEF: 2026 Carbon-Negative Mandates & Arboreum Impact Fund', to: '2mayor@riversideca.gov', date: '2026-01-05 14:14', bounced: false },
             { entity: 'Riverside County', subject: 'Technical Brief Follow-up: Patent [REDACTED]', to: '[REDACTED]@rivco.org', date: '2026-01-05 15:59', bounced: false },
