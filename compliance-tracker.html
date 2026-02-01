@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACS 2026 Compliance Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e8ecf0 0%, #f5f7fa 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #9bb5a5 0%, #d4a5a5 50%, #a5c7d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9em;
+            color: #718096;
+            letter-spacing: 1px;
+        }
+
+        /* Master Bleed Ticker */
+        .master-ticker {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .master-ticker .label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            color: #718096;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .master-ticker .amount {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 4em;
+            font-weight: 600;
+            transition: color 0.6s ease, transform 0.6s ease;
+        }
+
+        .master-ticker .amount.tumble {
+            animation: tumbleDown 0.8s ease-out;
+        }
+
+        @keyframes tumbleDown {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(30px) scale(0.85);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .master-ticker .amount.loss {
+            color: #b87c7c;
+        }
+
+        .master-ticker .amount.savings {
+            color: #6b9b7c;
+        }
+
+        .master-ticker .sublabel {
+            font-size: 0.9em;
+            color: #a0aec0;
+            margin-top: 10px;
+        }
+
+        .master-ticker .breakdown {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+        }
+
+        .master-ticker .breakdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .master-ticker .breakdown-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #718096;
+        }
+
+        .master-ticker .breakdown-value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .master-ticker .breakdown-value.loss {
+            color: #b87c7c;
+        }
+
+        .master-ticker .breakdown-value.savings {
+            color: #6b9b7c;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .toggle-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.95em;
+            color: #4a5568;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: rgba(212, 165, 165, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .toggle-switch.active {
+            background: rgba(155, 181, 165, 0.3);
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle-switch.active .slider {
+            transform: translateX(30px);
+        }
+
+        /* Corporate Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+        }
+
+        .card-ticker {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .card-name {
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .card-metric {
+            margin: 15px 0;
+        }
+
+        .card-metric .metric-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+
+        .card-metric .metric-value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.4em;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .card-metric .metric-value.loss {
+            color: #b87c7c;
+        }
+
+        .card-metric .metric-value.savings {
+            color: #6b9b7c;
+        }
+
+        .card-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(160, 174, 192, 0.3), transparent);
+            margin: 15px 0;
+        }
+
+        .card-fee {
+            background: rgba(107, 155, 184, 0.15);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .card-fee .fee-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .card-fee .fee-value {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #6b9bb8;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .footer h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .footer p {
+            font-size: 0.9em;
+            color: #718096;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer .reference {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85em;
+            color: #a0aec0;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .master-ticker .amount {
+                font-size: 2.5em;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>The ACS 2026 Compliance Tracker</h1>
+            <p>Arboreum Commercial Solutions, LLC</p>
+            <p>Real-Time Liability Monitor | Carbon-Negative Standard</p>
+        </div>
+
+        <div class="master-ticker">
+            <div id="ticker-label" class="label">Cumulative Industry Liability</div>
+            <div id="master-amount" class="amount loss">$0</div>
+            <div id="breakdown" class="breakdown" style="display: none;">
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Industry Liability:</span>
+                    <span id="liability-frozen" class="breakdown-value loss">$0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">ACS Revenue (15%):</span>
+                    <span id="acs-revenue" class="breakdown-value savings">$0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">AIF Donation (85%):</span>
+                    <span id="aif-donation" class="breakdown-value" style="color: #6b9bb8;">$0</span>
+                </div>
+            </div>
+            <div id="ticker-sublabel" class="sublabel">Per-second timber destruction + statutory delta</div>
+        </div>
+
+        <div class="toggle-container">
+            <span class="toggle-label">Current State: Loss</span>
+            <div class="toggle-switch" id="toggle-switch">
+                <div class="slider"></div>
+            </div>
+            <span class="toggle-label" id="toggle-status">Apply ACS Standard</span>
+        </div>
+
+        <div class="cards-grid" id="cards-grid">
+            <!-- Cards will be injected here by JavaScript -->
+        </div>
+
+        <div class="footer">
+            <h3>About the ACS Standard</h3>
+            <p>
+                The Arboreum Commercial Solutions (ACS) Standard represents a verified carbon-negative process
+                utilizing agricultural waste to replace virgin timber. Priority filing established 12/17/2025.
+                Licensed entities achieve immediate compliance with CA SB 54, SB 261, and SB 253 mandates while
+                generating revenue under the Arboreum Impact Fund (AIF) 85% profit distribution model.
+            </p>
+            <div class="reference">ACS 12/17 | The Standard-Setter</div>
+        </div>
+    </div>
+
+    <script>
+        const companies = [
+            { "name": "International Paper", "ticker": "IP", "dailyBurn": 1250000 },
+            { "name": "WestRock", "ticker": "WRK", "dailyBurn": 980000 },
+            { "name": "Packaging Corp of America", "ticker": "PKG", "dailyBurn": 740000 },
+            { "name": "Avery Dennison", "ticker": "AVY", "dailyBurn": 550000 },
+            { "name": "Graphic Packaging", "ticker": "GPK", "dailyBurn": 620000 }
+        ];
+
+        let isStandardApplied = false;
+        let toggleTime = null; // Track when standard was applied
+
+        // Fixed reference date for cumulative calculation (CA/Federal mandates effective date)
+        const MANDATE_DATE = '2026-01-01T00:00:00Z';
+
+        // SINGLE SOURCE OF TRUTH: baseBleedRate
+        const totalDailyBurn = companies.reduce((sum, c) => sum + c.dailyBurn, 0);
+        const baseBleedRate = totalDailyBurn / 86400; // Per-second industry liability rate ($47.92/sec)
+
+        // INTERDEPENDENT CALCULATIONS (all derived from baseBleedRate)
+        // When toggle OFF: IndustryLiability increases by baseBleedRate
+        // When toggle ON:  IndustryLiability FREEZES, ACSRevenue increases by (baseBleedRate * 0.15)
+        //                  AIFDonation = ACSRevenue * 0.85
+
+        // Toggle functionality
+        const toggleSwitch = document.getElementById('toggle-switch');
+        const toggleStatus = document.getElementById('toggle-status');
+        const masterAmount = document.getElementById('master-amount');
+        const tickerLabel = document.getElementById('ticker-label');
+        const tickerSublabel = document.getElementById('ticker-sublabel');
+
+        const breakdown = document.getElementById('breakdown');
+        const liabilityFrozen = document.getElementById('liability-frozen');
+        const acsRevenue = document.getElementById('acs-revenue');
+        const aifDonation = document.getElementById('aif-donation');
+
+        toggleSwitch.addEventListener('click', () => {
+            isStandardApplied = !isStandardApplied;
+            toggleSwitch.classList.toggle('active');
+
+            // Trigger tumble animation
+            masterAmount.classList.add('tumble');
+            setTimeout(() => masterAmount.classList.remove('tumble'), 800);
+
+            if (isStandardApplied) {
+                toggleTime = Date.now(); // Record when standard was applied
+                toggleStatus.textContent = 'ACS Standard Active ✓';
+
+                // Transition to captured value display (positive)
+                tickerLabel.textContent = 'ACS Captured Value';
+                tickerSublabel.textContent = '15% licensing fee from industry failure to innovate';
+
+                masterAmount.classList.remove('loss');
+                masterAmount.classList.add('savings');
+                breakdown.style.display = 'flex';
+                document.querySelectorAll('.metric-value').forEach(el => {
+                    el.classList.remove('loss');
+                    el.classList.add('savings');
+                });
+            } else {
+                toggleTime = null; // Clear toggle time when deactivated
+                toggleStatus.textContent = 'Apply ACS Standard';
+
+                // Revert to liability display
+                tickerLabel.textContent = 'Cumulative Industry Liability';
+                tickerSublabel.textContent = 'Per-second timber destruction + statutory delta';
+
+                masterAmount.classList.remove('savings');
+                masterAmount.classList.add('loss');
+                breakdown.style.display = 'none';
+                document.querySelectorAll('.metric-value').forEach(el => {
+                    el.classList.remove('savings');
+                    el.classList.add('loss');
+                });
+            }
+        });
+
+        // Render cards
+        function renderCards() {
+            const grid = document.getElementById('cards-grid');
+            grid.innerHTML = companies.map(company => {
+                const licenseFee = company.dailyBurn * 0.15;
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-ticker">${company.ticker}</div>
+                            <div class="card-name">${company.name}</div>
+                        </div>
+                        <div class="card-metric">
+                            <div class="metric-label">Daily Liability</div>
+                            <div class="metric-value loss" data-daily="${company.dailyBurn}">
+                                $${company.dailyBurn.toLocaleString('en-US')}
+                            </div>
+                        </div>
+                        <div class="card-divider"></div>
+                        <div class="card-fee">
+                            <div class="fee-label">15% ACS License Fee</div>
+                            <div class="fee-value">$${licenseFee.toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update master ticker
+        function updateMasterTicker() {
+            const now = Date.now();
+            const mandateStart = new Date(MANDATE_DATE).getTime();
+            const elapsed = (now - mandateStart) / 1000;
+
+            let displayAmount;
+            let industryLiability;
+            let acsRevenueValue = 0;
+            let aifDonationValue = 0;
+
+            if (isStandardApplied && toggleTime) {
+                // TOGGLE ON: Industry Liability FREEZES, ACS Revenue starts growing
+                const elapsedBeforeToggle = (toggleTime - mandateStart) / 1000;
+                industryLiability = Math.round(baseBleedRate * elapsedBeforeToggle);
+
+                // ACS Revenue grows at (baseBleedRate * 0.15) from toggle time
+                const elapsedSinceToggle = (now - toggleTime) / 1000;
+                acsRevenueValue = Math.round(baseBleedRate * 0.15 * elapsedSinceToggle);
+
+                // AIF Donation is always 85% of ACS Revenue
+                aifDonationValue = Math.round(acsRevenueValue * 0.85);
+
+                // Update breakdown display with all three interdependent values
+                liabilityFrozen.textContent = '$' + industryLiability.toLocaleString('en-US');
+                acsRevenue.textContent = '$' + acsRevenueValue.toLocaleString('en-US');
+                aifDonation.textContent = '$' + aifDonationValue.toLocaleString('en-US');
+
+                // Display ACS Revenue (what ACS captures)
+                displayAmount = acsRevenueValue;
+            } else {
+                // TOGGLE OFF: Industry Liability increases by baseBleedRate
+                industryLiability = Math.round(baseBleedRate * elapsed);
+                displayAmount = industryLiability;
+            }
+
+            masterAmount.textContent = '$' + displayAmount.toLocaleString('en-US');
+        }
+
+        // Initialize
+        renderCards();
+        updateMasterTicker(); // Call immediately to avoid $0 display
+        setInterval(updateMasterTicker, 100);
+    </script>
+</body>
+
+</html>
