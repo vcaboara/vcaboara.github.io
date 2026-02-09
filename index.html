@@ -3,250 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arboreum Commercial Solutions, LLC</title>
+    <title>WorkRave Statistics</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #0a0a0a;
-            color: #e5e5e5;
-            line-height: 1.6;
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        header {
-            margin-bottom: 60px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        h1 {
-            font-size: 1.5em;
-            font-weight: 500;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .tagline {
-            font-size: 0.95em;
-            color: #888;
-            font-weight: 400;
-        }
-
-        .section {
-            margin-bottom: 48px;
-        }
-
-        .section-title {
-            font-size: 0.75em;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: #666;
-            margin-bottom: 16px;
-            font-weight: 600;
-        }
-
-        .brief {
-            background: #121212;
-            border: 1px solid #2a2a2a;
-            border-radius: 6px;
-            padding: 28px;
-            margin-bottom: 24px;
-        }
-
-        .brief h2 {
-            font-size: 1.2em;
-            font-weight: 500;
-            color: #ffffff;
-            margin-bottom: 16px;
-        }
-
-        .brief p {
-            color: #b5b5b5;
-            font-size: 0.95em;
-            margin-bottom: 12px;
-        }
-
-        .brief p:last-child {
-            margin-bottom: 0;
-        }
-
-        .highlight {
-            color: #ffffff;
-            font-weight: 500;
-        }
-
-        .deadline-notice {
-            background: #1a1a1a;
-            border-left: 3px solid #6b9b7c;
-            padding: 16px 20px;
-            margin: 24px 0;
-            font-size: 0.9em;
-        }
-
-        .deadline-notice strong {
-            color: #6b9b7c;
-            font-weight: 600;
-        }
-
-        .cta {
-            margin-top: 32px;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: #ffffff;
-            color: #0a0a0a;
-            padding: 14px 32px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.95em;
-            font-weight: 500;
-            transition: background 0.2s ease;
-            border: 1px solid #ffffff;
-        }
-
-        .cta-button:hover {
-            background: #e5e5e5;
-        }
-
-        .cta-secondary {
-            display: inline-block;
-            color: #888;
-            text-decoration: none;
-            font-size: 0.9em;
-            margin-left: 20px;
-            border-bottom: 1px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        .cta-secondary:hover {
-            color: #b5b5b5;
-            border-bottom: 1px solid #888;
-        }
-
-        .details {
-            font-size: 0.85em;
-            color: #666;
-            line-height: 1.8;
-        }
-
-        .details ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .details li {
-            margin-bottom: 8px;
-            padding-left: 16px;
-            position: relative;
-        }
-
-        .details li:before {
-            content: "—";
-            position: absolute;
-            left: 0;
-            color: #444;
-        }
-
-        footer {
-            margin-top: 80px;
-            padding-top: 24px;
-            border-top: 1px solid #2a2a2a;
-            font-size: 0.85em;
-            color: #555;
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+            color: #333;
             text-align: center;
         }
-
-        footer a {
-            color: #888;
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block; /* To center the block */
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        p {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .button-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
             text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: all 0.2s ease;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
         }
-
-        footer a:hover {
-            color: #b5b5b5;
-            border-bottom: 1px solid #888;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 24px 16px;
-            }
-
-            h1 {
-                font-size: 1.3em;
-            }
-
-            .brief {
-                padding: 20px;
-            }
-
-            .cta-secondary {
-                display: block;
-                margin-left: 0;
-                margin-top: 16px;
-            }
+        .button-link:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Arboreum Commercial Solutions, LLC</h1>
-            <p class="tagline">Carbon-negative manufacturing. Regulatory compliance.</p>
-        </header>
-
-        <section class="section">
-            <div class="section-title">Partnership Brief</div>
-            
-            <div class="brief">
-                <h2>The 12/17 Standard</h2>
-                <p>A verified carbon-negative process utilizing agricultural waste to replace virgin timber in commercial packaging and paper manufacturing.</p>
-                
-                <p>Priority filing established <span class="highlight">December 17, 2025</span>. Addresses California SB 54 (Extended Producer Responsibility), SB 253 (Climate Corporate Data Accountability), and SB 261 (Climate-Related Financial Risk) mandates effective January 1, 2026.</p>
-                
-                <p>Licensed entities achieve immediate compliance while participating in the <span class="highlight">Arboreum Impact Fund (AIF)</span> 85% profit distribution model.</p>
-            </div>
-
-            <div class="deadline-notice">
-                <strong>August 10, 2026 Deadline:</strong> 15/15 licensing terms available for early partnership commitments. Post-deadline terms subject to standard commercial rates.
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-title">For Operations Leadership</div>
-            
-            <div class="details">
-                <p style="color: #b5b5b5; margin-bottom: 16px;">This is a manufacturing solution, not a consulting engagement. The 12/17 Standard provides:</p>
-                <ul>
-                    <li>Drop-in replacement for virgin timber feedstock</li>
-                    <li>Verified carbon-negative classification under CA regulatory framework</li>
-                    <li>85% revenue participation through AIF structure</li>
-                    <li>Immediate SB 54/SB 253/SB 261 compliance certification</li>
-                </ul>
-            </div>
-
-            <div class="cta">
-                <a href="compliance-tracker.html" class="cta-button">View Regulatory Case Study</a>
-                <a href="standard.html" class="cta-secondary">Technical Documentation →</a>
-            </div>
-        </section>
-
-        <footer>
-            <p>Arboreum Commercial Solutions, LLC | <a href="ledger.html">Compliance Ledger</a> | <a href="mailto:partnerships@arboreum.com">partnerships@arboreum.com</a></p>
-        </footer>
+        <h1>Welcome to this WorkRave Statistics Dashboard</h1>
+        <p>
+            Explore daily computer usage, keystrokes, mouse movements, and break statistics.
+            The data is processed from a WorkRave historystats file and visualized using Plotly.js.
+        </p>
+        <a href="plotly_stats.html" class="button-link">View Statistics</a>
     </div>
 </body>
 </html>
