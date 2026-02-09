@@ -3,6 +3,8 @@
 ## Automated Tests
 
 ### Browser-based Tests
+
+#### Ledger Tests
 Open `test_ledger.html` in a browser to run the full test suite:
 - Counter updates
 - Table rendering  
@@ -10,7 +12,20 @@ Open `test_ledger.html` in a browser to run the full test suite:
 - Value updates without DOM rebuild
 - Section collapse state tracking
 
+#### Compliance Tracker Tests
+Open `test_compliance_tracker.html` in a browser to run:
+- Master ticker real-time updates (100ms intervals)
+- Toggle switch functionality
+- Card rendering (5 corporate cards)
+- Color transitions (loss/savings)
+- Calculation accuracy (15% license fees, burn per second)
+- Data integrity (companies array)
+- Glassmorphism styling verification
+- Responsive grid layout
+
 ### Python Validation
+
+#### Ledger Validation
 ```bash
 python validate_ledger.py
 ```
@@ -20,6 +35,20 @@ Checks for:
 - **HTML structure** (required elements, balanced tags)
 - **Company name format** (LLC inclusion)
 
+#### Compliance Tracker Validation
+```bash
+python validate_compliance_tracker.py
+```
+
+Checks for:
+- **Companies data integrity** (5 companies with required fields)
+- **Required HTML elements** (master ticker, toggle, cards grid)
+- **Calculation accuracy** (15% fees, burn per second formula)
+- **Glassmorphism styling** (backdrop-filter applied)
+- **Color transition classes** (.loss/.savings)
+- **Update intervals** (100ms for ticker)
+- **Footer references** (ACS 12/17, AIF 85%)
+
 ## Pre-commit Hook
 
 A pre-commit hook is installed at `.git/hooks/pre-commit` that automatically:
@@ -28,6 +57,7 @@ A pre-commit hook is installed at `.git/hooks/pre-commit` that automatically:
 2. **Warns** about individual names in email addresses
 3. **Validates** HTML structure
 4. **Checks** for proper LLC designation in company name
+5. **Validates** compliance tracker data integrity (companies array structure)
 
 ### Testing the Hook
 
@@ -51,13 +81,16 @@ git commit --no-verify -m "message"
 ## Running Tests Before Push
 
 ```bash
-# Run Python validation
+# Run Python validations
 python validate_ledger.py
+python validate_compliance_tracker.py
 
 # Open browser tests
-start test_ledger.html  # Windows
+start test_ledger.html               # Windows
+start test_compliance_tracker.html   # Windows
 # or
-open test_ledger.html   # Mac/Linux
+open test_ledger.html                # Mac/Linux
+open test_compliance_tracker.html    # Mac/Linux
 ```
 
 ## CI/CD Integration
