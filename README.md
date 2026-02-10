@@ -2,9 +2,9 @@
 
 ### Industrial Protocol for Virgin Timber Displacement and Carbon-Negative Fiber Production
 
-[![Status: Patent Pending](https://img.shields.io/badge/Status-Patent_Application_Filed-blue)](https://arboreum.html)
-[![Compliance: SB 54 / SB 253](https://img.shields.io/badge/Compliance-SB_54_%7C_SB_253-green)](https://standard.html)
-[![Standard: 12/17](https://img.shields.io/badge/Standard-12%2F17_Standard-orange)](https://standard.html)
+[![Status: Patent Pending](https://img.shields.io/badge/Status-Patent_Application_Filed-blue)](https://vcaboara.github.io/arboreum.html)
+[![Compliance: SB 54 / SB 253](https://img.shields.io/badge/Compliance-SB_54_%7C_SB_253-green)](https://vcaboara.github.io/standard.html)
+[![Standard: 12/17](https://img.shields.io/badge/Standard-12%2F17_Standard-orange)](https://vcaboara.github.io/standard.html)
 
 ---
 
@@ -52,7 +52,7 @@ ACS operates on a **100% Licensing Model**.
 
 To maintain architectural integrity, ACS utilizes an AI-driven **Regulatory Case Study** to filter partnerships. We are currently seeking a **Chief Operating Officer (COO)** with high-level systems experience in industrial scaling and regulatory navigation.
 
-[**→ Access the Regulatory Case Study & Technical Sanctum**](https://arboreum.html)
+[**→ Access the Regulatory Case Study & Technical Sanctum**](https://vcaboara.github.io/arboreum.html)
 
 ---
 
