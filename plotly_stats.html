@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkRave Statistics Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <style>
+        /* CSS Variables for Dark Mode */
+        :root {
+            --body-bg: #f8f9fa;
+            --body-text: #343a40;
+            --filter-bg: #e9ecef;
+            --filter-text: #343a40;
+            --chart-bg: #ffffff;
+            --chart-shadow: rgba(0,0,0,0.1);
+            --header-color: #0056b3;
+            --collapsible-header-bg: #e0e0e0;
+            --collapsible-header-text: #343a40;
+            --collapsible-header-hover-bg: #d0d0d0;
+            --summary-bg: #f0f0f0;
+            --summary-border: #cccccc;
+            --group-header-bg: #dbe4ee; /* Light blue for group headers */
+            --group-header-text: #0056b3;
+            --query-bg: #e6f2ff; /* Light blue for query section */
+            --query-border: #aed6f1;
+        }
+
+        body.dark-mode {
+            --body-bg: #2c2c2c;
+            --body-text: #e0e0e0;
+            --filter-bg: #3a3a3a;
+            --filter-text: #e0e0e0;
+            --chart-bg: #3a3a3a;
+            --chart-shadow: rgba(0,0,0,0.3);
+            --header-color: #7bbaff; /* Lighter blue for dark mode */
+            --collapsible-header-bg: #4a4a4a;
+            --collapsible-header-text: #e0e0e0;
+            --collapsible-header-hover-bg: #5a5a5a;
+            --summary-bg: #333333;
+            --summary-border: #555555;
+            --group-header-bg: #4a4a4a; /* Darker blue for group headers in dark mode */
+            --group-header-text: #7bbaff;
+            --query-bg: #3a4a5a; /* Darker blue for query section */
+            --query-border: #5a7a8a;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--body-bg);
+            color: var(--body-text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1 {
+            color: var(--header-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--filter-bg);
+            border-radius: 8px;
+            justify-content: center;
+            align-items: flex-start;
+            transition: background-color 0.3s;
+        }
+        .query-controls {
+            background-color: var(--query-bg);
+            border: 1px solid var(--query-border);
+            flex-direction: column;
+            align-items: center;
+            max-width: 1000px;
+            margin: 20px auto;
+            box-shadow: 0 2px 5px var(--chart-shadow);
+        }
+        .query-controls h3 {
+            color: var(--header-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .query-controls p {
+            font-size: 0.9em;
+            color: var(--body-text);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .query-controls input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--body-text);
+            background-color: var(--chart-bg);
+            color: var(--body-text);
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .query-controls .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .query-controls button {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            background-color: var(--header-color);
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .query-controls button:hover {
+            background-color: #004494;
+        }
+        #queryResults {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--summary-border);
+            border-radius: 8px;
+            background-color: var(--chart-bg);
+            width: 90%;
+            box-sizing: border-box;
+            max-height: 200px; /* Limit height for scrollability */
+            overflow-y: auto;
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+        }
+
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+        }
+        .filter-group.checkbox-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            margin-left: 20px;
+        }
+        .filter-group.checkbox-group div {
+            display: flex;
+            align-items: center;
+        }
+        .filter-group label {
+            margin-right: 5px;
+            font-weight: bold;
+            color: var(--filter-text);
+        }
+        .filter-group input[type="date"],
+        .filter-group button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--body-text);
+            background-color: var(--chart-bg);
+            color: var(--body-text);
+        }
+        #darkModeToggle {
+            margin-right: 8px;
+        }
+        .filter-controls button {
+            background-color: #007bff; /* Primary button color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filter-controls button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Summary Statistics Section */
+        .summary-stats-wrapper, .query-wrapper {
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: var(--chart-bg); /* Match chart background for overall wrapper */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--chart-shadow);
+            overflow: hidden; /* Ensures rounded corners are respected */
+        }
+        .summary-stats-container {
+            background-color: var(--summary-bg);
+            border-top: 1px solid var(--summary-border); /* Separator from header */
+            border-bottom: 1px solid var(--summary-border); /* Separator below */
+            padding: 20px;
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        .summary-stats-container h2 {
+            display: none; /* Hide the h2 inside, as collapsible header will take over */
+        }
+
+        /* Grouping for Summary Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust column width as needed */
+            gap: 20px; /* Space between groups */
+        }
+
+        .stats-group {
+            border: 1px solid var(--summary-border);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--chart-bg); /* Use chart bg for individual groups */
+            box-shadow: 0 1px 3px var(--chart-shadow);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .stats-group h3 {
+            background-color: var(--group-header-bg);
+            color: var(--group-header-text);
+            padding: 10px 15px;
+            margin: 0;
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--summary-border);
+        }
+
+        .stats-content {
+            padding: 15px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            font-size: 1em;
+        }
+        body.dark-mode .stats-item {
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+        .stats-item span {
+            font-weight: normal;
+            color: var(--body-text);
+            display: inline-block; /* Allows text-align to work */
+            min-width: 150px; /* Ensures consistent width for alignment */
+            text-align: right;
+        }
+
+
+        .stats-group .comparison-notes {
+            font-size: 0.9em; /* Smaller font for comparison notes */
+            color: #6c757d; /* Lighter color for notes */
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+        }
+        body.dark-mode .stats-group .comparison-notes {
+             color: #ced4da;
+             border-top: 1px dashed rgba(255,255,255,0.1);
+        }
+
+        #chartContainer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .chart-wrapper {
+            background-color: var(--chart-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--chart-shadow);
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .collapsible-header {
+            background-color: var(--collapsible-header-bg);
+            color: var(--collapsible-header-text);
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            transition: background-color 0.2s, border-color 0.3s;
+        }
+        body.dark-mode .collapsible-header {
+             border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .collapsible-header:hover {
+            background-color: var(--collapsible-header-hover-bg);
+        }
+        .collapsible-header::after {
+            content: '▼';
+            font-size: 0.8em;
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+        .collapsible-header.collapsed::after {
+            content: '►';
+            transform: rotate(0deg);
+        }
+        .collapsible-content {
+            padding: 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .collapsible-content.expanded {
+            max-height: 2000px; /* Increased to accommodate more content */
+            padding: 10px;
+        }
+        .chart-div {
+            width: 100%;
+            height: 350px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .no-data-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #dc3545;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WorkRave Activity & Break Statistics</h1>
+
+    <div class="filter-controls">
+        <div class="filter-group">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="filter-group">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate">
+        </div>
+        <button id="resetDateRangeButton">Reset Date Range</button>
+        <div class="filter-group checkbox-group">
+            <label>Hide days with:</label>
+            <div>
+                <input type="checkbox" id="selectAllFilters">
+                <label for="selectAllFilters">Select All Filters</label>
+            </div>
+            <div>
+                <input type="checkbox" id="hideZeroActivityDays">
+                <label for="hideZeroActivityDays">zero activity</label>
+            </div>
+            <div>
+                <input type="checkbox" id="hideZeroUsageDays">
+                <label for="hideZeroUsageDays">zero usage time</label>
+            </div>
+            <div>
+                <input type="checkbox" id="hideNoBreakDataDays">
+                <label for="hideNoBreakDataDays">no break data</label>
+            </div>
+            <div>
+                <input type="checkbox" id="removeUsageOutliers">
+                <label for="removeUsageOutliers">remove usage outliers (>24h)</label>
+            </div>
+        </div>
+        <div class="filter-group">
+            <input type="checkbox" id="darkModeToggle">
+            <label for="darkModeToggle">Dark Mode</label>
+        </div>
+    </div>
+
+    <div id="noDataMessage" class="no-data-message" style="display: none;">
+        No data found for the selected filters.
+    </div>
+
+    <div class="summary-stats-wrapper">
+        <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+            Summary Statistics (Filtered Data)
+        </div>
+        <div id="summaryStats" class="summary-stats-container collapsible-content expanded">
+            <h2>Summary Statistics (Filtered Data)</h2> <div class="stats-grid">
+                <div class="stats-group">
+                    <h3>General</h3>
+                    <div class="stats-content">
+                        <div class="stats-item">Days in period: <span id="summaryDaysCount">N/A</span></div>
+                        <div class="stats-item">Total Usage: <span id="totalUsage">N/A</span></div>
+                        <div class="stats-item">Total Keystrokes: <span id="totalKeystrokes">N/A</span></div>
+                        <div class="stats-item">Total Mouse Movement: <span id="totalMouseMovement">N/A</span></div>
+                        <div class="stats-item">Total Mouse Clicks: <span id="totalMouseClicks">N/A</span></div>
+                        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 1em;">Productivity Ratios</h4>
+                        <div class="stats-item">Avg Keystrokes / min usage: <span id="avgKeystrokesPerMinUsage">N/A</span></div>
+                        <div class="stats-item">Avg Clicks / min usage: <span id="avgClicksPerMinUsage">N/A</span></div>
+                        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 1em;">Comparison (Office Worker)</h4>
+                        <div class="stats-item">Avg Keystrokes: <span>2,000 - 4,000 / day</span></div>
+                        <div class="stats-item">Avg Mouse Clicks: <span>1,500 - 8,000 / day</span></div>
+                        <div class="stats-item">Avg Mouse Movement: <span>Data less common in units; typically >50% of computer time.</span></div>
+                        <p class="comparison-notes">
+                            *Estimates based on general studies and can vary by role/source.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stats-group">
+                    <h3>Daily Usage (minutes / hours)</h3>
+                    <div class="stats-content">
+                        <div class="stats-item">Average: <span id="avgDailyUsage">N/A</span></div>
+                        <div class="stats-item">Median: <span id="medianDailyUsage">N/A</span></div>
+                        <div class="stats-item">Mode: <span id="modeDailyUsage">N/A</span></div>
+                        <div class="stats-item">Max: <span id="maxDailyUsage">N/A</span></div>
+                        <div class="stats-item">Min: <span id="minDailyUsage">N/A</span></div>
+                    </div>
+                </div>
+
+                <div class="stats-group">
+                    <h3>Daily Keystrokes</h3>
+                    <div class="stats-content">
+                        <div class="stats-item">Average: <span id="avgDailyKeystrokes">N/A</span></div>
+                        <div class="stats-item">Median: <span id="medianDailyKeystrokes">N/A</span></div>
+                        <div class="stats-item">Mode: <span id="modeDailyKeystrokes">N/A</span></div>
+                        <div class="stats-item">Max: <span id="maxDailyKeystrokes">N/A</span></div>
+                        <div class="stats-item">Min: <span id="minDailyKeystrokes">N/A</span></div>
+                    </div>
+                </div>
+
+                <div class="stats-group">
+                    <h3>Daily Mouse Movement</h3>
+                    <div class="stats-content">
+                        <div class="stats-item">Average: <span id="avgDailyMouseMovement">N/A</span></div>
+                        <div class="stats-item">Median: <span id="medianDailyMouseMovement">N/A</span></div>
+                        <div class="stats-item">Mode: <span id="modeDailyMouseMovement">N/A</span></div>
+                        <div class="stats-item">Max: <span id="maxDailyMouseMovement">N/A</span></div>
+                        <div class="stats-item">Min: <span id="minDailyMouseMovement">N/A</span></div>
+                    </div>
+                </div>
+
+                <div class="stats-group">
+                    <h3>Daily Mouse Clicks</h3>
+                    <div class="stats-content">
+                        <div class="stats-item">Average: <span id="avgDailyMouseClicks">N/A</span></div>
+                        <div class="stats-item">Median: <span id="medianDailyMouseClicks">N/A</span></div>
+                        <div class="stats-item">Mode: <span id="modeDailyMouseClicks">N/A</span></div>
+                        <div class="stats-item">Max: <span id="maxDailyMouseClicks">N/A</span></div>
+                        <div class="stats-item">Min: <span id="minDailyMouseClicks">N/A</span></div>
+                    </div>
+                </div>
+
+                <div class="stats-group">
+                    <h3>Daily Total Break Duration (minutes)</h3>
+                    <div class="stats-content">
+                        <div class="stats-item">Average: <span id="avgDailyBreakDuration">N/A</span></div>
+                        <div class="stats-item">Median: <span id="medianDailyBreakDuration">N/A</span></div>
+                        <div class="stats-item">Mode: <span id="modeDailyBreakDuration">N/A</span></div>
+                        <div class="stats-item">Max: <span id="maxDailyBreakDuration">N/A</span></div>
+                        <div class="stats-item">Min: <span id="minDailyBreakDuration">N/A</span></div>
+                    </div>
+                </div>
+
+                <div class="stats-group">
+                    <h3>Daily Break Type Breakdown (minutes)</h3>
+                    <div class="stats-content" id="breakTypeSummaryContent">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="query-wrapper">
+        <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+            Custom Query
+        </div>
+        <div class="query-controls collapsible-content expanded">
+            <p>Enter a query (e.g., "usage > 300", "keystrokes <= 10000"). <br>Available metrics: `usage`, `keystrokes`, `mouse_movement`, `mouse_clicks`, `break_duration`.</p>
+            <input type="text" id="customQueryInput" placeholder="Enter your query here">
+            <div class="button-group">
+                <button id="runQueryButton">Run Query</button>
+                <button id="downloadQueryResultsButton">Download CSV</button>
+            </div>
+            <div id="queryResults"></div>
+        </div>
+    </div>
+
+    <div id="chartContainer">
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Computer Usage Time
+            </div>
+            <div id="activityChart" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Usage Time Distribution (Histogram)
+            </div>
+            <div id="usageHistogram" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Keystrokes
+            </div>
+            <div id="keystrokeChart" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Keystrokes Distribution (Histogram)
+            </div>
+            <div id="keystrokeHistogram" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Mouse Movement
+            </div>
+            <div id="mouseMovementChart" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Mouse Movement Distribution (Histogram)
+            </div>
+            <div id="mouseMovementHistogram" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Mouse Clicks
+            </div>
+            <div id="mouseClickChart" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Mouse Clicks Distribution (Histogram)
+            </div>
+            <div id="mouseClickHistogram" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Total Break Duration
+            </div>
+            <div id="breakDurationChart" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Break Duration Distribution (Histogram)
+            </div>
+            <div id="breakDurationHistogram" class="chart-div collapsible-content expanded"></div>
+        </div>
+
+        <div class="chart-wrapper">
+            <div class="collapsible-header" onclick="window.toggleCollapse(this)">
+                Daily Break Duration by Type (Stacked Bar Chart)
+            </div>
+            <div id="breakTypeStackedBarChart" class="chart-div collapsible-content expanded"></div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_START_DATE = "2023-08-21";
+        const DEFAULT_END_DATE = "2025-04-16";
+        const JSON_DATA_URL = 'https://vcaboara.github.io/workrave_stats.json';
+
+        // Define outlier threshold (e.g., 24 hours in minutes)
+        const USAGE_OUTLIER_THRESHOLD_MINUTES = 1440;
+        // Define threshold for considering a weekend day as "worked" (in minutes)
+        const WEEKEND_WORK_THRESHOLD_MINUTES = 0; // Temporarily set to 0 to highlight all weekends
+
+        let allWorkRaveData = [];
+        let currentFilteredData = []; // Store filtered data to be used by queries
+
+        let lastQueryResults = []; // Store the results of the last custom query
+
+        // Mapping for WorkRave break types to human-readable names
+        const BREAK_TYPE_NAMES = {
+            0: 'Micro-break',
+            1: 'Rest Break',
+            2: 'Daily Limit Break',
+            // Add more if WorkRave introduces other types and they are found in data
+        };
+
+        // Helper functions (moved to global scope)
+        /**
+         * Calculates the median of an array of numbers.
+         * @param {number[]} arr The input array.
+         * @returns {number|string} The median, or 'N/A' if the array is empty.
+         */
+        window.calculateMedian = function(arr) { // Made global
+            if (arr.length === 0) return 'N/A';
+            const sortedArr = [...arr].sort((a, b) => a - b);
+            const mid = Math.floor(sortedArr.length / 2);
+            if (sortedArr.length % 2 === 0) {
+                return (sortedArr[mid - 1] + sortedArr[mid]) / 2;
+            }
+            return sortedArr[mid];
+        }
+
+        /**
+         * Calculates the mode(s) of an array of numbers.
+         * @param {number[]} arr The input array.
+         * @returns {string} A string representation of the mode(s), or 'N/A' if empty/no mode.
+         */
+        window.calculateMode = function(arr) { // Made global
+            if (arr.length === 0) return 'N/A';
+
+            const counts = {};
+            arr.forEach(num => {
+                counts[num] = (counts[num] || 0) + 1;
+            });
+
+            let maxCount = 0;
+            for (const num in counts) {
+                if (counts[num] > maxCount) {
+                    maxCount = counts[num];
+                }
+            }
+
+            const modes = [];
+            for (const num in counts) {
+                if (counts[num] === maxCount) {
+                    modes.push(parseFloat(num));
+                }
+            }
+
+            // If all elements appear once, there's no distinct mode.
+            // Or if there are multiple modes, but they cover all numbers.
+            if (modes.length === arr.length || modes.length === 0) { // Added modes.length === 0 check for safety
+                return 'N/A (No distinct mode)';
+            }
+            return modes.sort((a, b) => a - b).map(m => parseFloat(m).toFixed(2)).join(', '); // Ensure mode values are formatted
+        }
+
+        /**
+         * Calculates the linear regression (y = mx + b) for a given set of data points.
+         * @param {number[]} xData - Array of x-values (e.g., sequential indices).
+         * @param {number[]} yData - Array of y-values (metric data).
+         * @returns {{m: number, b: number}} - Object containing the slope (m) and y-intercept (b).
+         */
+        window.calculateLinearRegression = function(xData, yData) { // Made global
+            if (xData.length === 0 || yData.length === 0 || xData.length !== yData.length) {
+                return { m: 0, b: 0 }; // Return default if data is invalid
+            }
+
+            const n = xData.length;
+            let sumX = 0;
+            let sumY = 0;
+            let sumXY = 0;
+            let sumX2 = 0;
+
+            for (let i = 0; i < n; i++) {
+                sumX += xData[i];
+                sumY += yData[i];
+                sumXY += xData[i] * yData[i];
+                sumX2 += xData[i] * xData[i];
+            }
+
+            const numerator = n * sumXY - sumX * sumY;
+            const denominator = n * sumX2 - sumX * sumX;
+
+            if (denominator === 0) {
+                // Handle vertical line case (e.g., all x-values are the same)
+                return { m: 0, b: sumY / n }; // Horizontal line at average y
+            }
+
+            const m = numerator / denominator;
+            const b = (sumY - m * sumX) / n;
+
+            return { m, b };
+        }
+
+
+        // Function to fetch data once on initial load
+        async function fetchInitialData() {
+            try {
+                const response = await fetch(JSON_DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allWorkRaveData = await response.json();
+                console.log("Initial data fetched:", allWorkRaveData.length, "entries.");
+            } catch (error) {
+                console.error('Error fetching WorkRave data:', error);
+                document.body.innerHTML = "<p style='text-align: center; color: red;'>Failed to load WorkRave data from " + JSON_DATA_URL + ". Please ensure the file exists and is accessible.</p>";
+                return; // Stop execution if data fetch fails
+            }
+        }
+
+        // Function to toggle chart collapse
+        // Made explicitly global for onclick attribute
+        window.toggleCollapse = function(headerElement) {
+            headerElement.classList.toggle('collapsed');
+            const content = headerElement.nextElementSibling; // The chart-div is the next sibling
+            content.classList.toggle('expanded');
+            // Re-layout Plotly chart when expanded to ensure it draws correctly
+            if (content.classList.contains('expanded')) {
+                const chartDiv = content.querySelector('.js-plotly-plot'); // Select the actual Plotly div
+                if (chartDiv) {
+                    Plotly.relayout(chartDiv.id, {});
+                }
+            }
+        }
+
+        // Helper function to get all individual filter checkboxes (including new outlier one)
+        function getIndividualFilterCheckboxes() {
+            return [
+                document.getElementById('hideZeroActivityDays'),
+                document.getElementById('hideZeroUsageDays'),
+                document.getElementById('hideNoBreakDataDays'),
+                document.getElementById('removeUsageOutliers') // Include the new outlier checkbox
+            ];
+        }
+
+        // Function to save filter state to localStorage
+        function saveFilterState() {
+            localStorage.setItem('startDate', document.getElementById('startDate').value);
+            localStorage.setItem('endDate', document.getElementById('endDate').value);
+            localStorage.setItem('hideZeroActivityDays', document.getElementById('hideZeroActivityDays').checked);
+            localStorage.setItem('hideZeroUsageDays', document.getElementById('hideZeroUsageDays').checked);
+            localStorage.setItem('hideNoBreakDataDays', document.getElementById('hideNoBreakDataDays').checked);
+            localStorage.setItem('removeUsageOutliers', document.getElementById('removeUsageOutliers').checked);
+            localStorage.setItem('darkModeToggle', document.getElementById('darkModeToggle').checked);
+        }
+
+        // Function to load filter state from localStorage
+        function loadFilterState() {
+            const startDate = localStorage.getItem('startDate');
+            const endDate = localStorage.getItem('endDate');
+            const hideZeroActivityDays = localStorage.getItem('hideZeroActivityDays');
+            const hideZeroUsageDays = localStorage.getItem('hideZeroUsageDays');
+            const hideNoBreakDataDays = localStorage.getItem('hideNoBreakDataDays');
+            const removeUsageOutliers = localStorage.getItem('removeUsageOutliers');
+            const darkModeToggle = localStorage.getItem('darkModeToggle');
+
+            if (startDate) document.getElementById('startDate').value = startDate;
+            if (endDate) document.getElementById('endDate').value = endDate;
+            
+            // For checkboxes, localStorage returns strings "true" or "false"
+            if (hideZeroActivityDays !== null) document.getElementById('hideZeroActivityDays').checked = (hideZeroActivityDays === 'true');
+            if (hideZeroUsageDays !== null) document.getElementById('hideZeroUsageDays').checked = (hideZeroUsageDays === 'true');
+            if (hideNoBreakDataDays !== null) document.getElementById('hideNoBreakDataDays').checked = (hideNoBreakDataDays === 'true');
+            if (removeUsageOutliers !== null) document.getElementById('removeUsageOutliers').checked = (removeUsageOutliers === 'true');
+            
+            // Dark mode toggle
+            if (darkModeToggle !== null) {
+                const isDarkMode = (darkModeToggle === 'true');
+                document.body.classList.add('dark-mode');
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+        }
+
+        // Main function to apply filters and render charts
+        async function applyFiltersAndRenderCharts() {
+            document.getElementById('noDataMessage').style.display = 'none'; // Hide message initially
+
+            // Start with a copy of the full dataset
+            let filteredData = [...allWorkRaveData];
+
+            // 1. Apply Date Range Filter
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
+
+            const startDateFilter = startDateInput ? new Date(startDateInput + 'T00:00:00') : new Date(0);
+            const endDateFilter = endDateInput ? new Date(endDateInput + 'T23:59:59') : new Date();
+
+            filteredData = filteredData.filter(entry => {
+                if (!entry.start_date) return false; // Skip entries without start_date
+
+                // Corrected month index: subtract 1 from month as Date constructor expects 0-indexed month
+                const entryDate = new Date(Date.UTC(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day));
+                const entryDateStartOfDay = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
+                const entryDateEndOfDay = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate(), 23, 59, 59, 999);
+
+                return entryDateStartOfDay >= startDateFilter && entryDateEndOfDay <= endDateFilter;
+            });
+
+            // 2. Apply "Hide days with zero activity" Filter
+            const hideZeroActivityDays = document.getElementById('hideZeroActivityDays').checked;
+            if (hideZeroActivityDays) {
+                filteredData = filteredData.filter(entry => {
+                    const activity = entry.activity_stats;
+                    return (activity && (activity.keystrokes > 0 || activity.mouse_movement_units > 0 || activity.mouse_clicks > 0));
+                });
+            }
+
+            // 3. Apply "Hide days with zero usage time" Filter
+            const hideZeroUsageDays = document.getElementById('hideZeroUsageDays').checked;
+            if (hideZeroUsageDays) {
+                filteredData = filteredData.filter(entry => {
+                    // Corrected month index: subtract 1 from month
+                    const startDateTime = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day, entry.start_time.hour, entry.start_time.minute);
+                    const endDateTime = new Date(entry.end_date.year, entry.end_date.month - 1, entry.end_date.day, entry.end_time.hour, entry.end_time.minute);
+                    const durationMs = endDateTime - startDateTime;
+                    const usageMinutes = durationMs / (1000 * 60);
+                    return usageMinutes > 0; // Keep if usage is greater than zero
+                });
+            }
+
+            // 4. Apply "Hide days with no break data" Filter
+            const hideNoBreakDataDays = document.getElementById('hideNoBreakDataDays').checked;
+            if (hideNoBreakDataDays) {
+                filteredData = filteredData.filter(entry => {
+                    if (!entry.break_stats || entry.break_stats.length === 0) {
+                        return false; // Filter out if no break_stats array or it's empty
+                    }
+                    const totalBreakDuration = entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0);
+                    return totalBreakDuration > 0; // Keep if there's any break data AND total duration > 0
+                });
+            }
+
+            // 5. Apply "Remove usage outliers" Filter
+            const removeUsageOutliers = document.getElementById('removeUsageOutliers').checked;
+            if (removeUsageOutliers) {
+                filteredData = filteredData.filter(entry => {
+                    // Corrected month index: subtract 1 from month
+                    const startDateTime = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day, entry.start_time.hour, entry.start_time.minute);
+                    const endDateTime = new Date(entry.end_date.year, entry.end_date.month - 1, entry.end_date.day, entry.end_time.hour, entry.end_time.minute);
+                    const durationMs = endDateTime - startDateTime;
+                    const usageMinutes = durationMs / (1000 * 60);
+                    return usageMinutes <= USAGE_OUTLIER_THRESHOLD_MINUTES; // Filter out if usage is above threshold
+                });
+            }
+
+
+            if (filteredData.length === 0) {
+                document.getElementById('noDataMessage').style.display = 'block';
+                // Clear existing charts if no data
+                Plotly.newPlot('activityChart', [], {});
+                Plotly.newPlot('usageHistogram', [], {}); // Clear histogram as well
+                Plotly.newPlot('keystrokeChart', [], {});
+                Plotly.newPlot('keystrokeHistogram', [], {}); // Clear histogram as well
+                Plotly.newPlot('mouseMovementChart', [], {});
+                Plotly.newPlot('mouseMovementHistogram', [], {}); // Clear histogram as well
+                Plotly.newPlot('mouseClickChart', [], {});
+                Plotly.newPlot('mouseClickHistogram', [], {}); // Clear histogram as well
+                Plotly.newPlot('breakDurationChart', [], {});
+                Plotly.newPlot('breakDurationHistogram', [], {}); // Clear histogram as well
+                Plotly.newPlot('breakTypeStackedBarChart', [], {}); // Clear new break type chart
+
+                // Clear summary stats
+                updateSummaryStatistics([]);
+                return;
+            }
+
+            // Sort data by date before rendering
+            filteredData.sort((a, b) => {
+                // Corrected month index: subtract 1 from month
+                const dateA = new Date(a.start_date.year, a.start_date.month - 1, a.start_date.day);
+                const dateB = new Date(b.start_date.year, b.start_date.month - 1, b.start_date.day);
+                return dateA - dateB;
+            });
+
+            currentFilteredData = filteredData; // Store for custom queries
+            // Update summary statistics
+            updateSummaryStatistics(currentFilteredData);
+
+            window.renderPlotlyCharts(currentFilteredData); // Call as global function
+            // Re-run any custom query if there's one in the input field
+            window.runCustomQuery(); // Call as global function
+            saveFilterState(); // Save state after applying filters
+        }
+
+        function updateSummaryStatistics(data) {
+            let totalUsageMinutes = 0;
+            let totalKeystrokes = 0;
+            let totalMouseMovements = 0;
+            let totalMouseClicks = 0;
+            let totalBreakDurationsMinutes = 0; // Renamed to clearly indicate units
+            const daysCount = data.length;
+
+            let usageValues = [];
+            let keystrokeValues = [];
+            let mouseMovementValues = [];
+            let mouseClickValues = [];
+            let breakDurationValuesMinutes = []; // Renamed to clearly indicate units
+
+            let maxUsage = 0;
+            let minUsage = Infinity;
+
+            let maxKeystrokes = 0;
+            let minKeystrokes = Infinity;
+
+            let maxMouseMovement = 0;
+            let minMouseMovement = Infinity;
+
+            let maxMouseClicks = 0;
+            let minMouseClicks = Infinity;
+
+            let maxBreakDurationMinutes = 0; // Renamed
+            let minBreakDurationMinutes = Infinity; // Renamed
+
+            // New: Data structures for break types summary
+            const breakTypeTotalsMinutes = {}; // { type: totalDurationInMinutes }
+            const breakTypeCounts = {}; // { type: countOfDaysWithThatType }
+
+            data.forEach(entry => {
+                // Corrected month index: subtract 1 from month
+                const startDateTime = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day, entry.start_time.hour, entry.start_time.minute);
+                const endDateTime = new Date(entry.end_date.year, entry.end_date.month - 1, entry.end_date.day, entry.end_time.hour, entry.end_time.minute);
+                const durationMs = endDateTime - startDateTime;
+                const usageMinutes = durationMs / (1000 * 60);
+
+                usageValues.push(usageMinutes);
+                totalUsageMinutes += usageMinutes;
+                if (usageMinutes > maxUsage) maxUsage = usageMinutes;
+                if (usageMinutes > 0 && usageMinutes < minUsage) minUsage = usageMinutes; // Exclude 0 from min
+
+                if (entry.activity_stats) {
+                    const keystrokes = entry.activity_stats.keystrokes || 0;
+                    const mouseMovements = entry.activity_stats.mouse_movement_units || 0;
+                    const mouseClicks = entry.activity_stats.mouse_clicks || 0;
+
+                    keystrokeValues.push(keystrokes);
+                    totalKeystrokes += keystrokes;
+                    if (keystrokes > maxKeystrokes) maxKeystrokes = keystrokes;
+                    if (keystrokes > 0 && keystrokes < minKeystrokes) minKeystrokes = keystrokes; // Exclude 0 from min
+
+                    mouseMovementValues.push(mouseMovements);
+                    totalMouseMovements += mouseMovements;
+                    if (mouseMovements > maxMouseMovement) maxMouseMovement = mouseMovements;
+                    if (mouseMovements > 0 && mouseMovements < minMouseMovement) minMouseMovement = mouseMovements; // Exclude 0 from min
+
+                    mouseClickValues.push(mouseClicks);
+                    totalMouseClicks += mouseClicks;
+                    if (mouseClicks > maxMouseClicks) maxMouseClicks = mouseClicks;
+                    if (mouseClicks > 0 && mouseClicks < minMouseClicks) minMouseClicks = mouseClicks; // Exclude 0 from min
+                }
+
+                if (entry.break_stats && Array.isArray(entry.break_stats)) {
+                    let dailyBreakDurationSeconds = 0;
+                    entry.break_stats.forEach(b => {
+                        const durationSeconds = (b.values && b.values.length > 1 ? b.values[1] : 0); // Duration is in seconds
+                        dailyBreakDurationSeconds += durationSeconds;
+
+                        // Aggregate for break type breakdown, converting to minutes here
+                        const type = b.break_type;
+                        const durationMinutes = durationSeconds / 60; // Convert to minutes
+                        breakTypeTotalsMinutes[type] = (breakTypeTotalsMinutes[type] || 0) + durationMinutes;
+                        breakTypeCounts[type] = (breakTypeCounts[type] || 0) + 1; // Count how many times this type appeared
+                    });
+                    const dailyBreakDurationMinutes = dailyBreakDurationSeconds / 60; // Convert total daily break to minutes
+                    breakDurationValuesMinutes.push(dailyBreakDurationMinutes);
+                    totalBreakDurationsMinutes += dailyBreakDurationMinutes;
+                    if (dailyBreakDurationMinutes > maxBreakDurationMinutes) maxBreakDurationMinutes = dailyBreakDurationMinutes;
+                    if (dailyBreakDurationMinutes > 0 && dailyBreakDurationMinutes < minBreakDurationMinutes) minBreakDurationMinutes = dailyBreakDurationMinutes; // Exclude 0 from min
+                }
+            });
+
+            // Calculate Averages (using the total values calculated in the loop)
+            const avgUsageMinutes = daysCount > 0 ? (totalUsageMinutes / daysCount) : 0;
+            const avgUsageHours = avgUsageMinutes / 60;
+            const avgKeystrokes = daysCount > 0 ? (totalKeystrokes / daysCount) : 0;
+            const avgMouseMovement = daysCount > 0 ? (totalMouseMovements / daysCount) : 0;
+            const avgMouseClicks = daysCount > 0 ? (totalMouseClicks / daysCount) : 0;
+            const avgBreakDurationMinutes = daysCount > 0 ? (totalBreakDurationsMinutes / daysCount) : 0;
+
+            const maxUsageHours = maxUsage / 60;
+            const minUsageHours = minUsage / 60;
+
+            // Calculate Median and Mode
+            const medianUsageMinutes = window.calculateMedian(usageValues);
+            const medianUsageHours = medianUsageMinutes !== 'N/A' ? (medianUsageMinutes / 60) : 'N/A';
+            const modeUsageMinutes = window.calculateMode(usageValues);
+            const modeUsageHours = modeUsageMinutes !== 'N/A' && modeUsageMinutes.split(', ').every(val => !isNaN(parseFloat(val))) ? modeUsageMinutes.split(', ').map(val => (parseFloat(val) / 60).toFixed(2)).join(', ') : 'N/A';
+
+            const medianKeystrokes = window.calculateMedian(keystrokeValues);
+            const modeKeystrokes = window.calculateMode(keystrokeValues);
+
+            const medianMouseMovement = window.calculateMedian(mouseMovementValues);
+            const modeMouseMovement = window.calculateMode(mouseMovementValues);
+
+            const medianMouseClicks = window.calculateMedian(mouseClickValues);
+            const modeMouseClicks = window.calculateMode(mouseClickValues);
+
+            const medianBreakDurationMinutes = window.calculateMedian(breakDurationValuesMinutes);
+            const modeBreakDurationMinutes = window.calculateMode(breakDurationValuesMinutes);
+
+            // Calculate Productivity Ratios
+            const avgKeystrokesPerMinUsage = totalUsageMinutes > 0 ? (totalKeystrokes / totalUsageMinutes) : 0;
+            const avgClicksPerMinUsage = totalUsageMinutes > 0 ? (totalMouseClicks / totalUsageMinutes) : 0;
+
+
+            // Map of element IDs to update
+            const summaryElements = new Map([
+                ['summaryDaysCount', daysCount],
+                ['totalUsage', `${totalUsageMinutes.toFixed(2)} min / ${(totalUsageMinutes / 60).toFixed(2)}hrs`],
+                ['totalKeystrokes', totalKeystrokes.toLocaleString()],
+                ['totalMouseMovement', totalMouseMovements.toLocaleString()],
+                ['totalMouseClicks', totalMouseClicks.toLocaleString()],
+                ['avgKeystrokesPerMinUsage', avgKeystrokesPerMinUsage.toFixed(2)],
+                ['avgClicksPerMinUsage', avgClicksPerMinUsage.toFixed(2)],
+                ['avgDailyUsage', `${avgUsageMinutes.toFixed(2)} / ${avgUsageHours.toFixed(2)}`],
+                ['medianDailyUsage', `${typeof medianUsageMinutes === 'number' ? medianUsageMinutes.toFixed(2) : medianUsageMinutes} / ${typeof medianUsageHours === 'number' ? medianUsageHours.toFixed(2) : medianUsageHours}`],
+                ['modeDailyUsage', `${modeUsageMinutes} / ${modeUsageHours}`],
+                ['maxDailyUsage', `${maxUsage.toFixed(2)} / ${maxUsageHours.toFixed(2)}`],
+                ['minDailyUsage', `${minUsage !== Infinity ? minUsage.toFixed(2) : '0.00'} / ${minUsageHours !== Infinity ? minUsageHours.toFixed(2) : '0.00'}`],
+                ['avgDailyKeystrokes', Math.round(avgKeystrokes).toLocaleString()],
+                ['medianDailyKeystrokes', typeof medianKeystrokes === 'number' ? Math.round(medianKeystrokes).toLocaleString() : medianKeystrokes],
+                ['modeDailyKeystrokes', modeKeystrokes !== 'N/A (No distinct mode)' ? modeKeystrokes.split(', ').map(m => Math.round(parseFloat(m)).toLocaleString()).join(', ') : modeKeystrokes],
+                ['maxDailyKeystrokes', maxKeystrokes.toLocaleString()],
+                ['minDailyKeystrokes', minKeystrokes !== Infinity ? minKeystrokes.toLocaleString() : '0'],
+                ['avgDailyMouseMovement', Math.round(avgMouseMovement).toLocaleString()],
+                ['medianDailyMouseMovement', typeof medianMouseMovement === 'number' ? Math.round(medianMouseMovement).toLocaleString() : medianMouseMovement],
+                ['modeDailyMouseMovement', modeMouseMovement !== 'N/A (No distinct mode)' ? modeMouseMovement.split(', ').map(m => Math.round(parseFloat(m)).toLocaleString()).join(', ') : modeMouseMovement],
+                ['maxDailyMouseMovement', maxMouseMovement.toLocaleString()],
+                ['minDailyMouseMovement', minMouseMovement !== Infinity ? minMouseMovement.toLocaleString() : '0'],
+                ['avgDailyMouseClicks', Math.round(avgMouseClicks).toLocaleString()],
+                ['medianDailyMouseClicks', typeof medianMouseClicks === 'number' ? Math.round(medianMouseClicks).toLocaleString() : medianMouseClicks],
+                ['modeDailyMouseClicks', modeMouseClicks !== 'N/A (No distinct mode)' ? modeMouseClicks.split(', ').map(m => Math.round(parseFloat(m)).toLocaleString()).join(', ') : modeMouseClicks],
+                ['maxDailyMouseClicks', maxMouseClicks.toLocaleString()],
+                ['minDailyMouseClicks', minMouseClicks !== Infinity ? minMouseClicks.toLocaleString() : '0'],
+                ['avgDailyBreakDuration', avgBreakDurationMinutes.toFixed(2)],
+                ['medianDailyBreakDuration', typeof medianBreakDurationMinutes === 'number' ? medianBreakDurationMinutes.toFixed(2) : medianBreakDurationMinutes],
+                ['modeDailyBreakDuration', modeBreakDurationMinutes],
+                ['maxDailyBreakDuration', maxBreakDurationMinutes.toFixed(2)],
+                ['minDailyBreakDuration', minBreakDurationMinutes !== Infinity ? minBreakDurationMinutes.toFixed(2) : '0.00'],
+            ]);
+
+            // Update text content for each element, with explicit null checks and logging
+            summaryElements.forEach((value, id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                } else {
+                    console.error(`Error: HTML element with ID '${id}' not found. Cannot update summary statistics.`);
+                }
+            });
+
+            // Update Break Type Breakdown summary
+            const breakTypeSummaryContent = document.getElementById('breakTypeSummaryContent');
+            breakTypeSummaryContent.innerHTML = ''; // Clear previous content
+
+            const sortedBreakTypes = Object.keys(breakTypeTotalsMinutes).sort((a, b) => parseInt(a) - parseInt(b));
+
+            if (sortedBreakTypes.length === 0) {
+                breakTypeSummaryContent.innerHTML = '<div class="stats-item">No break data available.</div>';
+            } else {
+                sortedBreakTypes.forEach(type => {
+                    const avgDuration = daysCount > 0 ? (breakTypeTotalsMinutes[type] / daysCount) : 0; // This is already in minutes
+                    const typeName = BREAK_TYPE_NAMES[type] || `Unknown Type ${type}`;
+                    const div = document.createElement('div');
+                    div.className = 'stats-item';
+                    div.innerHTML = `Avg ${typeName}: <span>${avgDuration.toFixed(2)}</span>`;
+                    breakTypeSummaryContent.appendChild(div);
+                });
+            }
+
+        }
+
+        window.runCustomQuery = function() { // Made global
+            const queryInput = document.getElementById('customQueryInput').value.trim();
+            const queryResultsDiv = document.getElementById('queryResults');
+            queryResultsDiv.textContent = ''; // Clear previous results
+            lastQueryResults = []; // Clear previous query results for download
+
+            if (!queryInput) {
+                queryResultsDiv.textContent = 'Please enter a query.';
+                return;
+            }
+
+            if (currentFilteredData.length === 0) {
+                queryResultsDiv.textContent = 'No data available to query. Adjust filters or check data source.';
+                return;
+            }
+
+            // Regex to parse queries like "metric > value" or "metric <= value"
+            const queryRegex = /^\s*([a-zA-Z_]+)\s*([<>=!]+)\s*(\d+(\.\d+)?)\s*$/;
+            const match = queryInput.match(queryRegex);
+
+            if (!match) {
+                queryResultsDiv.textContent = 'Invalid query format. Please use "metric operator value" (e.g., "usage > 300").';
+                return;
+            }
+
+            const metricName = match[1].toLowerCase();
+            const operator = match[2];
+            const value = parseFloat(match[3]);
+
+            if (isNaN(value)) {
+                queryResultsDiv.textContent = 'Invalid numeric value in query.';
+                return;
+            }
+
+            let matchingDays = [];
+            let errorFound = false;
+
+            currentFilteredData.forEach(entry => {
+                let metricValue;
+                // Create a Date object to normalize month/day issues
+                const dateObj = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
+                const dateString = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+
+                switch (metricName) {
+                    case 'usage':
+                        // Corrected month index: subtract 1 from month
+                        const startDateTime = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day, entry.start_time.hour, entry.start_time.minute);
+                        const endDateTime = new Date(entry.end_date.year, entry.end_date.month - 1, entry.end_date.day, entry.end_time.hour, entry.end_time.minute);
+                        const durationMs = endDateTime - startDateTime;
+                        metricValue = durationMs / (1000 * 60); // minutes
+                        break;
+                    case 'keystrokes':
+                        metricValue = entry.activity_stats ? (entry.activity_stats.keystrokes || 0) : 0;
+                        break;
+                    case 'mouse_movement':
+                        metricValue = entry.activity_stats ? (entry.activity_stats.mouse_movement_units || 0) : 0;
+                        break;
+                    case 'mouse_clicks':
+                        metricValue = entry.activity_stats ? (entry.activity_stats.mouse_clicks || 0) : 0;
+                        break;
+                    case 'break_duration':
+                        metricValue = (entry.break_stats && Array.isArray(entry.break_stats)) ?
+                                      entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) / 60 : 0; // minutes
+                        break;
+                    default:
+                        queryResultsDiv.textContent = `Unknown metric: '${metricName}'. Please use one of: usage, keystrokes, mouse_movement, mouse_clicks, break_duration.`;
+                        errorFound = true;
+                        return; // Exit forEach
+                }
+
+                if (errorFound) return;
+
+                let conditionMet = false;
+                switch (operator) {
+                    case '>':
+                        conditionMet = metricValue > value;
+                        break;
+                    case '<':
+                        conditionMet = metricValue < value;
+                        break;
+                    case '>=':
+                        conditionMet = metricValue >= value;
+                        break;
+                    case '<=':
+                        conditionMet = metricValue <= value;
+                        break;
+                    case '==':
+                    case '=': // Allow single equals for equality
+                        conditionMet = metricValue === value;
+                        break;
+                    case '!=':
+                        conditionMet = metricValue !== value;
+                        break;
+                    default:
+                        queryResultsDiv.textContent = `Unsupported operator: '${operator}'. Please use one of: >, <, >=, <=, ==, !=.`;
+                        errorFound = true;
+                        return; // Exit forEach
+                }
+
+                if (errorFound) return;
+
+                if (conditionMet) {
+                    matchingDays.push({
+                        date: dateString,
+                        metric: metricName,
+                        value: metricValue.toFixed(2),
+                        query: queryInput // Store the query itself
+                    });
+                }
+            });
+
+            if (errorFound) return; // Stop if an error occurred during iteration
+
+            lastQueryResults = matchingDays; // Store results for download
+
+            if (matchingDays.length > 0) {
+                const formattedResults = matchingDays.map(day => `${day.date}: ${day.metric} = ${day.value}`).join('<br>');
+                queryResultsDiv.innerHTML = `Found ${matchingDays.length} day(s) where ${queryInput}:<br>${formattedResults}`;
+            } else {
+                queryResultsDiv.textContent = `No days found matching the query "${queryInput}".`;
+            }
+        }
+
+        window.downloadQueryResults = function() { // Made global
+            if (lastQueryResults.length === 0) {
+                alert("No query results to download. Please run a query first.");
+                return;
+            }
+
+            const header = "Date,Metric,Value,Query\n";
+            const csvRows = lastQueryResults.map(row => `${row.date},${row.metric},${row.value},"${row.query.replace(/"/g, '""')}"`);
+            const csvContent = header + csvRows.join("\n");
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'workrave_query_results.csv');
+            link.style.visibility = 'hidden'; // Hide the link
+            document.body.appendChild(link); // Add to DOM briefly
+            link.click(); // Trigger download
+            document.body.removeChild(link); // Clean up
+            URL.revokeObjectURL(url); // Release the URL object
+        }
+
+
+        window.renderPlotlyCharts = function(data) { // Made global
+            const dates = data.map(entry => {
+                // Create a Date object (month is 0-indexed for constructor)
+                const dateObj = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
+                // Format the Date object into ISO-MM-DD string
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-indexed, so add 1
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            });
+
+            // Create numerical x-axis for linear regression calculation based on filtered data
+            const xNumeric = Array.from({ length: dates.length }, (_, i) => i);
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const chartBgColor = isDarkMode ? '#3a3a3a' : '#ffffff';
+            const chartFontColor = isDarkMode ? '#e0e0e0' : '#343a40';
+            const gridLineColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+            // --- Determine working weekends for background shapes ---
+            const workingWeekendShapes = [];
+            data.forEach(entry => {
+                // Corrected month index: subtract 1 from month
+                const entryDate = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
+                const dayOfWeek = entryDate.getDay(); // 0 for Sunday, 6 for Saturday
+
+                // Corrected month index: subtract 1 from month
+                const startDateTime = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day, entry.start_time.hour, entry.start_time.minute);
+                const endDateTime = new Date(entry.end_date.year, entry.end_date.month - 1, entry.end_date.day, entry.end_time.hour, entry.end_time.minute);
+                const usageMinutes = (endDateTime - startDateTime) / (1000 * 60);
+
+                // Check if it's a weekend and if there's significant usage
+                if ((dayOfWeek === 0 || dayOfWeek === 6) && usageMinutes > WEEKEND_WORK_THRESHOLD_MINUTES) {
+                    // Use the robust date string generation here too
+                    const dateObj = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
+                    const dateString = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+
+                    workingWeekendShapes.push({
+                        type: 'rect',
+                        xref: 'x',
+                        yref: 'paper',
+                        x0: dateString,
+                        x1: dateString, // Span only this day
+                        y0: 0,
+                        y1: 1,
+                        fillcolor: 'rgba(255, 255, 0, 0.15)', // Light yellow with transparency
+                        line: { width: 0 },
+                        layer: 'below'
+                    });
+                }
+            });
+
+
+            const commonLayoutProps = {
+                font: {
+                    color: chartFontColor
+                },
+                paper_bgcolor: chartBgColor,
+                plot_bgcolor: chartBgColor,
+                height: 350,
+                margin: { t: 40, b: 120, l: 40, r: 40 }, // Increased bottom margin for legend
+                yaxis: {
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true
+                },
+                showlegend: true, // Explicitly show legend
+                legend: { // Legend placed below the graph
+                    orientation: 'h', // Horizontal orientation
+                    x: 0, // Align to the left
+                    y: -0.1, // Position slightly above the bottom edge of the margin
+                    xanchor: 'left', // Anchor from the left
+                    yanchor: 'top', // Anchor from the top
+                },
+                shapes: workingWeekendShapes // Add the dynamic shapes here
+            };
+
+            // --- Daily Computer Usage Time ---
+            const usageTimes = data.map(entry => {
+                // Corrected month index: subtract 1 from month
+                const startDateTime = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day, entry.start_time.hour, entry.start_time.minute);
+                const endDateTime = new Date(entry.end_date.year, entry.end_date.month - 1, entry.end_date.day, entry.end_time.hour, entry.end_time.minute);
+                const durationMs = endDateTime - startDateTime;
+                return durationMs / (1000 * 60);
+            });
+
+            const usageRegression = window.calculateLinearRegression(xNumeric, usageTimes);
+            const usageTrendLineY = xNumeric.map(x => usageRegression.m * x + usageRegression.b);
+
+            const usageTrace = {
+                x: dates,
+                y: usageTimes,
+                mode: 'lines+markers',
+                name: 'Daily Usage (minutes)',
+                line: { color: 'rgb(75, 192, 192)' },
+                marker: { color: 'rgb(75, 192, 192)' }
+            };
+            const usageTrendTrace = {
+                x: dates,
+                y: usageTrendLineY,
+                mode: 'lines',
+                name: 'Usage Trend',
+                line: { color: 'red', dash: 'dashdot', width: 2 }
+            };
+            const usageLayout = {
+                title: 'Daily Computer Usage Time (Minutes)',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                ...commonLayoutProps
+            };
+            Plotly.newPlot('activityChart', [usageTrace, usageTrendTrace], usageLayout);
+            document.getElementById('activityChart').dataset.plotlyInitialised = 'true';
+
+            // --- Daily Usage Time Distribution (Histogram) ---
+            const usageHistogramTrace = {
+                x: usageTimes,
+                type: 'histogram',
+                name: 'Usage Distribution',
+                marker: { color: 'rgb(75, 192, 192)' },
+                autobinx: true // Let Plotly automatically determine bins
+            };
+            const usageHistogramLayout = {
+                title: 'Daily Usage Time Distribution (Minutes)',
+                xaxis: {
+                    title: 'Minutes',
+                    automargin: true,
+                    type: 'linear',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor
+                },
+                yaxis: { title: 'Frequency', automargin: true },
+                ...commonLayoutProps,
+                showlegend: false
+            };
+            Plotly.newPlot('usageHistogram', [usageHistogramTrace], usageHistogramLayout);
+
+
+            // --- Daily Keystrokes ---
+            const keystrokes = data.map(entry => entry.activity_stats ? entry.activity_stats.keystrokes : 0);
+            const keystrokeRegression = window.calculateLinearRegression(xNumeric, keystrokes);
+            const keystrokeTrendLineY = xNumeric.map(x => keystrokeRegression.m * x + keystrokeRegression.b);
+
+            const keystrokeTrace = {
+                x: dates,
+                y: keystrokes,
+                mode: 'lines+markers',
+                name: 'Keystrokes',
+                line: { color: 'rgb(255, 99, 132)' },
+                marker: { color: 'rgb(255, 99, 132)' }
+            };
+            const keystrokeTrendTrace = {
+                x: dates,
+                y: keystrokeTrendLineY,
+                mode: 'lines',
+                name: 'Keystroke Trend',
+                line: { color: 'red', dash: 'dashdot', width: 2 }
+            };
+            const keystrokeLayout = {
+                title: 'Daily Keystrokes',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                ...commonLayoutProps
+            };
+            Plotly.newPlot('keystrokeChart', [keystrokeTrace, keystrokeTrendTrace], keystrokeLayout);
+            document.getElementById('keystrokeChart').dataset.plotlyInitialised = 'true';
+
+            // --- Daily Keystrokes Distribution (Histogram) ---
+            const keystrokeHistogramTrace = {
+                x: keystrokes,
+                type: 'histogram',
+                name: 'Keystrokes Distribution',
+                marker: { color: 'rgb(255, 99, 132)' },
+                autobinx: true // Let Plotly automatically determine bins
+            };
+            const keystrokeHistogramLayout = {
+                title: 'Daily Keystrokes Distribution',
+                xaxis: {
+                    title: 'Count',
+                    automargin: true,
+                    type: 'linear',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor
+                },
+                yaxis: { title: 'Frequency', automargin: true },
+                ...commonLayoutProps,
+                showlegend: false
+            };
+            Plotly.newPlot('keystrokeHistogram', [keystrokeHistogramTrace], keystrokeHistogramLayout);
+
+
+            // --- Daily Mouse Movement ---
+            const mouseMovements = data.map(entry => entry.activity_stats ? entry.activity_stats.mouse_movement_units : 0);
+            const mouseMovementRegression = window.calculateLinearRegression(xNumeric, mouseMovements);
+            const mouseMovementTrendLineY = xNumeric.map(x => mouseMovementRegression.m * x + mouseMovementRegression.b);
+
+            const mouseMovementTrace = {
+                x: dates,
+                y: mouseMovements,
+                mode: 'lines+markers',
+                name: 'Mouse Movement',
+                line: { color: 'rgb(54, 162, 235)' },
+                marker: { color: 'rgb(54, 162, 235)' }
+            };
+            const mouseMovementTrendTrace = {
+                x: dates,
+                y: mouseMovementTrendLineY,
+                mode: 'lines',
+                name: 'Mouse Movement Trend',
+                line: { color: 'red', dash: 'dashdot', width: 2 }
+            };
+            const mouseMovementLayout = {
+                title: 'Daily Mouse Movement (Units)',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                ...commonLayoutProps
+            };
+            Plotly.newPlot('mouseMovementChart', [mouseMovementTrace, mouseMovementTrendTrace], mouseMovementLayout);
+            document.getElementById('mouseMovementChart').dataset.plotlyInitialised = 'true';
+
+            // --- Daily Mouse Movement Distribution (Histogram) ---
+            const mouseMovementHistogramTrace = {
+                x: mouseMovements,
+                type: 'histogram',
+                name: 'Mouse Movement Distribution',
+                marker: { color: 'rgb(54, 162, 235)' },
+                autobinx: true // Let Plotly automatically determine bins
+            };
+            const mouseMovementHistogramLayout = {
+                title: 'Daily Mouse Movement Distribution (Units)',
+                xaxis: {
+                    title: 'Units',
+                    automargin: true,
+                    type: 'linear',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor
+                },
+                yaxis: { title: 'Frequency', automargin: true },
+                ...commonLayoutProps,
+                showlegend: false
+            };
+            Plotly.newPlot('mouseMovementHistogram', [mouseMovementHistogramTrace], mouseMovementHistogramLayout);
+
+
+            // --- Daily Mouse Clicks ---
+            const mouseClicks = data.map(entry => entry.activity_stats ? entry.activity_stats.mouse_clicks : 0);
+            const mouseClickRegression = window.calculateLinearRegression(xNumeric, mouseClicks);
+            const mouseClickTrendLineY = xNumeric.map(x => mouseClickRegression.m * x + mouseClickRegression.b);
+
+            const mouseClickTrace = {
+                x: dates,
+                y: mouseClicks,
+                mode: 'lines+markers',
+                name: 'Mouse Clicks',
+                line: { color: 'rgb(255, 205, 86)' },
+                marker: { color: 'rgb(255, 205, 86)' }
+            };
+            const mouseClickTrendTrace = {
+                x: dates,
+                y: mouseClickTrendLineY,
+                mode: 'lines',
+                name: 'Mouse Click Trend',
+                line: { color: 'red', dash: 'dashdot', width: 2 }
+            };
+            const mouseClickLayout = {
+                title: 'Daily Mouse Clicks',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                ...commonLayoutProps
+            };
+            Plotly.newPlot('mouseClickChart', [mouseClickTrace, mouseClickTrendTrace], mouseClickLayout);
+            document.getElementById('mouseClickChart').dataset.plotlyInitialised = 'true';
+
+            // --- Daily Mouse Clicks Distribution (Histogram) ---
+            const mouseClickHistogramTrace = {
+                x: mouseClicks,
+                type: 'histogram',
+                name: 'Mouse Clicks Distribution',
+                marker: { color: 'rgb(255, 205, 86)' },
+                autobinx: true // Let Plotly automatically determine bins
+            };
+            const mouseClickHistogramLayout = {
+                title: 'Daily Mouse Clicks Distribution',
+                xaxis: {
+                    title: 'Count',
+                    automargin: true,
+                    type: 'linear',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor
+                },
+                yaxis: { title: 'Frequency', automargin: true },
+                ...commonLayoutProps,
+                showlegend: false
+            };
+            Plotly.newPlot('mouseClickHistogram', [mouseClickHistogramTrace], mouseClickHistogramLayout);
+
+
+            // --- Daily Total Break Duration ---
+            const breakDurationsMinutes = data.map(entry => {
+                if (entry.break_stats && Array.isArray(entry.break_stats)) {
+                    return entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) / 60; // Convert to minutes
+                }
+                return 0;
+            });
+            const breakDurationRegression = window.calculateLinearRegression(xNumeric, breakDurationsMinutes);
+            const breakDurationTrendLineY = xNumeric.map(x => breakDurationRegression.m * x + breakDurationRegression.b);
+
+            const breakDurationTrace = {
+                x: dates,
+                y: breakDurationsMinutes,
+                mode: 'lines+markers',
+                name: 'Total Break Duration (minutes)',
+                line: { color: 'rgb(153, 102, 255)' },
+                marker: { color: 'rgb(153, 102, 255)' }
+            };
+            const breakDurationTrendTrace = {
+                x: dates,
+                y: breakDurationTrendLineY,
+                mode: 'lines',
+                name: 'Break Duration Trend',
+                line: { color: 'red', dash: 'dashdot', width: 2 }
+            };
+            const breakDurationLayout = {
+                title: 'Daily Total Break Duration (Minutes)',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                ...commonLayoutProps
+            };
+            Plotly.newPlot('breakDurationChart', [breakDurationTrace, breakDurationTrendTrace], breakDurationLayout);
+            document.getElementById('breakDurationChart').dataset.plotlyInitialised = 'true';
+
+            // --- Daily Break Duration Distribution (Histogram) ---
+            const breakDurationHistogramTrace = {
+                x: breakDurationsMinutes,
+                type: 'histogram',
+                name: 'Break Duration Distribution',
+                marker: { color: 'rgb(153, 102, 255)' },
+                autobinx: true // Let Plotly automatically determine bins
+            };
+            const breakDurationHistogramLayout = {
+                title: 'Daily Break Duration Distribution (Minutes)',
+                xaxis: {
+                    title: 'Minutes',
+                    automargin: true,
+                    type: 'linear',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor
+                },
+                yaxis: { title: 'Frequency', automargin: true },
+                ...commonLayoutProps,
+                showlegend: false
+            };
+            Plotly.newPlot('breakDurationHistogram', [breakDurationHistogramTrace], breakDurationHistogramLayout);
+
+            // --- NEW: Daily Break Duration by Type (Stacked Bar Chart) ---
+            const breakDataByTypeSeconds = {}; // { break_type: { dateKey: totalDurationForTypeOnThatDayInSeconds } }
+            const allBreakTypes = new Set();
+
+            data.forEach(entry => {
+                const entryDate = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
+                const dateKey = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}-${String(entryDate.getDate()).padStart(2, '0')}`;
+
+                if (entry.break_stats && Array.isArray(entry.break_stats)) {
+                    entry.break_stats.forEach(b => {
+                        const type = b.break_type;
+                        allBreakTypes.add(type);
+
+                        if (!breakDataByTypeSeconds[type]) {
+                            breakDataByTypeSeconds[type] = {};
+                        }
+                        const durationSeconds = (b.values && b.values.length > 1 ? b.values[1] : 0);
+                        breakDataByTypeSeconds[type][dateKey] = (breakDataByTypeSeconds[type][dateKey] || 0) + durationSeconds;
+                    });
+                }
+            });
+
+            const sortedBreakTypes = Array.from(allBreakTypes).sort((a, b) => a - b);
+            
+            // Define a set of colors to use for different break types
+            const breakTypeColors = [
+                '#1f77b4', // blue
+                '#ff7f0e', // orange
+                '#2ca02c', // green
+                '#d62728', // red
+                '#9467bd', // purple
+                '#8c564b', // brown
+                '#e377c2', // pink
+                '#7f7f7f', // gray
+                '#bcbd22', // olive
+                '#17becf'  // cyan
+            ];
+
+            const breakTypeTraces = sortedBreakTypes.map(type => {
+                const yValuesMinutes = dates.map(date => { // `dates` array is already ISO-MM-DD strings
+                    const durationSeconds = breakDataByTypeSeconds[type] ? (breakDataByTypeSeconds[type][date] || 0) : 0;
+                    return durationSeconds / 60; // Convert to minutes for the chart
+                });
+                const typeName = BREAK_TYPE_NAMES[type] || `Type ${type}`;
+                // Use the predefined colors, cycling through them
+                const traceColor = breakTypeColors[type % breakTypeColors.length]; 
+                return {
+                    x: dates,
+                    y: yValuesMinutes,
+                    name: typeName,
+                    type: 'bar',
+                    marker: { color: traceColor },
+                    hovertemplate: `<b>%{x}</b><br>${typeName}: %{y:.2f} minutes<extra></extra>`
+                };
+            });
+
+            const breakTypeLayout = {
+                title: 'Daily Break Duration by Type (Minutes)',
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true,
+                    rangeslider: { visible: false },
+                    type: 'date'
+                },
+                yaxis: {
+                    title: 'Minutes',
+                    gridcolor: gridLineColor,
+                    zerolinecolor: gridLineColor,
+                    automargin: true
+                },
+                barmode: 'stack', // Important for stacking bars
+                ...commonLayoutProps
+            };
+
+            Plotly.newPlot('breakTypeStackedBarChart', breakTypeTraces, breakTypeLayout);
+            document.getElementById('breakTypeStackedBarChart').dataset.plotlyInitialised = 'true';
+
+            // Removed plotly_relayout event listeners from individual charts as rangesliders are removed
+        }
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load filter state first
+            loadFilterState();
+            
+            // Set default dates if not loaded from localStorage
+            if (!document.getElementById('startDate').value) {
+                document.getElementById('startDate').value = DEFAULT_START_DATE;
+            }
+            if (!document.getElementById('endDate').value) {
+                document.getElementById('endDate').value = DEFAULT_END_DATE;
+            }
+
+            await fetchInitialData();
+
+            const selectAllFiltersCheckbox = document.getElementById('selectAllFilters');
+            const individualFilterCheckboxes = getIndividualFilterCheckboxes();
+
+            function updateSelectAllCheckbox() {
+                const allChecked = individualFilterCheckboxes.every(cb => cb.checked);
+                selectAllFiltersCheckbox.checked = allChecked;
+            }
+
+            // Event Listeners for Filters
+            document.getElementById('startDate').addEventListener('change', applyFiltersAndRenderCharts);
+            document.getElementById('endDate').addEventListener('change', applyFiltersAndRenderCharts);
+
+            // Event listener for Reset Date Range button
+            document.getElementById('resetDateRangeButton').addEventListener('click', () => {
+                document.getElementById('startDate').value = DEFAULT_START_DATE;
+                document.getElementById('endDate').value = DEFAULT_END_DATE;
+                applyFiltersAndRenderCharts();
+            });
+
+
+            selectAllFiltersCheckbox.addEventListener('change', () => {
+                const isChecked = selectAllFiltersCheckbox.checked;
+                individualFilterCheckboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                });
+                applyFiltersAndRenderCharts();
+            });
+
+            individualFilterCheckboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    updateSelectAllCheckbox();
+                    applyFiltersAndRenderCharts();
+                });
+            });
+
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+
+            darkModeToggle.addEventListener('change', () => {
+                if (darkModeToggle.checked) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+                applyFiltersAndRenderCharts(); // Re-render charts for theme
+            });
+
+            // Custom Query Listener
+            document.getElementById('runQueryButton').addEventListener('click', window.runCustomQuery); // Call as global
+            document.getElementById('customQueryInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    window.runCustomQuery(); // Call as global
+                }
+            });
+
+            // Download Query Results Listener
+            document.getElementById('downloadQueryResultsButton').addEventListener('click', window.downloadQueryResults); // Call as global
+
+
+            // Initial render - this will now use the loaded filter states
+            applyFiltersAndRenderCharts();
+            updateSelectAllCheckbox(); // Update select all checkbox based on loaded state
+        });
+    </script>
+</body>
+</html>

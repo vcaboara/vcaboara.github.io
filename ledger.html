@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arboreum Commercial Solutions LLC | Sovereign Ledger</title>
+    <style>
+        :root {
+            --bg: #03060b;
+            --card: #0d1117;
+            --border: #30363d;
+            --blue: #58a6ff;
+            --red: #ff7b72;
+            --text: #c9d1d9;
+            --high-vis: #f0f6fc;
+            --slate: #8b949e;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #ledger-content {
+            width: 100%;
+            max-width: 950px;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 0 60px rgba(255, 123, 114, 0.05);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .priority-box {
+            border: 2px solid var(--red);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            background: rgba(255, 123, 114, 0.05);
+        }
+
+        .liability-text {
+            font-size: clamp(2.5em, 6vw, 4.5em);
+            color: var(--red);
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .label {
+            color: var(--high-vis);
+            font-size: 0.8em;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .stat-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-links a {
+            color: var(--blue);
+            text-decoration: underline;
+            font-size: 0.85em;
+        }
+
+        .mandate-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .mandate-section {
+            background: #161b22;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .mandate-section .label {
+            font-size: 0.7em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .mandate-section a {
+            display: block;
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 0.75em;
+            padding: 6px 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .mandate-section a:hover {
+            background: rgba(88, 166, 255, 0.1);
+            text-decoration: underline;
+        }
+
+        .multiplier-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--high-vis);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .toggle-btn.active {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(255, 123, 114, 0.1);
+        }
+
+        .status-delivered {
+            color: #26a641;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        details {
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+        }
+
+        summary {
+            padding: 15px;
+            cursor: pointer;
+            color: var(--blue);
+            font-weight: bold;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+        }
+
+        th {
+            color: var(--blue);
+            text-transform: uppercase;
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .entity-val {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .bounce-tag {
+            color: var(--red);
+            font-size: 0.65em;
+            border: 1px solid var(--red);
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .section-divider {
+            color: var(--high-vis);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 10px 15px;
+            background: #0d1117;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-divider:hover {
+            background: #161b22;
+        }
+
+        .section-divider::before {
+            content: '▼ ';
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .section-divider.collapsed::before {
+            transform: rotate(-90deg);
+        }
+
+        .patent-mark {
+            margin-top: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            font-size: 1.1em;
+            color: var(--high-vis);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ledger-content">
+        <div class="header">
+            <div class="label" style="color: var(--blue);">Priority Filing: 12/17/2025 | Patent Pending</div>
+            <h1 style="color: var(--high-vis); margin: 10px 0; font-size: 2.2em;">SOVEREIGN COMPLIANCE LEDGER</h1>
+            <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Pietro Caboara
+                (Arboreum
+                Commercial Solutions LLC)</p>
+            <p style="color: var(--red); font-size: 0.85em; margin-top: 8px;">USDA/DOE/BETO Mandate Effective:
+                12/30/2025</p>
+        </div>
+
+        <div class="multiplier-toggle">
+            <button id="x1-btn" class="toggle-btn active" onclick="setMultiplier(1)">BASE FINES (1x)</button>
+            <button id="x3-btn" class="toggle-btn" onclick="setMultiplier(3)">TREBLED DAMAGES (3x)</button>
+        </div>
+
+        <div class="priority-box">
+            <div id="liability-label" class="label">Total Accrued Statutory Liability</div>
+            <div id="main-counter" class="liability-text">$0</div>
+            <div style="color: var(--red); font-size: 0.8em; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">
+                DYNAMICAL ENTROPY TAX ACTIVE
+            </div>
+        </div>
+
+        <div
+            style="background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 20px 0; text-align: center;">
+            <p style="color: var(--slate); font-size: 0.9em; margin: 0;">
+                This real-time compliance ledger tracks statutory patent infringement damages under <strong
+                    style="color: var(--blue);">35 U.S.C. § 284</strong>.
+            </p>
+        </div>
+
+        <div class="mandate-grid">
+            <div class="mandate-section">
+                <div class="label" style="color: var(--high-vis);">Patent Statutes</div>
+                <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank"
+                    title="Compensation for patent infringement - includes lost profits and reasonable royalties">35
+                    U.S.C. § 284 (Damages)</a>
+                <a href="https://www.law.cornell.edu/uscode/text/35/285" target="_blank"
+                    title="Court may award attorney fees to prevailing party in exceptional cases">35 U.S.C. § 285
+                    (Attorney Fees)</a>
+                <a href="https://www.law.cornell.edu/uscode/text/35/271" target="_blank"
+                    title="Defines acts constituting patent infringement - making, using, selling, or importing">35
+                    U.S.C. § 271 (Infringement)</a>
+                <a href="https://www.law.cornell.edu/uscode/text/35/287" target="_blank"
+                    title="Patentee must provide notice to infringer to recover damages - virtual marking allowed">35
+                    U.S.C. § 287 (Notice)</a>
+            </div>
+
+            <div class="mandate-section">
+                <div class="label" style="color: var(--high-vis);">CA State Mandates</div>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB253"
+                    target="_blank" title="Climate Corporate Data Accountability Act - $500k/yr penalty">SB 253 (Climate
+                    Data)</a>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB261"
+                    target="_blank" title="Climate-Related Financial Risk Act - $50k/yr penalty">SB 261 (Financial
+                    Risk)</a>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202120220SB54"
+                    target="_blank" title="Plastic Pollution Prevention Act - $500M/yr + $50k/day">SB 54
+                    (Plastic/Packaging)</a>
+                <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB308"
+                    target="_blank" title="Net Negative by 2045, criminal non-compliance">SB 308 (Net Negative)</a>
+            </div>
+
+            <div class="mandate-section">
+                <div class="label" style="color: var(--high-vis);">Federal Programs</div>
+                <a href="https://www.energy.gov/eere/bioenergy" target="_blank"
+                    title="Bioenergy Technologies Office - Advanced biofuels mandate">DOE BETO Bioeconomy</a>
+                <a href="https://www.usda.gov/topics/farming/biopreferred-program" target="_blank"
+                    title="Federal procurement preference for bio-based products">USDA BioPreferred</a>
+                <a href="https://www.federalregister.gov/d/2023-28700" target="_blank"
+                    title="$1.25-$1.75/gal tax credit, 50% emissions reduction">SAF Tax Credit (IRA)</a>
+                <a href="https://www.energy.gov/bil/energy-infrastructure-act" target="_blank"
+                    title="Infrastructure Investment and Jobs Act - Bioenergy funding">IIJA Bioenergy</a>
+            </div>
+        </div>
+
+        <div
+            style="background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin: 20px 0; text-align: center;">
+            <p style="color: var(--slate); font-size: 0.85em; line-height: 1.6; margin: 0;">
+                Documented notices were sent to all listed entities (see below). Fines accrue from notice date at base
+                liability + $50/second.
+                <span style="color: var(--red); font-weight: 600;">BOUNCE LOG</span> indicates entities that
+                rejected/blocked notice delivery.
+            </p>
+        </div>
+
+        <div
+            style="background: #0d1117; padding: 20px; border-radius: 8px; border: 2px solid var(--blue); margin: 20px 0;">
+            <h3 style="color: var(--high-vis); margin: 0 0 15px 0; text-align: center; font-size: 1.1em;">🛡️ Path to
+                Compliance</h3>
+            <p style="color: var(--slate); font-size: 0.9em; line-height: 1.6; margin: 0 0 10px 0; text-align: center;">
+                Any entity currently listed below and in violation of <strong style="color: var(--blue);">CA SB
+                    54</strong>
+                (Plastic Pollution Prevention) or <strong style="color: var(--blue);">CA SB 261</strong>
+                (Climate-Related Financial Risk) can resolve their <strong style="color: var(--red);">Willful
+                    Blindness</strong>
+                status by entering into a provisional licensing agreement with Arboreum Commercial Solutions LLC.
+            </p>
+            <p style="color: var(--high-vis); font-size: 0.85em; text-align: center; margin: 10px 0 0 0;">
+                Contact: <a href="mailto:partnerships@arboreum.net"
+                    style="color: var(--blue); text-decoration: underline;">partnerships@arboreum.net</a>
+            </p>
+        </div>
+
+        <details style="margin-top: 30px; margin-bottom: 30px;">
+            <summary style="color: var(--high-vis); text-align: center; font-size: 1.1em; padding: 15px;">
+                📧 Documented Notices and Delivery Status — Click to Expand
+            </summary>
+            <table
+                style="width: 100%; border-collapse: collapse; margin-top: 15px; background: #161b22; border: 1px solid var(--border);">
+                <thead>
+                    <tr style="background: #0d1117;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Entity</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Subject
+                        </th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Recipient
+                        </th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Date Sent
+                        </th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 1px solid var(--border);">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="notices-table"></tbody>
+            </table>
+        </details>
+
+        <details>
+            <summary style="color: var(--high-vis); text-align: center; font-size: 1.1em; padding: 15px;">⚖️ Verified
+                Entity Logs and Statutory Delta — Click to Expand</summary>
+            <div
+                style="padding: 15px; font-size: 0.85em; color: var(--slate); background: #0d1117; border-bottom: 1px solid var(--border);">
+                <strong style="color: var(--blue);">Categories:</strong>
+                <span style="color: var(--slate);">U.S. Federal Agencies</span> (USDA/DOE/BETO mandate compliance) •
+                <span style="color: var(--slate);">U.S. Commercial Entities</span> (pharma, biotech, financial) •
+                <span style="color: var(--slate);">Global & EU Entities</span> (international corporations) •
+                <span style="color: var(--slate);">ACS Forensic Evidence</span> (audit registry)
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target Entity</th>
+                        <th>Notice/Change Date</th>
+                        <th>Accrued Fine (USD)</th>
+                    </tr>
+                </thead>
+                <tbody id="notice-log">
+                    <!-- JS will inject sections here -->
+                </tbody>
+            </table>
+        </details>
+
+        <div class="patent-mark">
+            <p><strong>Patent Pending</strong> | Arboreum Commercial Solutions LLC &copy; 2026</p>
+        </div>
+    </div>
+
+    <script>
+        let multiplier = 1;
+        const PRIORITY_DATE = new Date('2025-12-17T00:00:00Z').getTime();
+        const JAN_1_ANCHOR = new Date('2026-01-01T00:00:00Z').getTime();
+
+        const GROWTH_RATE = 612.45;
+
+        const US_FEDERAL = [
+            { id: 'USDA', date: JAN_1_ANCHOR, base: 250000000 },
+            { id: 'DOE', date: JAN_1_ANCHOR, base: 250000000 },
+            { id: 'BETO', date: JAN_1_ANCHOR, base: 250000000 }
+        ];
+
+        const US_COMMERCIAL = [
+            { id: 'Abbott Laboratories', date: '2026-01-15T11:00:00Z', base: 50000000 },
+            { id: 'Pfizer Inc.', date: '2026-01-15T10:00:00Z', base: 100000000, bounce: true },
+            { id: 'Eli Lilly & Co.', date: '2026-01-19T14:00:00Z', base: 100000000 },
+            { id: 'Johnson & Johnson', date: '2026-01-14T09:00:00Z', base: 100000000 },
+            { id: 'Merck & Co.', date: '2026-01-15T10:00:00Z', base: 100000000 },
+            { id: 'Amgen Inc.', date: '2026-01-19T10:00:00Z', base: 50000000, bounce: true },
+            { id: 'Bristol Myers Squibb', date: '2026-01-14T11:30:00Z', base: 50000000 },
+            { id: 'Gilead Sciences', date: '2026-01-14T15:45:00Z', base: 50000000 },
+            { id: 'Moderna Inc.', date: '2026-01-14T16:20:00Z', base: 50000000, bounce: true },
+            { id: 'Morgan Stanley Wealth Mgmt', date: '2026-01-20T12:00:00Z', base: 25000000 },
+            { id: 'E*TRADE Financial', date: '2026-01-20T12:00:00Z', base: 25000000 },
+            { id: 'Thermo Fisher Scientific', date: '2026-01-16T14:00:00Z', base: 50000000 },
+            { id: 'Danaher Corporation', date: '2026-01-16T15:00:00Z', base: 50000000 },
+            { id: 'NextCorps (Incubator Notice)', date: '2026-01-09T09:00:00Z', base: 10000000 }
+        ];
+
+        const GLOBAL_EU_ENTITIES = [
+            { id: 'MilliporeSigma (Merck KGaA)', date: '2026-01-16T14:00:00Z', base: 50000000 },
+            { id: 'Infineon Technologies', date: '2026-01-17T10:00:00Z', base: 50000000 },
+            { id: 'GSK (GlaxoSmithKline)', date: '2026-01-16T09:00:00Z', base: 75000000 },
+            { id: 'Novartis AG', date: '2026-01-16T11:00:00Z', base: 75000000, bounce: true },
+            { id: 'Roche Holding AG', date: '2026-01-17T08:00:00Z', base: 75000000 },
+            { id: 'Sanofi S.A.', date: '2026-01-17T08:15:00Z', base: 50000000, bounce: true },
+            { id: 'AstraZeneca PLC', date: '2026-01-18T12:00:00Z', base: 75000000 },
+            { id: 'Bayer AG', date: '2026-01-18T13:00:00Z', base: 50000000 }
+        ];
+
+        const ACS_FORENSIC_LOGS = [
+            { id: 'ACS Internal Audit Registry', date: PRIORITY_DATE, base: 10000000 },
+            { id: 'Global Bioeconomy Standard (Protocol)', date: JAN_1_ANCHOR, base: 100000000 }
+        ];
+
+        const DOCUMENTED_NOTICES = [
+            { entity: 'USDA', subject: 'Technical Response: 12/30 Memorandum (Patent App [REDACTED])', to: 'OES@usda.gov', date: '2025-12-31 18:36', bounced: true },
+            { entity: 'USDA', subject: 'PRIORITY: Domestic Tech Disclosure - Patent [REDACTED] (Filed 12/17)', to: 'CFIUS@treasury.gov', date: '2026-01-01 08:28', bounced: true },
+            { entity: 'DOE/BETO', subject: 'Technical Implementation: 12/30 USDA Mandate / Patent [REDACTED]', to: 'BETO@ee.doe.gov', date: '2026-01-01 08:30', bounced: true },
+            { entity: 'Riverside County', subject: 'FORMAL NOTIFICATION - USPTO [REDACTED] TECHNICAL STANDARDS', to: '[REDACTED]@riversideca.gov', date: '2026-01-05 14:14', bounced: false },
+            { entity: 'Riverside County', subject: 'URGENT BRIEF: 2026 Carbon-Negative Mandates & Arboreum Impact Fund', to: '2mayor@riversideca.gov', date: '2026-01-05 14:14', bounced: false },
+            { entity: 'Riverside County', subject: 'Technical Brief Follow-up: Patent [REDACTED]', to: '[REDACTED]@rivco.org', date: '2026-01-05 15:59', bounced: false },
+            { entity: 'Riverside County', subject: 'FOLLOW-UP: Physical Inquiry (1/5/26) - Patent Pending [REDACTED]', to: 'agdept@rivco.org', date: '2026-01-05 16:24', bounced: false },
+            { entity: 'Riverside County', subject: 'FORMAL NOTICE: Priority Federal Filing (12/17) & Industrial Service Report', to: '[REDACTED]@blendedimpact.com, [REDACTED]@riversideca.gov', date: '2026-01-07 18:56', bounced: false },
+            { entity: 'Rep. Calvert', subject: 'CONSTITUENT CASEWORK: Vincent Pietro Caboara – USDA/CARB Verification', to: 'CalvertConstituentServices@mail.house.gov', date: '2026-01-12 14:16', bounced: false },
+            { entity: 'Riverside County', subject: 'Re: [EXTERNAL] URGENT BRIEF: 2026 Carbon-Negative Mandates & Arboreum Impact Fund', to: '2MAYOR@riversideca.gov', date: '2026-01-13 13:01', bounced: false }
+        ];
+
+        function populateNoticesTable() {
+            const tbody = document.getElementById('notices-table');
+            let html = '';
+            for (const notice of DOCUMENTED_NOTICES) {
+                const statusClass = notice.bounced ? 'bounce-tag' : 'status-delivered';
+                const statusText = notice.bounced ? '❌ BOUNCED/EVASION' : '✓ Delivered';
+                html += `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26;">${notice.entity}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26; font-size: 0.85em;">${notice.subject}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26; font-size: 0.8em; color: var(--slate);">${notice.to}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26; font-size: 0.85em;">${notice.date}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #1c1f26;"><span class="${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
+
+        function setMultiplier(m) {
+            multiplier = m;
+            document.getElementById('x1-btn').classList.toggle('active', m === 1);
+            document.getElementById('x3-btn').classList.toggle('active', m === 3);
+            document.getElementById('liability-label').innerText = `Total Accrued Statutory Liability (${m}x)`;
+            updateLedger();
+        }
+
+        function createRow(e, now, section) {
+            const noticeTime = new Date(e.date).getTime();
+            const elapsed = Math.max(0, (now - noticeTime) / 1000);
+            const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
+            return `
+                <tr class="section-row" data-section="${section}">
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">BOUNCE LOG</span>' : ''}</td>
+                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
+                    <td><span class="entity-val">$${currentFine.toLocaleString('en-US')}</span></td>
+                </tr>
+            `;
+        }
+
+        window.collapsedSections = new Set();
+
+        window.toggleSection = function (section) {
+            if (window.collapsedSections.has(section)) {
+                window.collapsedSections.delete(section);
+            } else {
+                window.collapsedSections.add(section);
+            }
+            buildTable();
+        };
+
+        function createRow(e, now, section) {
+            const noticeTime = new Date(e.date).getTime();
+            const elapsed = Math.max(0, (now - noticeTime) / 1000);
+            const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
+            return `
+                <tr class="section-row" data-section="${section}">
+                    <td>${e.id} ${e.bounce ? '<span class="bounce-tag">BOUNCE LOG</span>' : ''}</td>
+                    <td>${new Date(noticeTime).toLocaleDateString()}</td>
+                    <td><span class="entity-val" data-value-id="${e.id}">$${currentFine.toLocaleString('en-US')}</span></td>
+                </tr>
+            `;
+        }
+
+        function buildTable() {
+            const now = Date.now();
+            const logBody = document.getElementById('notice-log');
+            let html = '';
+
+            // U.S. Federal
+            const fedCollapsed = window.collapsedSections.has('federal');
+            html += `<tr class="section-divider ${fedCollapsed ? 'collapsed' : ''}" data-section-header="federal" onclick="toggleSection('federal')"><td colspan="3">U.S. Federal Agencies</td></tr>`;
+            if (!fedCollapsed) {
+                US_FEDERAL.forEach(e => html += createRow(e, now, 'federal'));
+            }
+
+            // U.S. Commercial
+            const comCollapsed = window.collapsedSections.has('commercial');
+            html += `<tr class="section-divider ${comCollapsed ? 'collapsed' : ''}" data-section-header="commercial" onclick="toggleSection('commercial')"><td colspan="3">U.S. Commercial Entities</td></tr>`;
+            if (!comCollapsed) {
+                US_COMMERCIAL.forEach(e => html += createRow(e, now, 'commercial'));
+            }
+
+            // Global & EU
+            const globalCollapsed = window.collapsedSections.has('global');
+            html += `<tr class="section-divider ${globalCollapsed ? 'collapsed' : ''}" data-section-header="global" onclick="toggleSection('global')"><td colspan="3">Global & EU Entities</td></tr>`;
+            if (!globalCollapsed) {
+                GLOBAL_EU_ENTITIES.forEach(e => html += createRow(e, now, 'global'));
+            }
+
+            // Forensic
+            const forensicCollapsed = window.collapsedSections.has('forensic');
+            html += `<tr class="section-divider ${forensicCollapsed ? 'collapsed' : ''}" data-section-header="forensic" onclick="toggleSection('forensic')"><td colspan="3">ACS Forensic Evidence Logs</td></tr>`;
+            if (!forensicCollapsed) {
+                ACS_FORENSIC_LOGS.forEach(e => html += createRow(e, now, 'forensic'));
+            }
+
+            logBody.innerHTML = html;
+        }
+
+        function updateValues() {
+            const now = Date.now();
+            const secondsSincePriority = (now - PRIORITY_DATE) / 1000;
+            const totalLiability = Math.floor(secondsSincePriority * GROWTH_RATE) * multiplier;
+            document.getElementById('main-counter').innerText = "$" + totalLiability.toLocaleString('en-US');
+
+            // Update individual entity values without rebuilding table
+            const allEntities = [...US_FEDERAL, ...US_COMMERCIAL, ...GLOBAL_EU_ENTITIES, ...ACS_FORENSIC_LOGS];
+            allEntities.forEach(e => {
+                const cell = document.querySelector(`[data-value-id="${e.id}"]`);
+                if (cell) {
+                    const noticeTime = new Date(e.date).getTime();
+                    const elapsed = Math.max(0, (now - noticeTime) / 1000);
+                    const currentFine = Math.floor((e.base + (elapsed * 50)) * multiplier);
+                    cell.innerText = '$' + currentFine.toLocaleString('en-US');
+                }
+            });
+        }
+
+        // Build table once on load
+        buildTable();
+        populateNoticesTable();
+
+        // Only update values, not structure
+        setInterval(updateValues, 200);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+venv*/
+.venv*/
+*.bak
+*.zip
+.vscode/
