@@ -17,7 +17,7 @@ This protocol is engineered to solve the immediate "Material Sovereignty" crisis
 ### The 12/17/25 Core Advantage
 
 * **Zero Virgin Timber:** 1:1 replacement using annual agricultural waste (rice/wheat straw).
-* **Energy Sovereignty:** Net-positive thermal recovery providing **~1500 kWh/ton surplus** via ORC integration.
+* **Energy Sovereignty:** Net-positive thermal recovery providing **~1500 kWh/ton surplus**.
 * **PFAS-Free Sovereignty:** Native "Clean-Start" feedstock bypasses the historical contamination found in recycled streams.
 * **Carbon Negative:** Verified Scope 3 data for mandatory climate disclosures.
 
