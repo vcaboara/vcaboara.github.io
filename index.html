@@ -8,18 +8,16 @@
     <style>
         body {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background: #000;
-            color: #fff;
+            background: #f8f9fa;
+            color: #1a1a1a;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            /* Changed to min-height for better small-window flow */
             margin: 0;
             text-align: center;
             padding-bottom: 80px;
-            /* Buffer to prevent footer overlap */
             box-sizing: border-box;
         }
 
@@ -27,7 +25,6 @@
             max-width: 500px;
             padding: 20px;
             flex-grow: 1;
-            /* Pushes content away from footer */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -38,7 +35,6 @@
             letter-spacing: -3px;
             text-transform: uppercase;
             margin-bottom: 0px;
-            /* Reduced space */
             font-weight: 900;
         }
 
@@ -63,33 +59,31 @@
         }
 
         .links a {
-            color: #fff;
+            color: #1a1a1a;
             text-decoration: none;
-            border: 1px solid #333;
+            border: 2px solid #1a1a1a;
             width: 100%;
             max-width: 350px;
             padding: 15px 0;
-            /* Slightly reduced padding */
             transition: 0.3s;
             text-transform: uppercase;
             font-weight: bold;
             font-size: 0.7rem;
             letter-spacing: 2px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #ffffff;
         }
 
         .links a:hover {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
         }
 
         footer {
             position: relative;
-            /* Changed from absolute to flow naturally if window is small */
             padding: 20px 0;
             font-size: 0.65rem;
-            color: #333;
+            color: #666;
             letter-spacing: 1px;
             text-transform: uppercase;
             width: 100%;
