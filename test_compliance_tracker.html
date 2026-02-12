@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Compliance Tracker Test Suite</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+
+        .test {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #30363d;
+        }
+
+        .pass {
+            border-color: #2ea043;
+            background: rgba(46, 160, 67, 0.1);
+        }
+
+        .fail {
+            border-color: #f85149;
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #30363d;
+            font-size: 1.2em;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #30363d;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Compliance Tracker Test Suite</h1>
+    <div id="results"></div>
+    <div id="summary" class="summary"></div>
+    <h2>Live Preview</h2>
+    <iframe id="preview" src="compliance-tracker.html"></iframe>
+
+    <script>
+        const results = document.getElementById('results');
+        const summary = document.getElementById('summary');
+        const tests = [];
+        let passed = 0;
+        let failed = 0;
+
+        function addTest(name, fn) {
+            tests.push({ name, fn });
+        }
+
+        async function runTests() {
+            const iframe = document.getElementById('preview');
+
+            iframe.onload = async () => {
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait for init
+
+                const doc = iframe.contentDocument;
+                const win = iframe.contentWindow;
+
+                // Test 1: Companies data loaded
+                addTest('Companies data array exists and has 5 entries', () => {
+                    return win.companies && win.companies.length === 5;
+                });
+
+                // Test 2: Master ticker element exists
+                addTest('Master ticker element exists', () => {
+                    return doc.getElementById('master-amount') !== null;
+                });
+
+                // Test 3: Master ticker is updating
+                addTest('Master ticker updates with real-time values', async () => {
+                    const ticker = doc.getElementById('master-amount');
+                    const initial = ticker.textContent;
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    const updated = ticker.textContent;
+                    return initial !== updated && updated.includes('$');
+                });
+
+                // Test 4: Cards rendered
+                addTest('5 corporate cards are rendered', () => {
+                    const cards = doc.querySelectorAll('.card');
+                    return cards.length === 5;
+                });
+
+                // Test 5: Each card has required elements
+                addTest('Each card has ticker, name, daily liability, and license fee', () => {
+                    const cards = doc.querySelectorAll('.card');
+                    let allValid = true;
+                    cards.forEach(card => {
+                        const ticker = card.querySelector('.card-ticker');
+                        const name = card.querySelector('.card-name');
+                        const liability = card.querySelector('.metric-value');
+                        const fee = card.querySelector('.fee-value');
+                        if (!ticker || !name || !liability || !fee) {
+                            allValid = false;
+                        }
+                    });
+                    return allValid;
+                });
+
+                // Test 6: Toggle switch exists
+                addTest('Toggle switch element exists', () => {
+                    return doc.getElementById('toggle-switch') !== null;
+                });
+
+                // Test 7: Toggle functionality
+                addTest('Toggle switch changes state when clicked', () => {
+                    const toggle = doc.getElementById('toggle-switch');
+                    const initialState = toggle.classList.contains('active');
+                    toggle.click();
+                    const newState = toggle.classList.contains('active');
+                    toggle.click(); // Reset
+                    return initialState !== newState;
+                });
+
+                // Test 8: Color transition on toggle
+                addTest('Master ticker changes color class when toggle activated', () => {
+                    const toggle = doc.getElementById('toggle-switch');
+                    const ticker = doc.getElementById('master-amount');
+
+                    // Ensure starting state is loss
+                    if (toggle.classList.contains('active')) {
+                        toggle.click();
+                    }
+
+                    const hasLossClass = ticker.classList.contains('loss');
+                    toggle.click();
+                    const hasSavingsClass = ticker.classList.contains('savings');
+                    toggle.click(); // Reset
+
+                    return hasLossClass && hasSavingsClass;
+                });
+
+                // Test 9: Daily burn calculation accuracy
+                addTest('Total daily burn equals sum of all companies', () => {
+                    const expectedTotal = win.companies.reduce((sum, c) => sum + c.dailyBurn, 0);
+                    const actualTotal = win.totalDailyBurn;
+                    return expectedTotal === actualTotal && expectedTotal === 4140000;
+                });
+
+                // Test 10: Burn per second calculation
+                addTest('Burn per second calculated correctly (total/86400)', () => {
+                    const expected = 4140000 / 86400;
+                    const actual = win.burnPerSecond;
+                    return Math.abs(actual - expected) < 0.01;
+                });
+
+                // Test 11: License fee calculation (15%)
+                addTest('License fees calculated at 15% for all cards', () => {
+                    const cards = doc.querySelectorAll('.card');
+                    let allCorrect = true;
+
+                    cards.forEach((card, index) => {
+                        const company = win.companies[index];
+                        const feeElement = card.querySelector('.fee-value');
+                        const feeText = feeElement.textContent.replace(/[$,]/g, '');
+                        const actualFee = parseFloat(feeText);
+                        const expectedFee = company.dailyBurn * 0.15;
+
+                        if (Math.abs(actualFee - expectedFee) > 1) {
+                            allCorrect = false;
+                        }
+                    });
+
+                    return allCorrect;
+                });
+
+                // Test 12: Footer content exists
+                addTest('Footer with ACS reference exists', () => {
+                    const footer = doc.querySelector('.footer');
+                    const reference = doc.querySelector('.reference');
+                    return footer && reference && reference.textContent.includes('ACS 12/17/2025');
+                });
+
+                // Test 13: All company tickers are valid
+                addTest('All company tickers match expected values', () => {
+                    const expectedTickers = ['IP', 'WRK', 'PKG', 'AVY', 'GPK'];
+                    const actualTickers = win.companies.map(c => c.ticker);
+                    return JSON.stringify(expectedTickers) === JSON.stringify(actualTickers);
+                });
+
+                // Test 14: Glassmorphism styles applied
+                addTest('Glassmorphism backdrop-filter applied to key elements', () => {
+                    const ticker = doc.querySelector('.master-ticker');
+                    const card = doc.querySelector('.card');
+                    const tickerStyle = window.getComputedStyle(ticker);
+                    const cardStyle = window.getComputedStyle(card);
+
+                    return tickerStyle.backdropFilter.includes('blur') &&
+                        cardStyle.backdropFilter.includes('blur');
+                });
+
+                // Test 15: Responsive grid layout
+                addTest('Cards grid uses responsive layout', () => {
+                    const grid = doc.getElementById('cards-grid');
+                    const gridStyle = window.getComputedStyle(grid);
+                    return gridStyle.display === 'grid';
+                });
+
+                // Run all tests
+                for (const test of tests) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test';
+
+                    try {
+                        const result = await test.fn();
+                        if (result) {
+                            testDiv.classList.add('pass');
+                            testDiv.innerHTML = `<div class="test-name">✓ ${test.name}</div><div>PASSED</div>`;
+                            passed++;
+                        } else {
+                            testDiv.classList.add('fail');
+                            testDiv.innerHTML = `<div class="test-name">✗ ${test.name}</div><div>FAILED</div>`;
+                            failed++;
+                        }
+                    } catch (error) {
+                        testDiv.classList.add('fail');
+                        testDiv.innerHTML = `<div class="test-name">✗ ${test.name}</div><div>ERROR: ${error.message}</div>`;
+                        failed++;
+                    }
+
+                    results.appendChild(testDiv);
+                }
+
+                // Display summary
+                const total = passed + failed;
+                summary.innerHTML = `
+                    <strong>Test Results:</strong> ${passed}/${total} passed
+                    ${failed > 0 ? `<span style="color: #f85149;"> | ${failed} failed</span>` : ' | All tests passed! ✓'}
+                `;
+                summary.style.borderColor = failed === 0 ? '#2ea043' : '#f85149';
+            };
+        }
+
+        runTests();
+    </script>
+</body>
+
+</html>

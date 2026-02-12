@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARBOREUM | The 12/17/25 Standard</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* Changed to min-height for better small-window flow */
+            margin: 0;
+            text-align: center;
+            padding-bottom: 80px;
+            /* Buffer to prevent footer overlap */
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 500px;
+            padding: 20px;
+            flex-grow: 1;
+            /* Pushes content away from footer */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            letter-spacing: -3px;
+            text-transform: uppercase;
+            margin-bottom: 0px;
+            /* Reduced space */
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 5px;
+            /* Tightened space */
+            margin-bottom: 25px;
+            /* Reduced space under subtitle */
+            display: block;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            /* Reduced gap between buttons */
+        }
+
+        .links a {
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 350px;
+            padding: 15px 0;
+            /* Slightly reduced padding */
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .links a:hover {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        footer {
+            position: relative;
+            /* Changed from absolute to flow naturally if window is small */
+            padding: 20px 0;
+            font-size: 0.65rem;
+            color: #333;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ARBOREUM</h1>
+        <span class="subtitle">CLOSED-LOOP CARBON-NEGATIVE SYSTEMS</span>
+
+        <div class="links">
+            <a href="standard.html">The 12/17/25 Standard (VTD)</a>
+            <a href="arboreum.html">Arboreum Commercial Solutions, LLC</a>
+            <a href="mandates.html">Arboreum Impact Foundation Mandates</a>
+        </div>
+    </div>
+
+    <footer>
+        Established 2025 | Patent Pending | Site Authority: v.1.0.11
+    </footer>
+</body>
+
+</html>
