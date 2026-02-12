@@ -1,4 +1,4 @@
-# Arboreum Commercial Solutions LLC | The 12/17/25 Standard
+# Arboreum Commercial Solutions, LLC | The 12/17/25 Standard
 
 ## Industrial Protocol for Virgin Timber Displacement and Carbon-Negative Fiber Production
 
@@ -10,7 +10,7 @@
 
 ## Executive Overview
 
-Arboreum Commercial Solutions LLC (ACS) provides the **12/17/25 Standard**, a proprietary industrial framework for replacing virgin timber with agricultural waste in paper, packaging, and structural fiber production.
+Arboreum Commercial Solutions, LLC (ACS) provides the **12/17/25 Standard**, a proprietary industrial framework for replacing virgin timber with agricultural waste in paper, packaging, and structural fiber production.
 
 This protocol is engineered to solve the immediate "Material Sovereignty" crisis facing global supply chains due to escalating regulatory mandates in California (SB 54, SB 253/261), the U.S. Federal level (EPA TSCA), and the European Union (PPWR).
 
@@ -54,4 +54,4 @@ ACS allocates 85% of its profits to the **Arboreum Impact Foundation (AIF)**.
 
 ### Legal Notice
 
-*Standard established and patent application filed December 17, 2025. Arboreum Commercial Solutions LLC and Arboreum Impact Foundation (AIF). All rights reserved.*
+*Standard established and patent application filed December 17, 2025. Arboreum Commercial Solutions, LLC and Arboreum Impact Foundation (AIF). All rights reserved.*
