@@ -55,10 +55,12 @@ def validate_mandates(file_path):
     # Check for key technical content
     required_content = [
         ('12/17 Patent', 'Patent implementation reference'),
-        (r'15/15\s+ACS.*?Toll', 'Revenue model reference', True),  # regex for multi-line content
+        # regex for multi-line content
+        (r'15/15\s+ACS.*?Toll', 'Revenue model reference', True),
         ('85% AIF Endowment', 'Funding mechanism reference'),
         ('agricultural waste', 'Environmental pillar content'),
-        (r'debt-free.*?PhD', 'Educational benefits content', True),  # regex for potentially multi-line
+        # regex for potentially multi-line
+        (r'debt-free.*?PhD', 'Educational benefits content', True),
         ('6-hour "Peak Performance" shifts', 'Staff flywheel content'),
         ('biochar soil injection', 'Environmental restoration method'),
         ('Land Back', 'Reparations content'),
