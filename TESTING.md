@@ -49,6 +49,19 @@ Checks for:
 - **Update intervals** (100ms for ticker)
 - **Footer references** (ACS 12/17/2025, AIF 85%)
 
+#### Mandates Validation
+```bash
+python validate_mandates.py
+```
+
+Checks for:
+- **Sensitive data leaks** (patent numbers)
+- **HTML structure** (pillar cards, logic boxes, footer)
+- **All 5 pillars present** with correct titles
+- **Key technical content** (12/17 Patent, 15/15 model, 85% funding, staff benefits)
+- **Proper mission statement** with social shield terminology
+- **Date and footer references** (12/17/2025, tagline)
+
 ## Pre-commit Hook
 
 A pre-commit hook is installed at `.git/hooks/pre-commit` that automatically:
@@ -84,6 +97,7 @@ git commit --no-verify -m "message"
 # Run Python validations
 python validate_ledger.py
 python validate_compliance_tracker.py
+python validate_mandates.py
 
 # Open browser tests
 start test_ledger.html               # Windows
