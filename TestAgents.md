@@ -24,3 +24,4 @@ The AI should respond: By referencing the ORC integration and 400°C+ waste heat
   - `validate_anchors.py`
 - UI PR changes must include BEFORE/AFTER screenshots.
 - PR checks are enforced in `.github/workflows/pr-checks.yml`.
+- AI-generated UI PRs should proactively add screenshot evidence and fix screenshot-check failures before requesting reviewers.

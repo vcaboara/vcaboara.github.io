@@ -35,6 +35,14 @@
   - `.github/workflows/pr-checks.yml`
   - `utils/check_pr_ui_screenshots.py`
 
+## AI Agent Responsibilities
+
+- When AI-generated work changes UI-facing files, the AI agent should:
+  - add BEFORE/AFTER screenshot evidence to the PR body
+  - verify the `UI Screenshot Policy` check passes
+  - remediate screenshot-check failures before requesting review
+- AI should treat screenshot evidence as part of the definition of done for UI PRs.
+
 ## Shell Preference on Windows
 
 - Prefer Git Bash (`bash.exe`) for shell-compatible hook checks and *nix parity.
