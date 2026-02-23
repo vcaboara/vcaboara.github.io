@@ -150,10 +150,21 @@ open test_compliance_tracker.html    # Mac/Linux
 
 ## CI/CD Integration
 
-To add GitHub Actions or similar CI:
-1. Add `validate_ledger.py` to workflow
-2. Add headless browser test runner for `test_ledger.html`
-3. Block PRs that fail validation
+PR checks are now automated via `.github/workflows/pr-checks.yml`:
+1. Runs Python validators (`validate_ledger.py`, `validate_compliance_tracker.py`, `validate_mandates.py`, `validate_anchors.py`)
+2. Enforces UI screenshot policy for PRs touching UI-facing files (`.html/.css/.scss/.sass/.jsx/.tsx`)
+3. Fails PRs missing BEFORE/AFTER screenshot evidence for UI changes
+
+PR template: `.github/pull_request_template.md`
+
+### UI Screenshot Requirement
+
+If a PR changes UI-facing files, the PR body must include:
+- **BEFORE** section
+- **AFTER** section
+- At least two screenshot images total
+
+Enforcement script: `utils/check_pr_ui_screenshots.py`
 
 ### Important: Hooks vs GitHub Required Checks
 
