@@ -62,6 +62,16 @@ Checks for:
 - **Proper mission statement** with social shield terminology
 - **Date and footer references** (12/17/2025, tagline)
 
+#### Anchor ID Validation
+```bash
+python validate_anchors.py
+```
+
+Checks for:
+- **Stable deep-link IDs** on all core pages
+- **Missing expected anchors** (fails validation)
+- **Duplicate IDs** (warns for cleanup)
+
 ## Pre-commit Hook
 
 A versioned pre-commit hook is stored at `.githooks/pre-commit` and can be enabled locally with:
@@ -128,6 +138,7 @@ git commit --no-verify -m "message"
 python validate_ledger.py
 python validate_compliance_tracker.py
 python validate_mandates.py
+python validate_anchors.py
 
 # Open browser tests
 start test_ledger.html               # Windows
