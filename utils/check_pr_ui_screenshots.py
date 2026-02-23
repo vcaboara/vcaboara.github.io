@@ -33,7 +33,8 @@ UI_EXCLUDE_PATTERNS = (
 def run_git_diff(base_sha: str, head_sha: str) -> list[str]:
     cmd = ["git", "diff", "--name-only", f"{base_sha}...{head_sha}"]
     result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    files = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    files = [line.strip()
+             for line in result.stdout.splitlines() if line.strip()]
     return files
 
 
@@ -56,8 +57,10 @@ def count_images(pr_body: str) -> int:
 
 
 def has_before_after_labels(pr_body: str) -> bool:
-    has_before = re.search(r"\bbefore\b", pr_body, flags=re.IGNORECASE) is not None
-    has_after = re.search(r"\bafter\b", pr_body, flags=re.IGNORECASE) is not None
+    has_before = re.search(r"\bbefore\b", pr_body,
+                           flags=re.IGNORECASE) is not None
+    has_after = re.search(r"\bafter\b", pr_body,
+                          flags=re.IGNORECASE) is not None
     return has_before and has_after
 
 
