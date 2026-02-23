@@ -87,8 +87,10 @@ ANCHOR_REQUIREMENTS = {
 
 
 def extract_ids(content):
-    html_only = re.sub(r'<script\b[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)
-    html_only = re.sub(r'<style\b[^>]*>.*?</style>', '', html_only, flags=re.DOTALL | re.IGNORECASE)
+    html_only = re.sub(r'<script\b[^>]*>.*?</script>',
+                       '', content, flags=re.DOTALL | re.IGNORECASE)
+    html_only = re.sub(r'<style\b[^>]*>.*?</style>',
+                       '', html_only, flags=re.DOTALL | re.IGNORECASE)
     return re.findall(r'id=["\']([^"\']+)["\']', html_only)
 
 
@@ -103,7 +105,8 @@ def validate_file(file_path, required_ids):
         if required_id not in id_set:
             issues.append(f"❌ MISSING: id='{required_id}'")
 
-    duplicate_ids = sorted({anchor_id for anchor_id in ids if ids.count(anchor_id) > 1})
+    duplicate_ids = sorted(
+        {anchor_id for anchor_id in ids if ids.count(anchor_id) > 1})
     for duplicate_id in duplicate_ids:
         issues.append(f"⚠️  WARNING: duplicate id found: '{duplicate_id}'")
 

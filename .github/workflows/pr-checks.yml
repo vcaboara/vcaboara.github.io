@@ -1,48 +1,48 @@
 name: PR Checks
 
 on:
-  pull_request:
-    branches: ["main"]
+    pull_request:
+        branches: ["main"]
 
 permissions:
-  contents: read
-  pull-requests: read
+    contents: read
+    pull-requests: read
 
 jobs:
-  validations:
-    name: Validation Suite
-    runs-on: ubuntu-latest
+    validations:
+        name: Validation Suite
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
 
-      - name: Run Python validators
-        run: |
-          python validate_ledger.py
-          python validate_compliance_tracker.py
-          python validate_mandates.py
-          python validate_anchors.py
+            - name: Run Python validators
+              run: |
+                  python validate_ledger.py
+                  python validate_compliance_tracker.py
+                  python validate_mandates.py
+                  python validate_anchors.py
 
-  ui-screenshot-policy:
-    name: UI Screenshot Policy
-    runs-on: ubuntu-latest
+    ui-screenshot-policy:
+        name: UI Screenshot Policy
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Enforce BEFORE/AFTER screenshots for UI changes
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
-        run: |
-          python utils/check_pr_ui_screenshots.py \
-            --base-sha "${{ github.event.pull_request.base.sha }}" \
-            --head-sha "${{ github.event.pull_request.head.sha }}"
+            - name: Enforce BEFORE/AFTER screenshots for UI changes
+              env:
+                  PR_BODY: ${{ github.event.pull_request.body }}
+              run: |
+                  python utils/check_pr_ui_screenshots.py \
+                    --base-sha "${{ github.event.pull_request.base.sha }}" \
+                    --head-sha "${{ github.event.pull_request.head.sha }}"
