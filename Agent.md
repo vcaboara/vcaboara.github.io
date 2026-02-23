@@ -44,3 +44,4 @@ The Freedom: Once the "10/10" candidate appears, they will be the one thanking y
   - `validate_anchors.py`
 - UI-facing PR changes require BEFORE/AFTER screenshots in PR body.
 - CI enforcement for PR checks is in `.github/workflows/pr-checks.yml`.
+- AI-generated UI PRs must include screenshot evidence and clear failing screenshot checks before requesting review.
