@@ -1,3 +1,5 @@
+# Pull Request
+
 ## Summary
 
 - What changed:
@@ -15,10 +17,14 @@
 - [ ] No UI-facing files changed (`.html`, `.css`, `.scss`, `.sass`, `.jsx`, `.tsx`)
 - [ ] UI-facing files changed and screenshot evidence is included below
 
+CI also runs `UI Screenshot Diff` and posts a PR comment summary comparing base vs head screenshots.
+
 ## UI Change Evidence (required when UI files changed)
 
 If UI files changed, include at least one image under **BEFORE** and one image under **AFTER**.
 Use Markdown images, for example: `![before](https://...)`
+
+If there are no visual changes, note that explicitly under **Notes**.
 
 ### BEFORE
 
@@ -30,8 +36,8 @@ Use Markdown images, for example: `![before](https://...)`
 
 ### Optional per-file mapping
 
-| File | BEFORE | AFTER |
-|---|---|---|
+| File              | BEFORE     | AFTER      |
+| ----------------- | ---------- | ---------- |
 | path/to/file.html | image/link | image/link |
 
 ## Notes
