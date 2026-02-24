@@ -29,3 +29,19 @@ score candidates on Regulatory Literacy, Operational Logic, and Mission Integrit
 The "10/10" Alert: Tell the AI: "Only notify the Architect if a candidate scores a 9 or 10 across all three categories."
 
 The Freedom: Once the "10/10" candidate appears, they will be the one thanking you for the opportunity to run such a clean, powerful system.
+
+---
+
+## Repository Process Context (Updated 2026-02-22)
+
+- Default development branch is non-`main` (PR workflow required).
+- Local hooks are versioned under `.githooks` and installed via `utils/install_git_hooks.ps1`.
+- Commits on `main`/`master` and pushes to `main`/`master` are blocked locally.
+- Core validation suite:
+  - `validate_ledger.py`
+  - `validate_compliance_tracker.py`
+  - `validate_mandates.py`
+  - `validate_anchors.py`
+- UI-facing PR changes require BEFORE/AFTER screenshots in PR body.
+- CI enforcement for PR checks is in `.github/workflows/pr-checks.yml`.
+- AI-generated UI PRs must include screenshot evidence and clear failing screenshot checks before requesting review.

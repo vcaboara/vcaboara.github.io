@@ -32,7 +32,8 @@ def check_sensitive_data(file_path):
     # Check for LLC in company name
     if 'Arboreum Commercial Solutions' in content:
         if not re.search(r'Arboreum Commercial Solutions, LLC', content):
-            matches = re.findall(r'Arboreum Commercial Solutions(?!, LLC)', content)
+            matches = re.findall(
+                r'Arboreum Commercial Solutions(?!, LLC)', content)
             if matches:
                 issues.append(
                     f"⚠️  WARNING: 'Arboreum Commercial Solutions' missing ', LLC' in {len(matches)} place(s)")

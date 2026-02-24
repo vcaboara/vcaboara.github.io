@@ -1,0 +1,83 @@
+#!/bin/sh
+
+echo "Running pre-commit checks..."
+
+current_branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
+if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+    echo "❌ ERROR: Direct commits to '$current_branch' are blocked."
+    echo "   Create/use a feature branch and open a PR to merge into main."
+    exit 1
+fi
+
+confirm_continue() {
+    if [ ! -t 0 ]; then
+        return 1
+    fi
+
+    printf "Continue anyway? (y/N) "
+    read reply
+    case "$reply" in
+        y|Y|yes|YES)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+# Check for sensitive patent number (only in additions, not deletions)
+if git diff --cached --name-only | grep -q "ledger.html\|legal.html"; then
+    if git diff --cached | grep "^+" | grep -v "^+++" | grep -E "19/424,?106" >/dev/null; then
+        echo "❌ ERROR: Patent number 19/424,106 detected in staged changes!"
+        echo "   This sensitive data should remain [REDACTED]"
+        exit 1
+    fi
+fi
+
+# Check for potentially exposed individual names in email addresses
+if git diff --cached --name-only | grep -q "ledger.html"; then
+    if git diff --cached ledger.html | grep -E "\+(.*)(DGause|rmoran|jlilley|stacy|Mark Hagler|Ryan Elliott)" >/dev/null; then
+        echo "⚠️  WARNING: Individual names may be exposed in email addresses"
+        echo "   Please verify names are properly redacted with [REDACTED]"
+        if ! confirm_continue; then
+            exit 1
+        fi
+    fi
+fi
+
+# Validate HTML structure of critical files
+for file in ledger.html legal.html compliance-tracker.html; do
+    if git diff --cached --name-only | grep -q "^$file$"; then
+        if ! git diff --cached "$file" | grep -E "^\+" | grep -v "^\+\+\+" | grep -q "</html>"; then
+            if git diff --cached "$file" | tail -20 | grep -q "^\+"; then
+                echo "⚠️  WARNING: $file may have malformed HTML structure"
+            fi
+        fi
+    fi
+done
+
+# Validate compliance tracker data integrity
+if git diff --cached --name-only | grep -q "compliance-tracker.html"; then
+    if git diff --cached compliance-tracker.html | grep -E "^\+" | grep -q "companies = "; then
+        if ! git diff --cached compliance-tracker.html | grep -E "^\+" | grep -q '"ticker".*"dailyBurn"'; then
+            echo "⚠️  WARNING: Companies data structure may be corrupted in compliance-tracker.html"
+            if ! confirm_continue; then
+                exit 1
+            fi
+        fi
+    fi
+fi
+
+# Check that LLC is present in company name references
+if git diff --cached --name-only | grep -q "ledger.html"; then
+    if git diff --cached ledger.html | grep -E "^\+.*Arboreum Commercial Solutions[^L]" | grep -v "LLC" >/dev/null; then
+        echo "⚠️  WARNING: 'Arboreum Commercial Solutions' should include 'LLC'"
+        if ! confirm_continue; then
+            exit 1
+        fi
+    fi
+fi
+
+echo "✓ Pre-commit checks passed"
+exit 0
