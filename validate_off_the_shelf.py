@@ -23,6 +23,7 @@ def validate_off_the_shelf(file_path):
         (r'id=["\']ots-main["\']', 'Main section'),
         (r'id=["\']ots-footer["\']', 'Footer element'),
         (r'id=["\']ots-intro["\']', 'Introduction paragraph'),
+        (r'id=["\']patent-notice["\']', 'Patent Pending notice'),
     ]
 
     for pattern, element_name in required_elements:
@@ -31,11 +32,15 @@ def validate_off_the_shelf(file_path):
 
     # Check for all 5 required sections
     required_sections = [
-        (r'id=["\']section-thermal["\']', 'Thermal Conversion & Energy Systems'),
-        (r'id=["\']section-extraction["\']', 'Extraction & Fractionation Systems'),
-        (r'id=["\']section-recovery["\']', 'Resource Recovery & Energy Reclamation'),
+        (r'id=["\']section-thermal["\']',
+         'Thermal Conversion & Energy Systems'),
+        (r'id=["\']section-extraction["\']',
+         'Extraction & Fractionation Systems'),
+        (r'id=["\']section-recovery["\']',
+         'Resource Recovery & Energy Reclamation'),
         (r'id=["\']section-fiber["\']', 'Fiber Processing & Aqueous Systems'),
-        (r'id=["\']section-scada["\']', 'Industrial Control & Compliance (SCADA)'),
+        (r'id=["\']section-scada["\']',
+         'Industrial Control & Compliance (SCADA)'),
     ]
 
     for pattern, section_name in required_sections:
@@ -95,7 +100,8 @@ def validate_off_the_shelf(file_path):
                     f"⚠️  WARNING: Revenue list has {revenue_items} items, expected 5")
 
     # Check for theme CSS variables
-    required_vars = ['--bg', '--card', '--border', '--blue', '--red', '--text', '--high-vis', '--slate']
+    required_vars = ['--bg', '--card', '--border', '--blue',
+                     '--red', '--text', '--high-vis', '--slate']
     for var in required_vars:
         if f'{var}:' not in content:
             issues.append(
@@ -144,9 +150,15 @@ def validate_off_the_shelf(file_path):
         issues.append(
             "⚠️  WARNING: Footer should note that integration architecture is proprietary and for licensees only")
 
+    # Check for Patent Pending notice
+    if 'patent pending' not in content.lower():
+        issues.append(
+            "❌ CRITICAL: Missing 'Patent Pending' notice in footer")
+
     # Check for proper table structure
     if '<thead>' not in content or '<tbody>' not in content:
-        issues.append("❌ CRITICAL: Tables missing proper thead/tbody structure")
+        issues.append(
+            "❌ CRITICAL: Tables missing proper thead/tbody structure")
 
     # Check for all section headings (h2 tags in sections)
     section_headings = len(re.findall(r'<section[^>]*>\s*<h2>', content))
