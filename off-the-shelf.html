@@ -29,8 +29,13 @@
 
         .home-link-bar {
             margin-bottom: 20px;
-            padding-bottom: 10px;
+            padding: 10px 0;
             border-bottom: 1px solid #eee;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            min-height: 44px;
         }
 
         #ots-content {
@@ -41,7 +46,7 @@
             color: #000;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             letter-spacing: 0.4px;
         }
 
@@ -211,23 +216,30 @@
 
 <body>
     <div id="ots-nav" class="home-link-bar">
-        <a href="index.html">← Return to Home</a>
+        <a href="index.html">Home</a>
+        <a href="standard.html">Standard</a>
+        <a href="arboreum.html">Arboreum</a>
+        <a href="mandates.html">Mandates</a>
+        <a href="off-the-shelf.html">Industrial Reference</a>
+        <a href="ledger.html">Ledger</a>
+        <a href="compliance-tracker.html">Compliance</a>
+        <a href="legal.html">Legal</a>
     </div>
 
     <div id="ots-content">
 
         <header id="ots-header">
             <h1>Off-the-Shelf Industrial Reference</h1>
-            <p>Verified Hardware for ACS Standard Integration</p>
+            <p>Industrial systems reference for ACS standard integration</p>
             <p id="status-badge" style="margin-top: 8px; color: #666; font-size: 0.8rem;">Reference status: verified
                 systems list</p>
         </header>
 
         <main id="ots-main">
             <p id="ots-intro">
-                This reference provides verified off-the-shelf industrial systems that integrate with the ACS standard
+                This reference lists off-the-shelf industrial systems that integrate with the ACS standard
                 framework.
-                Each category represents a critical functional area.
+                Categories are grouped by primary function.
             </p>
 
             <div id="sections-grid">
@@ -384,15 +396,15 @@
                         wood vinegar.</li>
                     <li><strong>Energy & Climate Assets:</strong> Site-generated green electricity and Verified Carbon
                         Removal Certificates (CORCs).</li>
-                    <li><strong>Risk Mitigation:</strong> Comprehensive elimination of climate-related regulatory fines
-                        and supply chain volatility.</li>
+                    <li><strong>Risk Mitigation:</strong> Reduction of climate-related regulatory exposure and supply
+                        chain volatility.</li>
                 </ul>
             </section>
         </main>
 
         <footer id="ots-footer">
             <p>
-                <em>This off-the-shelf reference represents verified industrial systems compatible with the ACS
+                <em>This off-the-shelf reference lists industrial systems compatible with the ACS
                     standard framework.</em>
             </p>
             <p><strong>Note:</strong> Integration architecture and system connectivity details are proprietary and
