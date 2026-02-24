@@ -247,9 +247,10 @@
 <body>
 
     <div id="ledger-content">
-        <div class="header">
+        <div class="header" id="ledger-header">
             <div class="label" style="color: var(--blue);">Priority Filing: 12/17/2025 | Patent Pending</div>
-            <h1 style="color: var(--high-vis); margin: 10px 0; font-size: 2.2em;">SOVEREIGN COMPLIANCE LEDGER</h1>
+            <h1 id="ledger-title" style="color: var(--high-vis); margin: 10px 0; font-size: 2.2em;">SOVEREIGN COMPLIANCE
+                LEDGER</h1>
             <p style="color: var(--blue); font-size: 1em; font-weight: bold;">Managing Member: Vincent Pietro Caboara
                 (Arboreum
                 Commercial Solutions LLC)</p>
@@ -257,12 +258,12 @@
                 12/30/2025</p>
         </div>
 
-        <div class="multiplier-toggle">
+        <div class="multiplier-toggle" id="damages-multiplier">
             <button id="x1-btn" class="toggle-btn active" onclick="setMultiplier(1)">BASE FINES (1x)</button>
             <button id="x3-btn" class="toggle-btn" onclick="setMultiplier(3)">TREBLED DAMAGES (3x)</button>
         </div>
 
-        <div class="priority-box">
+        <div class="priority-box" id="liability-summary">
             <div id="liability-label" class="label">Total Accrued Statutory Liability</div>
             <div id="main-counter" class="liability-text">$0</div>
             <div style="color: var(--red); font-size: 0.8em; margin-top: 10px; font-weight: bold; letter-spacing: 2px;">
@@ -278,7 +279,7 @@
             </p>
         </div>
 
-        <div class="mandate-grid">
+        <div class="mandate-grid" id="regulatory-mandates">
             <div class="mandate-section">
                 <div class="label" style="color: var(--high-vis);">Patent Statutes</div>
                 <a href="https://www.law.cornell.edu/uscode/text/35/284" target="_blank"
@@ -333,7 +334,7 @@
             </p>
         </div>
 
-        <div
+        <div id="path-to-compliance"
             style="background: #0d1117; padding: 20px; border-radius: 8px; border: 2px solid var(--blue); margin: 20px 0;">
             <h3 style="color: var(--high-vis); margin: 0 0 15px 0; text-align: center; font-size: 1.1em;">🛡️ Path to
                 Compliance</h3>
@@ -351,7 +352,7 @@
             </p>
         </div>
 
-        <details style="margin-top: 30px; margin-bottom: 30px;">
+        <details id="documented-notices" style="margin-top: 30px; margin-bottom: 30px;">
             <summary style="color: var(--high-vis); text-align: center; font-size: 1.1em; padding: 15px;">
                 📧 Documented Notices and Delivery Status — Click to Expand
             </summary>
@@ -373,7 +374,7 @@
             </table>
         </details>
 
-        <details>
+        <details id="verified-entity-logs">
             <summary style="color: var(--high-vis); text-align: center; font-size: 1.1em; padding: 15px;">⚖️ Verified
                 Entity Logs and Statutory Delta — Click to Expand</summary>
             <div
@@ -398,7 +399,7 @@
             </table>
         </details>
 
-        <div class="patent-mark">
+        <div class="patent-mark" id="patent-marking">
             <p><strong>Patent Pending</strong> | Arboreum Commercial Solutions, LLC &copy; 2026</p>
         </div>
     </div>

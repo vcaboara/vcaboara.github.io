@@ -26,7 +26,7 @@ def validate_mandates(file_path):
         (r'class=["\']pillar-card', 'Pillar cards'),
         (r'class=["\']logic-box', 'Logic box for mission statement'),
         (r'class=["\']funding-notice', 'Funding notice section'),
-        (r'<footer>', 'Footer element'),
+        (r'<footer\b[^>]*>', 'Footer element'),
     ]
 
     for pattern, description in required_elements:
@@ -100,7 +100,9 @@ def validate_mandates(file_path):
         issues.append("⚠️  WARNING: Missing footer tagline")
 
     # Check for HTML validity basics
-    if content.count('<h3>') != content.count('</h3>'):
+    h3_open = len(re.findall(r'<h3\b[^>]*>', content))
+    h3_close = len(re.findall(r'</h3>', content))
+    if h3_open != h3_close:
         issues.append("❌ CRITICAL: Mismatched h3 tags")
 
     if content.count('<section') != content.count('</section>'):
