@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,16 +14,18 @@
             --filter-bg: #e9ecef;
             --filter-text: #343a40;
             --chart-bg: #ffffff;
-            --chart-shadow: rgba(0,0,0,0.1);
+            --chart-shadow: rgba(0, 0, 0, 0.1);
             --header-color: #0056b3;
             --collapsible-header-bg: #e0e0e0;
             --collapsible-header-text: #343a40;
             --collapsible-header-hover-bg: #d0d0d0;
             --summary-bg: #f0f0f0;
             --summary-border: #cccccc;
-            --group-header-bg: #dbe4ee; /* Light blue for group headers */
+            --group-header-bg: #dbe4ee;
+            /* Light blue for group headers */
             --group-header-text: #0056b3;
-            --query-bg: #e6f2ff; /* Light blue for query section */
+            --query-bg: #e6f2ff;
+            /* Light blue for query section */
             --query-border: #aed6f1;
         }
 
@@ -32,16 +35,19 @@
             --filter-bg: #3a3a3a;
             --filter-text: #e0e0e0;
             --chart-bg: #3a3a3a;
-            --chart-shadow: rgba(0,0,0,0.3);
-            --header-color: #7bbaff; /* Lighter blue for dark mode */
+            --chart-shadow: rgba(0, 0, 0, 0.3);
+            --header-color: #7bbaff;
+            /* Lighter blue for dark mode */
             --collapsible-header-bg: #4a4a4a;
             --collapsible-header-text: #e0e0e0;
             --collapsible-header-hover-bg: #5a5a5a;
             --summary-bg: #333333;
             --summary-border: #555555;
-            --group-header-bg: #4a4a4a; /* Darker blue for group headers in dark mode */
+            --group-header-bg: #4a4a4a;
+            /* Darker blue for group headers in dark mode */
             --group-header-text: #7bbaff;
-            --query-bg: #3a4a5a; /* Darker blue for query section */
+            --query-bg: #3a4a5a;
+            /* Darker blue for query section */
             --query-border: #5a7a8a;
         }
 
@@ -52,11 +58,31 @@
             color: var(--body-text);
             transition: background-color 0.3s, color 0.3s;
         }
+
         h1 {
             color: var(--header-color);
             text-align: center;
             margin-bottom: 30px;
         }
+
+        .home-link-bar {
+            text-align: left;
+            margin-bottom: 20px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .home-link-bar a {
+            color: var(--header-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .home-link-bar a:hover {
+            text-decoration: underline;
+        }
+
         .filter-controls {
             display: flex;
             flex-wrap: wrap;
@@ -69,6 +95,7 @@
             align-items: flex-start;
             transition: background-color 0.3s;
         }
+
         .query-controls {
             background-color: var(--query-bg);
             border: 1px solid var(--query-border);
@@ -78,17 +105,20 @@
             margin: 20px auto;
             box-shadow: 0 2px 5px var(--chart-shadow);
         }
+
         .query-controls h3 {
             color: var(--header-color);
             margin-top: 0;
             margin-bottom: 10px;
         }
+
         .query-controls p {
             font-size: 0.9em;
             color: var(--body-text);
             text-align: center;
             margin-bottom: 15px;
         }
+
         .query-controls input[type="text"] {
             width: 80%;
             padding: 10px;
@@ -99,6 +129,7 @@
             margin-bottom: 10px;
             box-sizing: border-box;
         }
+
         .query-controls .button-group {
             display: flex;
             gap: 10px;
@@ -106,6 +137,7 @@
             width: 100%;
             margin-top: 10px;
         }
+
         .query-controls button {
             padding: 10px 20px;
             border-radius: 4px;
@@ -116,9 +148,11 @@
             font-size: 1em;
             transition: background-color 0.3s;
         }
+
         .query-controls button:hover {
             background-color: #004494;
         }
+
         #queryResults {
             margin-top: 20px;
             padding: 15px;
@@ -127,9 +161,11 @@
             background-color: var(--chart-bg);
             width: 90%;
             box-sizing: border-box;
-            max-height: 200px; /* Limit height for scrollability */
+            max-height: 200px;
+            /* Limit height for scrollability */
             overflow-y: auto;
-            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+            white-space: pre-wrap;
+            /* Preserve whitespace and wrap text */
         }
 
 
@@ -137,21 +173,25 @@
             display: flex;
             align-items: center;
         }
+
         .filter-group.checkbox-group {
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
             margin-left: 20px;
         }
+
         .filter-group.checkbox-group div {
             display: flex;
             align-items: center;
         }
+
         .filter-group label {
             margin-right: 5px;
             font-weight: bold;
             color: var(--filter-text);
         }
+
         .filter-group input[type="date"],
         .filter-group button {
             padding: 8px 12px;
@@ -160,52 +200,67 @@
             background-color: var(--chart-bg);
             color: var(--body-text);
         }
+
         #darkModeToggle {
             margin-right: 8px;
         }
+
         .filter-controls button {
-            background-color: #007bff; /* Primary button color */
+            background-color: #007bff;
+            /* Primary button color */
             color: white;
             border: none;
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         .filter-controls button:hover {
             background-color: #0056b3;
         }
 
         /* Summary Statistics Section */
-        .summary-stats-wrapper, .query-wrapper {
+        .summary-stats-wrapper,
+        .query-wrapper {
             max-width: 1000px;
             margin: 20px auto;
-            background-color: var(--chart-bg); /* Match chart background for overall wrapper */
+            background-color: var(--chart-bg);
+            /* Match chart background for overall wrapper */
             border-radius: 8px;
             box-shadow: 0 2px 5px var(--chart-shadow);
-            overflow: hidden; /* Ensures rounded corners are respected */
+            overflow: hidden;
+            /* Ensures rounded corners are respected */
         }
+
         .summary-stats-container {
             background-color: var(--summary-bg);
-            border-top: 1px solid var(--summary-border); /* Separator from header */
-            border-bottom: 1px solid var(--summary-border); /* Separator below */
+            border-top: 1px solid var(--summary-border);
+            /* Separator from header */
+            border-bottom: 1px solid var(--summary-border);
+            /* Separator below */
             padding: 20px;
             transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
+
         .summary-stats-container h2 {
-            display: none; /* Hide the h2 inside, as collapsible header will take over */
+            display: none;
+            /* Hide the h2 inside, as collapsible header will take over */
         }
 
         /* Grouping for Summary Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust column width as needed */
-            gap: 20px; /* Space between groups */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            /* Adjust column width as needed */
+            gap: 20px;
+            /* Space between groups */
         }
 
         .stats-group {
             border: 1px solid var(--summary-border);
             border-radius: 8px;
             overflow: hidden;
-            background-color: var(--chart-bg); /* Use chart bg for individual groups */
+            background-color: var(--chart-bg);
+            /* Use chart bg for individual groups */
             box-shadow: 0 1px 3px var(--chart-shadow);
             transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
@@ -227,34 +282,42 @@
             display: flex;
             justify-content: space-between;
             padding: 5px 0;
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
             font-size: 1em;
         }
+
         body.dark-mode .stats-item {
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
         }
+
         .stats-item:last-child {
             border-bottom: none;
         }
+
         .stats-item span {
             font-weight: normal;
             color: var(--body-text);
-            display: inline-block; /* Allows text-align to work */
-            min-width: 150px; /* Ensures consistent width for alignment */
+            display: inline-block;
+            /* Allows text-align to work */
+            min-width: 150px;
+            /* Ensures consistent width for alignment */
             text-align: right;
         }
 
 
         .stats-group .comparison-notes {
-            font-size: 0.9em; /* Smaller font for comparison notes */
-            color: #6c757d; /* Lighter color for notes */
+            font-size: 0.9em;
+            /* Smaller font for comparison notes */
+            color: #6c757d;
+            /* Lighter color for notes */
             margin-top: 10px;
             padding-top: 10px;
-            border-top: 1px dashed rgba(0,0,0,0.1);
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
         }
+
         body.dark-mode .stats-group .comparison-notes {
-             color: #ced4da;
-             border-top: 1px dashed rgba(255,255,255,0.1);
+            color: #ced4da;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
         }
 
         #chartContainer {
@@ -265,6 +328,7 @@
             max-width: 1000px;
             margin: 0 auto;
         }
+
         .chart-wrapper {
             background-color: var(--chart-bg);
             border-radius: 8px;
@@ -272,6 +336,7 @@
             overflow: hidden;
             transition: background-color 0.3s, box-shadow 0.3s;
         }
+
         .collapsible-header {
             background-color: var(--collapsible-header-bg);
             color: var(--collapsible-header-text);
@@ -282,35 +347,43 @@
             align-items: center;
             font-weight: bold;
             font-size: 1.1em;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             transition: background-color 0.2s, border-color 0.3s;
         }
+
         body.dark-mode .collapsible-header {
-             border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .collapsible-header:hover {
             background-color: var(--collapsible-header-hover-bg);
         }
+
         .collapsible-header::after {
             content: '▼';
             font-size: 0.8em;
             margin-left: 10px;
             transition: transform 0.3s ease;
         }
+
         .collapsible-header.collapsed::after {
             content: '►';
             transform: rotate(0deg);
         }
+
         .collapsible-content {
             padding: 10px;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, padding 0.3s ease-out;
         }
+
         .collapsible-content.expanded {
-            max-height: 2000px; /* Increased to accommodate more content */
+            max-height: 2000px;
+            /* Increased to accommodate more content */
             padding: 10px;
         }
+
         .chart-div {
             width: 100%;
             height: 350px;
@@ -326,7 +399,9 @@
         }
     </style>
 </head>
+
 <body>
+    <div class="home-link-bar"><a href="index.html">← Return to Home</a></div>
     <h1>WorkRave Activity & Break Statistics</h1>
 
     <div class="filter-controls">
@@ -377,7 +452,8 @@
             Summary Statistics (Filtered Data)
         </div>
         <div id="summaryStats" class="summary-stats-container collapsible-content expanded">
-            <h2>Summary Statistics (Filtered Data)</h2> <div class="stats-grid">
+            <h2>Summary Statistics (Filtered Data)</h2>
+            <div class="stats-grid">
                 <div class="stats-group">
                     <h3>General</h3>
                     <div class="stats-content">
@@ -387,12 +463,15 @@
                         <div class="stats-item">Total Mouse Movement: <span id="totalMouseMovement">N/A</span></div>
                         <div class="stats-item">Total Mouse Clicks: <span id="totalMouseClicks">N/A</span></div>
                         <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 1em;">Productivity Ratios</h4>
-                        <div class="stats-item">Avg Keystrokes / min usage: <span id="avgKeystrokesPerMinUsage">N/A</span></div>
+                        <div class="stats-item">Avg Keystrokes / min usage: <span
+                                id="avgKeystrokesPerMinUsage">N/A</span></div>
                         <div class="stats-item">Avg Clicks / min usage: <span id="avgClicksPerMinUsage">N/A</span></div>
-                        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 1em;">Comparison (Office Worker)</h4>
+                        <h4 style="margin-top: 15px; margin-bottom: 5px; font-size: 1em;">Comparison (Office Worker)
+                        </h4>
                         <div class="stats-item">Avg Keystrokes: <span>2,000 - 4,000 / day</span></div>
                         <div class="stats-item">Avg Mouse Clicks: <span>1,500 - 8,000 / day</span></div>
-                        <div class="stats-item">Avg Mouse Movement: <span>Data less common in units; typically >50% of computer time.</span></div>
+                        <div class="stats-item">Avg Mouse Movement: <span>Data less common in units; typically >50% of
+                                computer time.</span></div>
                         <p class="comparison-notes">
                             *Estimates based on general studies and can vary by role/source.
                         </p>
@@ -457,7 +536,7 @@
                 <div class="stats-group">
                     <h3>Daily Break Type Breakdown (minutes)</h3>
                     <div class="stats-content" id="breakTypeSummaryContent">
-                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -469,7 +548,8 @@
             Custom Query
         </div>
         <div class="query-controls collapsible-content expanded">
-            <p>Enter a query (e.g., "usage > 300", "keystrokes <= 10000"). <br>Available metrics: `usage`, `keystrokes`, `mouse_movement`, `mouse_clicks`, `break_duration`.</p>
+            <p>Enter a query (e.g., "usage > 300", "keystrokes <= 10000"). <br>Available metrics: `usage`, `keystrokes`,
+                    `mouse_movement`, `mouse_clicks`, `break_duration`.</p>
             <input type="text" id="customQueryInput" placeholder="Enter your query here">
             <div class="button-group">
                 <button id="runQueryButton">Run Query</button>
@@ -587,7 +667,7 @@
          * @param {number[]} arr The input array.
          * @returns {number|string} The median, or 'N/A' if the array is empty.
          */
-        window.calculateMedian = function(arr) { // Made global
+        window.calculateMedian = function (arr) { // Made global
             if (arr.length === 0) return 'N/A';
             const sortedArr = [...arr].sort((a, b) => a - b);
             const mid = Math.floor(sortedArr.length / 2);
@@ -602,7 +682,7 @@
          * @param {number[]} arr The input array.
          * @returns {string} A string representation of the mode(s), or 'N/A' if empty/no mode.
          */
-        window.calculateMode = function(arr) { // Made global
+        window.calculateMode = function (arr) { // Made global
             if (arr.length === 0) return 'N/A';
 
             const counts = {};
@@ -638,7 +718,7 @@
          * @param {number[]} yData - Array of y-values (metric data).
          * @returns {{m: number, b: number}} - Object containing the slope (m) and y-intercept (b).
          */
-        window.calculateLinearRegression = function(xData, yData) { // Made global
+        window.calculateLinearRegression = function (xData, yData) { // Made global
             if (xData.length === 0 || yData.length === 0 || xData.length !== yData.length) {
                 return { m: 0, b: 0 }; // Return default if data is invalid
             }
@@ -689,7 +769,7 @@
 
         // Function to toggle chart collapse
         // Made explicitly global for onclick attribute
-        window.toggleCollapse = function(headerElement) {
+        window.toggleCollapse = function (headerElement) {
             headerElement.classList.toggle('collapsed');
             const content = headerElement.nextElementSibling; // The chart-div is the next sibling
             content.classList.toggle('expanded');
@@ -735,13 +815,13 @@
 
             if (startDate) document.getElementById('startDate').value = startDate;
             if (endDate) document.getElementById('endDate').value = endDate;
-            
+
             // For checkboxes, localStorage returns strings "true" or "false"
             if (hideZeroActivityDays !== null) document.getElementById('hideZeroActivityDays').checked = (hideZeroActivityDays === 'true');
             if (hideZeroUsageDays !== null) document.getElementById('hideZeroUsageDays').checked = (hideZeroUsageDays === 'true');
             if (hideNoBreakDataDays !== null) document.getElementById('hideNoBreakDataDays').checked = (hideNoBreakDataDays === 'true');
             if (removeUsageOutliers !== null) document.getElementById('removeUsageOutliers').checked = (removeUsageOutliers === 'true');
-            
+
             // Dark mode toggle
             if (darkModeToggle !== null) {
                 const isDarkMode = (darkModeToggle === 'true');
@@ -1052,7 +1132,7 @@
 
         }
 
-        window.runCustomQuery = function() { // Made global
+        window.runCustomQuery = function () { // Made global
             const queryInput = document.getElementById('customQueryInput').value.trim();
             const queryResultsDiv = document.getElementById('queryResults');
             queryResultsDiv.textContent = ''; // Clear previous results
@@ -1114,7 +1194,7 @@
                         break;
                     case 'break_duration':
                         metricValue = (entry.break_stats && Array.isArray(entry.break_stats)) ?
-                                      entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) / 60 : 0; // minutes
+                            entry.break_stats.reduce((sum, b) => sum + (b.values && b.values.length > 1 ? b.values[1] : 0), 0) / 60 : 0; // minutes
                         break;
                     default:
                         queryResultsDiv.textContent = `Unknown metric: '${metricName}'. Please use one of: usage, keystrokes, mouse_movement, mouse_clicks, break_duration.`;
@@ -1175,7 +1255,7 @@
             }
         }
 
-        window.downloadQueryResults = function() { // Made global
+        window.downloadQueryResults = function () { // Made global
             if (lastQueryResults.length === 0) {
                 alert("No query results to download. Please run a query first.");
                 return;
@@ -1199,7 +1279,7 @@
         }
 
 
-        window.renderPlotlyCharts = function(data) { // Made global
+        window.renderPlotlyCharts = function (data) { // Made global
             const dates = data.map(entry => {
                 // Create a Date object (month is 0-indexed for constructor)
                 const dateObj = new Date(entry.start_date.year, entry.start_date.month - 1, entry.start_date.day);
@@ -1605,7 +1685,7 @@
             });
 
             const sortedBreakTypes = Array.from(allBreakTypes).sort((a, b) => a - b);
-            
+
             // Define a set of colors to use for different break types
             const breakTypeColors = [
                 '#1f77b4', // blue
@@ -1627,7 +1707,7 @@
                 });
                 const typeName = BREAK_TYPE_NAMES[type] || `Type ${type}`;
                 // Use the predefined colors, cycling through them
-                const traceColor = breakTypeColors[type % breakTypeColors.length]; 
+                const traceColor = breakTypeColors[type % breakTypeColors.length];
                 return {
                     x: dates,
                     y: yValuesMinutes,
@@ -1668,7 +1748,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             // Load filter state first
             loadFilterState();
-            
+
             // Set default dates if not loaded from localStorage
             if (!document.getElementById('startDate').value) {
                 document.getElementById('startDate').value = DEFAULT_START_DATE;
@@ -1730,7 +1810,7 @@
 
             // Custom Query Listener
             document.getElementById('runQueryButton').addEventListener('click', window.runCustomQuery); // Call as global
-            document.getElementById('customQueryInput').addEventListener('keypress', function(event) {
+            document.getElementById('customQueryInput').addEventListener('keypress', function (event) {
                 if (event.key === 'Enter') {
                     window.runCustomQuery(); // Call as global
                 }
@@ -1746,4 +1826,5 @@
         });
     </script>
 </body>
+
 </html>

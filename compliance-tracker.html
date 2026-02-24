@@ -30,6 +30,24 @@
             margin: 0 auto;
         }
 
+        .home-link-bar {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .home-link-bar a {
+            color: #4a5568;
+            text-decoration: none;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .home-link-bar a:hover {
+            text-decoration: underline;
+        }
+
         .header {
             text-align: center;
             margin-bottom: 60px;
@@ -327,6 +345,22 @@
             letter-spacing: 1px;
         }
 
+        .footer .home-link {
+            margin-top: 18px;
+        }
+
+        .footer .home-link a {
+            color: #4a5568;
+            text-decoration: none;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        .footer .home-link a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -345,6 +379,7 @@
 
 <body>
     <div class="container">
+        <div class="home-link-bar"><a href="index.html">← Return to Home</a></div>
         <div class="header" id="tracker-header">
             <h1 id="tracker-title">The ACS 2026 Compliance Tracker</h1>
             <p>Arboreum Commercial Solutions, LLC</p>
