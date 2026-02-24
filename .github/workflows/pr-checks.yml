@@ -28,6 +28,7 @@ jobs:
                   python validate_compliance_tracker.py
                   python validate_mandates.py
                   python validate_anchors.py
+                  python validate_off_the_shelf.py
 
     ui-screenshot-policy:
         name: UI Screenshot Policy
