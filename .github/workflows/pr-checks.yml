@@ -39,9 +39,22 @@ jobs:
               with:
                   fetch-depth: 0
 
+            - name: Fetch current PR body
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const { owner, repo } = context.repo;
+                      const pull_number = context.payload.pull_request.number;
+                      const { data: pr } = await github.rest.pulls.get({
+                        owner,
+                        repo,
+                        pull_number,
+                      });
+                      const body = pr.body || '';
+                      fs.appendFileSync(process.env.GITHUB_ENV, `PR_BODY<<EOF\n${body}\nEOF\n`);
+
             - name: Enforce BEFORE/AFTER screenshots for UI changes
-              env:
-                  PR_BODY: ${{ github.event.pull_request.body }}
               run: |
                   python utils/check_pr_ui_screenshots.py \
                     --base-sha "${{ github.event.pull_request.base.sha }}" \
