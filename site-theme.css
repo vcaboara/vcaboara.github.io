@@ -1,0 +1,101 @@
+:root {
+  --app-bg: #eef2f7;
+  --app-surface: #f7f9fc;
+  --app-surface-strong: #ffffff;
+  --app-text: #1f2a3d;
+  --app-muted: #667796;
+  --app-border: #cfd9ec;
+  --app-nav-bg: rgba(255, 255, 255, 0.78);
+  --app-accent-1: #2f80ff;
+  --app-accent-2: #2ec7b8;
+  --app-shadow: 0 10px 30px rgba(30, 45, 76, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #101723;
+    --app-surface: #141d2d;
+    --app-surface-strong: #101a2a;
+    --app-text: #e8eefc;
+    --app-muted: #9fb0d3;
+    --app-border: #2a3a57;
+    --app-nav-bg: rgba(16, 26, 42, 0.86);
+    --app-accent-1: #4e9dff;
+    --app-accent-2: #31d3be;
+    --app-shadow: 0 12px 34px rgba(0, 0, 0, 0.32);
+  }
+}
+
+body {
+  background: radial-gradient(circle at top, rgba(74, 100, 146, 0.09), transparent 45%), var(--app-bg) !important;
+  color: var(--app-text) !important;
+}
+
+.home-link-bar {
+  margin: 0 0 24px 0 !important;
+  padding: 10px 14px !important;
+  border: 1px solid var(--app-border) !important;
+  background: var(--app-nav-bg) !important;
+  border-radius: 10px !important;
+  backdrop-filter: blur(8px);
+}
+
+.home-link-bar a {
+  color: var(--app-text) !important;
+  opacity: 0.92;
+}
+
+.home-link-bar a:hover {
+  color: var(--app-accent-1) !important;
+}
+
+.container,
+.page-shell,
+#ledger-content,
+#ots-content {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: var(--app-shadow) !important;
+  border-radius: 14px !important;
+}
+
+h1 {
+  color: var(--app-text);
+}
+
+.subtitle,
+footer,
+#ots-header p,
+#ots-intro,
+.section p,
+.notice p {
+  color: var(--app-muted) !important;
+}
+
+.links a,
+.button-link,
+.cta-dark {
+  background: linear-gradient(90deg, var(--app-accent-1), var(--app-accent-2)) !important;
+  color: #f4f8ff !important;
+  border-color: transparent !important;
+}
+
+.links a:hover,
+.button-link:hover,
+.cta-dark:hover {
+  filter: brightness(1.08);
+}
+
+th {
+  background: color-mix(in srgb, var(--app-surface-strong) 70%, var(--app-accent-1) 10%) !important;
+}
+
+td,
+th,
+.logic-box,
+.pillar-card,
+.notice,
+.master-ticker,
+.summary-stats {
+  border-color: var(--app-border) !important;
+}
