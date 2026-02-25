@@ -57,9 +57,14 @@ def create_pr(base: str, head: str, title: str, body_file: str | None, draft: bo
 
     if push:
         print(f"📤 Pushing branch '{head}'...")
-        push_result = run_command(["git", "push", "-u", "origin", head])
+        push_result = run_command(
+            ["git", "push", "-u", "origin", head], capture=True)
         if push_result.returncode != 0:
             print("❌ Failed to push branch.")
+            if push_result.stderr:
+                print(push_result.stderr.strip())
+            elif push_result.stdout:
+                print(push_result.stdout.strip())
             return 1
 
     cmd = [

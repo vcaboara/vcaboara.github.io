@@ -71,13 +71,29 @@ def export_revision(revision: str, out_dir: Path) -> None:
     archive_cmd = ["git", "archive", revision]
     tar_cmd = ["tar", "-x", "-C", str(out_dir)]
 
-    archive_proc = subprocess.Popen(archive_cmd, stdout=subprocess.PIPE)
+    archive_proc = subprocess.Popen(
+        archive_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
     try:
         subprocess.run(tar_cmd, stdin=archive_proc.stdout, check=True)
     finally:
         if archive_proc.stdout:
             archive_proc.stdout.close()
-        archive_proc.wait()
+        archive_stderr = None
+        if archive_proc.stderr:
+            archive_stderr = archive_proc.stderr.read()
+            archive_proc.stderr.close()
+        archive_returncode = archive_proc.wait()
+
+    if archive_returncode != 0:
+        raise subprocess.CalledProcessError(
+            archive_returncode,
+            archive_cmd,
+            stderr=archive_stderr,
+        )
 
 
 class LocalServer:
@@ -91,6 +107,7 @@ class LocalServer:
         handler = functools.partial(
             SimpleHTTPRequestHandler, directory=str(self.directory))
         self.httpd = ThreadingHTTPServer(("127.0.0.1", self.port), handler)
+        self.port = self.httpd.server_address[1]
         self.thread = threading.Thread(
             target=self.httpd.serve_forever, daemon=True)
         self.thread.start()
@@ -118,7 +135,9 @@ def capture_screenshot(url: str, output_path: Path) -> None:
 
 
 def compute_diff(base_img_path: Path, head_img_path: Path, diff_img_path: Path) -> tuple[float, str]:
-    with Image.open(base_img_path).convert("RGB") as base_img, Image.open(head_img_path).convert("RGB") as head_img:
+    with Image.open(base_img_path) as base_img_file, Image.open(head_img_path) as head_img_file:
+        base_img = base_img_file.convert("RGB")
+        head_img = head_img_file.convert("RGB")
         if base_img.size != head_img.size:
             target_size = (max(base_img.width, head_img.width),
                            max(base_img.height, head_img.height))
@@ -204,8 +223,8 @@ def main() -> int:
     parser.add_argument("--output-markdown",
                         default="ui-screenshot-diff-summary.md")
     parser.add_argument("--artifacts-dir", default="pr-screenshots/ci-diff")
-    parser.add_argument("--base-port", type=int, default=8765)
-    parser.add_argument("--head-port", type=int, default=8766)
+    parser.add_argument("--base-port", type=int, default=0)
+    parser.add_argument("--head-port", type=int, default=0)
     args = parser.parse_args()
 
     output_markdown = Path(args.output_markdown)
@@ -238,7 +257,7 @@ def main() -> int:
 
         from playwright.sync_api import Error as PlaywrightError  # type: ignore
 
-        with LocalServer(base_dir, args.base_port), LocalServer(head_dir, args.head_port):
+        with LocalServer(base_dir, args.base_port) as base_server, LocalServer(head_dir, args.head_port) as head_server:
             for page in comparable_pages:
                 base_page = base_dir / page
                 head_page = head_dir / page
@@ -247,15 +266,18 @@ def main() -> int:
                         page=page, status="skipped", diff_percent=0.0, notes="page missing in one revision"))
                     continue
 
-                base_img = artifacts_dir / "base" / f"{Path(page).stem}.png"
-                head_img = artifacts_dir / "head" / f"{Path(page).stem}.png"
-                diff_img = artifacts_dir / "diff" / f"{Path(page).stem}.png"
+                normalized_page = str(page).replace("\\", "/")
+                safe_page_id = normalized_page.lstrip("/").replace("/", "__")
+
+                base_img = artifacts_dir / "base" / f"{safe_page_id}.png"
+                head_img = artifacts_dir / "head" / f"{safe_page_id}.png"
+                diff_img = artifacts_dir / "diff" / f"{safe_page_id}.png"
 
                 try:
                     capture_screenshot(
-                        f"http://127.0.0.1:{args.base_port}/{page}", base_img)
+                        f"http://127.0.0.1:{base_server.port}/{page}", base_img)
                     capture_screenshot(
-                        f"http://127.0.0.1:{args.head_port}/{page}", head_img)
+                        f"http://127.0.0.1:{head_server.port}/{page}", head_img)
                     diff_percent, size_note = compute_diff(
                         base_img, head_img, diff_img)
                     status = "changed" if diff_percent > 0 else "no-visible-change"
