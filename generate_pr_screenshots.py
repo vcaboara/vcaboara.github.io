@@ -24,6 +24,11 @@ def start_http_server(port: int, cwd: Path) -> subprocess.Popen[bytes]:
         stderr=subprocess.DEVNULL,
     )
     time.sleep(1.5)
+    if process.poll() is not None:
+        raise RuntimeError(
+            f"Failed to start HTTP server on port {port}. "
+            "Ensure the port is free and try again."
+        )
     return process
 
 
