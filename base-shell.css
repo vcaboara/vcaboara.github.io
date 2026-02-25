@@ -1,0 +1,133 @@
+:root {
+  --bg: #0f1724;
+  --surface: #151f31;
+  --surface-2: #1b2940;
+  --text: #e9eefb;
+  --muted: #a7b4d3;
+  --border: #2b3a58;
+  --accent-a: #4b8dff;
+  --accent-b: #30c9be;
+  --shadow: 0 14px 38px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(75, 141, 255, 0.18), transparent 36%),
+    radial-gradient(circle at 90% 0%, rgba(48, 201, 190, 0.12), transparent 32%),
+    var(--bg);
+  padding: 28px 18px;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 24px 24px 30px;
+}
+
+.top-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  min-height: 46px;
+  margin: 0 0 22px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(9, 14, 24, 0.5);
+}
+
+.top-nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.83rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.top-nav a:hover {
+  color: var(--accent-a);
+}
+
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.8rem, 2.4vw, 2.4rem);
+  letter-spacing: -0.02em;
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.content-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.content-card h2 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.content-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.page-footer {
+  margin-top: 26px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  color: #eff6ff;
+  text-decoration: none;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+}
+
+.cta.ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
