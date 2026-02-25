@@ -88,9 +88,11 @@ class LocalServer:
         self.thread: threading.Thread | None = None
 
     def __enter__(self) -> "LocalServer":
-        handler = functools.partial(SimpleHTTPRequestHandler, directory=str(self.directory))
+        handler = functools.partial(
+            SimpleHTTPRequestHandler, directory=str(self.directory))
         self.httpd = ThreadingHTTPServer(("127.0.0.1", self.port), handler)
-        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+        self.thread = threading.Thread(
+            target=self.httpd.serve_forever, daemon=True)
         self.thread.start()
         time.sleep(0.6)
         return self
@@ -118,7 +120,8 @@ def capture_screenshot(url: str, output_path: Path) -> None:
 def compute_diff(base_img_path: Path, head_img_path: Path, diff_img_path: Path) -> tuple[float, str]:
     with Image.open(base_img_path).convert("RGB") as base_img, Image.open(head_img_path).convert("RGB") as head_img:
         if base_img.size != head_img.size:
-            target_size = (max(base_img.width, head_img.width), max(base_img.height, head_img.height))
+            target_size = (max(base_img.width, head_img.width),
+                           max(base_img.height, head_img.height))
             base_canvas = Image.new("RGB", target_size, (255, 255, 255))
             head_canvas = Image.new("RGB", target_size, (255, 255, 255))
             base_canvas.paste(base_img, (0, 0))
@@ -134,7 +137,8 @@ def compute_diff(base_img_path: Path, head_img_path: Path, diff_img_path: Path) 
         histogram = diff_gray.histogram()
         total_pixels = base_img.width * base_img.height
         changed_pixels = total_pixels - histogram[0]
-        diff_percent = (changed_pixels / total_pixels) * 100 if total_pixels else 0.0
+        diff_percent = (changed_pixels / total_pixels) * \
+            100 if total_pixels else 0.0
 
         if changed_pixels > 0:
             diff_img_path.parent.mkdir(parents=True, exist_ok=True)
@@ -164,7 +168,8 @@ def write_summary(
     lines.append("")
 
     if not comparable_pages:
-        lines.append("No comparable HTML page changes detected for screenshot diff.")
+        lines.append(
+            "No comparable HTML page changes detected for screenshot diff.")
         output_markdown.write_text("\n".join(lines), encoding="utf-8")
         return
 
@@ -173,18 +178,21 @@ def write_summary(
     lines.append("|---|---:|---:|---|")
     for result in results:
         icon = "✅" if result.status == "no-visible-change" else "🟡" if result.status == "changed" else "❌"
-        lines.append(f"| {result.page} | {icon} {result.status} | {result.diff_percent:.3f}% | {result.notes} |")
+        lines.append(
+            f"| {result.page} | {icon} {result.status} | {result.diff_percent:.3f}% | {result.notes} |")
 
     changed_pages = [r.page for r in results if r.status == "changed"]
     lines.append("")
     if changed_pages:
         lines.append("### Summary")
-        lines.append(f"Visual changes detected on {len(changed_pages)} page(s):")
+        lines.append(
+            f"Visual changes detected on {len(changed_pages)} page(s):")
         for page in changed_pages:
             lines.append(f"- {page}")
     else:
         lines.append("### Summary")
-        lines.append("No visible pixel differences detected on comparable pages.")
+        lines.append(
+            "No visible pixel differences detected on comparable pages.")
 
     output_markdown.write_text("\n".join(lines), encoding="utf-8")
 
@@ -193,7 +201,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-sha", required=True)
     parser.add_argument("--head-sha", required=True)
-    parser.add_argument("--output-markdown", default="ui-screenshot-diff-summary.md")
+    parser.add_argument("--output-markdown",
+                        default="ui-screenshot-diff-summary.md")
     parser.add_argument("--artifacts-dir", default="pr-screenshots/ci-diff")
     parser.add_argument("--base-port", type=int, default=8765)
     parser.add_argument("--head-port", type=int, default=8766)
@@ -234,7 +243,8 @@ def main() -> int:
                 base_page = base_dir / page
                 head_page = head_dir / page
                 if not base_page.exists() or not head_page.exists():
-                    results.append(PageDiffResult(page=page, status="skipped", diff_percent=0.0, notes="page missing in one revision"))
+                    results.append(PageDiffResult(
+                        page=page, status="skipped", diff_percent=0.0, notes="page missing in one revision"))
                     continue
 
                 base_img = artifacts_dir / "base" / f"{Path(page).stem}.png"
@@ -242,21 +252,28 @@ def main() -> int:
                 diff_img = artifacts_dir / "diff" / f"{Path(page).stem}.png"
 
                 try:
-                    capture_screenshot(f"http://127.0.0.1:{args.base_port}/{page}", base_img)
-                    capture_screenshot(f"http://127.0.0.1:{args.head_port}/{page}", head_img)
-                    diff_percent, size_note = compute_diff(base_img, head_img, diff_img)
+                    capture_screenshot(
+                        f"http://127.0.0.1:{args.base_port}/{page}", base_img)
+                    capture_screenshot(
+                        f"http://127.0.0.1:{args.head_port}/{page}", head_img)
+                    diff_percent, size_note = compute_diff(
+                        base_img, head_img, diff_img)
                     status = "changed" if diff_percent > 0 else "no-visible-change"
-                    notes = size_note + ("; diff image saved" if diff_percent > 0 else "")
-                    results.append(PageDiffResult(page=page, status=status, diff_percent=diff_percent, notes=notes))
+                    notes = size_note + \
+                        ("; diff image saved" if diff_percent > 0 else "")
+                    results.append(PageDiffResult(
+                        page=page, status=status, diff_percent=diff_percent, notes=notes))
                 except (PlaywrightError, OSError, RuntimeError) as exc:
-                    results.append(PageDiffResult(page=page, status="error", diff_percent=0.0, notes=str(exc)))
+                    results.append(PageDiffResult(
+                        page=page, status="error", diff_percent=0.0, notes=str(exc)))
 
     except subprocess.CalledProcessError as exc:
         print("❌ Failed to export git revisions")
         print(exc.stderr)
         return 1
     finally:
-        write_summary(output_markdown, ui_changed_files, comparable_pages, results)
+        write_summary(output_markdown, ui_changed_files,
+                      comparable_pages, results)
         shutil.rmtree(work_dir, ignore_errors=True)
 
     print(output_markdown.read_text(encoding="utf-8"))

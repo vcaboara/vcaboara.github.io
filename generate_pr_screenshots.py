@@ -79,11 +79,13 @@ def generate_screenshots(port: int, output_dir: Path, targets: list[tuple[str, s
                 all_ok = False
                 continue
             target_path = output_dir / output_name
-            ok = capture_screenshot(f"{base_url}/{page}", target_path, full_page=full_page)
+            ok = capture_screenshot(
+                f"{base_url}/{page}", target_path, full_page=full_page)
             all_ok = all_ok and ok
 
         if all_ok:
-            print(f"\n✅ Screenshot generation complete. Output dir: {output_dir}")
+            print(
+                f"\n✅ Screenshot generation complete. Output dir: {output_dir}")
         return all_ok
     finally:
         server.terminate()
@@ -91,16 +93,20 @@ def generate_screenshots(port: int, output_dir: Path, targets: list[tuple[str, s
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate local screenshots for PR evidence")
-    parser.add_argument("--port", type=int, default=8000, help="Local HTTP server port (default: 8000)")
-    parser.add_argument("--output-dir", default="pr-screenshots", help="Output directory (default: pr-screenshots)")
+    parser = argparse.ArgumentParser(
+        description="Generate local screenshots for PR evidence")
+    parser.add_argument("--port", type=int, default=8000,
+                        help="Local HTTP server port (default: 8000)")
+    parser.add_argument("--output-dir", default="pr-screenshots",
+                        help="Output directory (default: pr-screenshots)")
     parser.add_argument(
         "--page",
         action="append",
         default=[],
         help="Page spec: path.html or path.html=filename.png (can repeat)",
     )
-    parser.add_argument("--no-full-page", action="store_true", help="Disable full-page screenshots")
+    parser.add_argument("--no-full-page", action="store_true",
+                        help="Disable full-page screenshots")
     args = parser.parse_args()
 
     targets = parse_page_specs(args.page)
