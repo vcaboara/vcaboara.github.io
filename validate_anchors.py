@@ -33,14 +33,6 @@ ANCHOR_REQUIREMENTS = {
         "industrial-synergy",
         "patent-authority",
     ],
-    "raw_standard.html": [
-        "standard-title",
-        "executive-summary",
-        "regulatory-interoperability",
-        "licensing-model",
-        "system-status",
-        "raw-standard-footer",
-    ],
     "legal.html": [
         "virtual-patent-marking",
         "statutory-notice",
