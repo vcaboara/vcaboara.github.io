@@ -115,9 +115,9 @@ def validate_off_the_shelf(file_path):
         # Skip external links (those starting with http)
         if not link.startswith('http'):
             # Check local links exist
-            if link in ['index.html', 'Manufacturers.md', 'ledger.html', 'compliance-tracker.html']:
+            if link in ['index.html', 'standard.html', 'arboreum.html', 'mandates.html', 'off-the-shelf.html', 'legal.html', 'ledger.html', 'compliance-tracker.html']:
                 pass  # These are expected
-            elif not link.startswith('http'):
+            else:
                 invalid_links.append(link)
 
     if invalid_links:
