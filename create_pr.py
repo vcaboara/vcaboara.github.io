@@ -94,13 +94,18 @@ def create_pr(base: str, head: str, title: str, body_file: str | None, draft: bo
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Create a pull request with GitHub CLI")
-    parser.add_argument("--base", default="main", help="Target/base branch (default: main)")
-    parser.add_argument("--head", help="Source branch (default: current branch)")
+    parser = argparse.ArgumentParser(
+        description="Create a pull request with GitHub CLI")
+    parser.add_argument("--base", default="main",
+                        help="Target/base branch (default: main)")
+    parser.add_argument(
+        "--head", help="Source branch (default: current branch)")
     parser.add_argument("--title", required=True, help="PR title")
     parser.add_argument("--body-file", help="Optional PR body markdown file")
-    parser.add_argument("--draft", action="store_true", help="Create PR as draft")
-    parser.add_argument("--push", action="store_true", help="Push source branch before creating PR")
+    parser.add_argument("--draft", action="store_true",
+                        help="Create PR as draft")
+    parser.add_argument("--push", action="store_true",
+                        help="Push source branch before creating PR")
     args = parser.parse_args()
 
     head = args.head or get_current_branch()
