@@ -4,4 +4,6 @@ __pycache__/
 *.py[cod]
 *.bak
 *.zip
+*.pdf
 .vscode/
+pdf_content.txt
