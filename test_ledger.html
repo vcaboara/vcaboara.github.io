@@ -39,10 +39,43 @@
             border: 1px solid #30363d;
             margin-top: 20px;
         }
+
+        .home-link-bar {
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            min-height: 44px;
+        }
+
+        .home-link-bar a {
+            color: #58a6ff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.82rem;
+            letter-spacing: 0.4px;
+        }
+
+        .home-link-bar a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
 <body>
+    <div class="home-link-bar">
+        <a href="index.html">Home</a>
+        <a href="standard.html">Standard</a>
+        <a href="arboreum.html">Arboreum</a>
+        <a href="mandates.html">Mandates</a>
+        <a href="off-the-shelf.html">Industrial Reference</a>
+        <a href="ledger.html">Ledger</a>
+        <a href="compliance-tracker.html">Compliance</a>
+        <a href="legal.html">Legal</a>
+    </div>
     <h1>Ledger.html Test Suite</h1>
     <div id="results"></div>
     <h2>Live Preview</h2>
