@@ -1,6 +1,6 @@
 """
 Validation script for mandates.html
-Checks for required pillar content, HTML structure, and sensitive data
+Checks for required pillar content and HTML structure
 """
 import re
 import sys
@@ -13,12 +13,6 @@ def validate_mandates(file_path):
         content = f.read()
 
     issues = []
-
-    # Check for sensitive data patterns
-    patent_pattern = r'19/' + r'424,' + r'?106'
-    if re.search(patent_pattern, content):
-        issues.append(
-            f"❌ CRITICAL: Patent number [REDACTED] found (should be [REDACTED])")
 
     # Check for required structural elements
     required_elements = [

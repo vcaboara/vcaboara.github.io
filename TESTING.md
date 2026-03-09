@@ -8,6 +8,7 @@
 Open `test_ledger.html` in a browser to run the full test suite:
 - Counter updates
 - Table rendering  
+- Priority filing patent reference checks
 - Collapsible sections
 - Value updates without DOM rebuild
 - Section collapse state tracking
@@ -31,7 +32,7 @@ python validate_ledger.py
 ```
 
 Checks for:
-- **Sensitive data leaks** (patent numbers, individual names)
+- **Content policy checks** (individual names in email addresses)
 - **HTML structure** (required elements, balanced tags)
 - **Company name format** (LLC inclusion)
 
@@ -55,7 +56,6 @@ python validate_mandates.py
 ```
 
 Checks for:
-- **Sensitive data leaks** (patent numbers)
 - **HTML structure** (pillar cards, logic boxes, footer)
 - **All 5 pillars present** with correct titles
 - **Key technical content** (12/17 Patent, 15/15 model, 85% funding, staff benefits)
@@ -83,11 +83,10 @@ powershell -ExecutionPolicy Bypass -File .\utils\install_git_hooks.ps1
 The hook automatically:
 
 1. **Blocks commits on `main`/`master`** (requires branch + PR workflow)
-2. **Blocks commits** containing sensitive patent number (format: XX/XXX,XXX)
-3. **Warns** about individual names in email addresses
-4. **Validates** HTML structure
-5. **Checks** for proper LLC designation in company name
-6. **Validates** compliance tracker data integrity (companies array structure)
+2. **Warns** about individual names in email addresses
+3. **Validates** HTML structure
+4. **Checks** for proper LLC designation in company name
+5. **Validates** compliance tracker data integrity (companies array structure)
 
 ### Testing the Hook
 

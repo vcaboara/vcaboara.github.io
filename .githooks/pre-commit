@@ -26,14 +26,8 @@ confirm_continue() {
     esac
 }
 
-# Check for sensitive patent number (only in additions, not deletions)
-if git diff --cached --name-only | grep -q "ledger.html\|legal.html"; then
-    if git diff --cached | grep "^+" | grep -v "^+++" | grep -E "19/424,?106" >/dev/null; then
-        echo "❌ ERROR: Patent number 19/424,106 detected in staged changes!"
-        echo "   This sensitive data should remain [REDACTED]"
-        exit 1
-    fi
-fi
+# Note: Published patent reference usage (e.g., US 19/424,106) is allowed.
+# Keep content style consistent through page-level tests/validators.
 
 # Check for potentially exposed individual names in email addresses
 if git diff --cached --name-only | grep -q "ledger.html"; then
