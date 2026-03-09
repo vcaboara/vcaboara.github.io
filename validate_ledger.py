@@ -1,6 +1,6 @@
 """
 Automated test runner for ledger.html
-Validates HTML structure and sensitive data patterns
+Validates HTML structure and content policy checks
 """
 import re
 import sys
@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def check_sensitive_data(file_path):
-    """Check for sensitive data patterns that should be redacted"""
+    """Check for content-policy issues (PII exposure and naming consistency)"""
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -78,7 +78,7 @@ def main():
 
     all_issues = []
 
-    print("📋 Checking for sensitive data patterns...")
+    print("📋 Checking content policy guardrails...")
     sensitive_issues = check_sensitive_data(ledger_path)
     all_issues.extend(sensitive_issues)
 

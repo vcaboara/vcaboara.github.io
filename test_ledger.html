@@ -116,6 +116,17 @@
                     return tbody && tbody.querySelectorAll('tr').length > 0;
                 });
 
+                addTest('Priority filing label includes patent reference', () => {
+                    const label = doc.querySelector('#ledger-header .label');
+                    return label && label.textContent.includes('US 19/424,106');
+                });
+
+                addTest('Patent reference appears once on page', () => {
+                    const bodyText = doc.body ? doc.body.textContent : '';
+                    const matches = (bodyText || '').match(/US 19\/424,106/g) || [];
+                    return matches.length === 1;
+                });
+
                 addTest('Section dividers exist', () => {
                     const dividers = doc.querySelectorAll('.section-divider');
                     return dividers.length === 4; // Federal, Commercial, Global, Forensic
