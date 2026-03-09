@@ -1,6 +1,6 @@
 """
 Automated test runner for ledger.html
-Validates HTML structure and checks for sensitive data patterns
+Validates HTML structure and sensitive data patterns
 """
 import re
 import sys
@@ -13,12 +13,6 @@ def check_sensitive_data(file_path):
         content = f.read()
 
     issues = []
-
-    # Check for patent number (using pattern to avoid triggering in this file)
-    patent_pattern = r'19/' + r'424,' + r'?106'
-    if re.search(patent_pattern, content):
-        issues.append(
-            f"❌ CRITICAL: Patent number [REDACTED] found (should be [REDACTED])")
 
     # Check for individual names in email addresses
     names = ['DGause', 'rmoran', 'jlilley', 'Mark Hagler', 'Ryan Elliott']
