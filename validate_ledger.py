@@ -14,11 +14,7 @@ def check_sensitive_data(file_path):
 
     issues = []
 
-    # Check for patent number (using pattern to avoid triggering in this file)
-    patent_pattern = r'19/' + r'424,' + r'?106'
-    if re.search(patent_pattern, content):
-        issues.append(
-            f"❌ CRITICAL: Patent number [REDACTED] found (should be [REDACTED])")
+    # Patent number US 19/424,106 is intentionally published in the priority date label
 
     # Check for individual names in email addresses
     names = ['DGause', 'rmoran', 'jlilley', 'Mark Hagler', 'Ryan Elliott']
