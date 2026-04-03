@@ -7,3 +7,9 @@ __pycache__/
 *.pdf
 .vscode/
 pdf_content.txt
+
+# Local PR workflow scratch files
+pr_body*.txt
+*_main_pr*.html
+index_main*.html
+notes.md

@@ -5,6 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIF MANDATES | Arboreum Impact Foundation</title>
+    <script>
+        (function () {
+            var t = 'light';
+            try {
+                var storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'dark' || storedTheme === 'light') {
+                    t = storedTheme;
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            } catch (e) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="theme.css">
     <meta name="description"
         content="The core mandates of the Arboreum Impact Foundation (AIF): Environmental restoration, universal food security, and systemic human reform.">
     <link rel="stylesheet" href="theme.css">
@@ -114,6 +133,7 @@
         <a href="ledger.html">Ledger</a>
         <a href="compliance-tracker.html">Compliance</a>
         <a href="legal.html">Legal</a>
+        <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
     </div>
 
     <h1 id="aif-title">Arboreum Impact Foundation (AIF)</h1>
@@ -210,6 +230,7 @@
         <p>Arboreum Impact Foundation | Sovereignty & Stewardship</p>
         <p>Document Ref: Mandate-2026-V1. All systems grounded in the 12/17/2025 Priority Patent Filing.</p>
     </footer>
+    <script src="theme.js"></script>
 
 </body>
 
