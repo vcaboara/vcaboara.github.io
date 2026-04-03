@@ -137,11 +137,9 @@ html[data-theme="dark"] table {
 html[data-theme="dark"] th {
     background: #252525;
     color: #ccc;
-}
-html[data-theme="dark"] td {
     border-bottom-color: #333;
 }
-html[data-theme="dark"] th {
+html[data-theme="dark"] td {
     border-bottom-color: #333;
 }
 html[data-theme="dark"] tr:nth-child(even) td {
