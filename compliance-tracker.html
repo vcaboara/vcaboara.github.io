@@ -7,7 +7,19 @@
     <title>ACS 2026 Compliance Tracker</title>
     <script>
         (function () {
-            var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+            var t = 'light';
+            try {
+                var storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'dark' || storedTheme === 'light') {
+                    t = storedTheme;
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            } catch (e) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            }
             document.documentElement.setAttribute('data-theme', t);
         })();
     </script>

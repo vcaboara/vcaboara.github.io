@@ -6,7 +6,11 @@
 
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    try {
+        localStorage.setItem('theme', theme);
+    } catch (e) {
+        // Gracefully degrade when storage is blocked (private/restricted modes).
+    }
     var btn = document.getElementById('theme-toggle');
     if (btn) {
         var isDark = theme === 'dark';
@@ -26,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btn) {
         btn.addEventListener('click', toggleTheme);
         // Sync button label with currently active theme
-        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        var current = document.documentElement.getAttribute('data-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         applyTheme(current);
     }
 });
