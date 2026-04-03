@@ -88,17 +88,171 @@
             text-transform: uppercase;
             width: 100%;
         }
+
+        .manage-consent-btn {
+            margin-top: 12px;
+            border: 1px solid #666;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .manage-consent-btn:hover {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+
+        .consent-banner {
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 16px;
+            border: 1px solid #1a1a1a;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+            z-index: 1000;
+        }
+
+        .consent-banner h2 {
+            margin: 0 0 8px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .consent-banner p {
+            margin: 0;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+            text-transform: none;
+            color: #2a2a2a;
+        }
+
+        .consent-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .consent-actions button {
+            border: 1px solid #1a1a1a;
+            background: #ffffff;
+            color: #1a1a1a;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .consent-actions button:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
     </style>
-  <script>
-    !function(key) {
-    if (window.reb2b) return;
-    window.reb2b = {loaded: true};
-    var s = document.createElement("script");
-    s.async = true;
-    s.src = "https://ddwl4m2hdecbv.cloudfront.net/b/" + key + "/" + key + ".js.gz";
-    document.getElementsByTagName("script")[0].parentNode.insertBefore(s, document.getElementsByTagName("script")[0]);
-}("W6Z57HZ58LOX");
-  </script>
+    <script>
+        (function () {
+            var RB2B_KEY = "W6Z57HZ58LOX";
+            var CONSENT_KEY = "arboreum-tracking-consent";
+            var CONSENT_GRANTED = "granted";
+            var CONSENT_DECLINED = "declined";
+
+            function getConsent() {
+                try {
+                    return window.localStorage.getItem(CONSENT_KEY);
+                } catch (error) {
+                    return null;
+                }
+            }
+
+            function setConsent(value) {
+                try {
+                    window.localStorage.setItem(CONSENT_KEY, value);
+                } catch (error) {
+                    return;
+                }
+            }
+
+            function loadRb2b() {
+                if (window.reb2b && window.reb2b.loaded) return;
+                window.reb2b = { loaded: true };
+
+                var s = document.createElement("script");
+                s.async = true;
+                s.src = "https://ddwl4m2hdecbv.cloudfront.net/b/" + RB2B_KEY + "/" + RB2B_KEY + ".js.gz";
+
+                var firstScript = document.getElementsByTagName("script")[0];
+                if (firstScript && firstScript.parentNode) {
+                    firstScript.parentNode.insertBefore(s, firstScript);
+                } else {
+                    document.head.appendChild(s);
+                }
+            }
+
+            function hideBanner() {
+                var banner = document.getElementById("consent-banner");
+                if (banner) {
+                    banner.hidden = true;
+                }
+            }
+
+            function showBanner() {
+                var banner = document.getElementById("consent-banner");
+                if (banner) {
+                    banner.hidden = false;
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                var consent = getConsent();
+                var acceptButton = document.getElementById("consent-accept");
+                var declineButton = document.getElementById("consent-decline");
+                var manageButton = document.getElementById("manage-consent-btn");
+
+                if (consent === CONSENT_GRANTED) {
+                    loadRb2b();
+                    hideBanner();
+                } else if (consent === CONSENT_DECLINED) {
+                    hideBanner();
+                } else {
+                    showBanner();
+                }
+
+                if (acceptButton) {
+                    acceptButton.addEventListener("click", function () {
+                        setConsent(CONSENT_GRANTED);
+                        loadRb2b();
+                        hideBanner();
+                    });
+                }
+
+                if (declineButton) {
+                    declineButton.addEventListener("click", function () {
+                        setConsent(CONSENT_DECLINED);
+                        hideBanner();
+                    });
+                }
+
+                if (manageButton) {
+                    manageButton.addEventListener("click", function () {
+                        showBanner();
+                    });
+                }
+            });
+        })();
+    </script>
 </head>
 
 <body>
@@ -116,7 +270,22 @@
 
     <footer id="site-footer">
         Established 2025 | Patent Pending | Site Authority: v.1.0.11
+        <div>
+            <button id="manage-consent-btn" class="manage-consent-btn" type="button">Privacy Choices</button>
+        </div>
     </footer>
+
+    <section id="consent-banner" class="consent-banner" role="dialog" aria-label="Tracking consent" hidden>
+        <h2>Privacy Settings</h2>
+        <p>
+            We use RB2B for visit analytics and business attribution. To support international privacy requirements,
+            RB2B only loads after you provide consent.
+        </p>
+        <div class="consent-actions">
+            <button id="consent-decline" type="button">Decline</button>
+            <button id="consent-accept" type="button">Accept</button>
+        </div>
+    </section>
 </body>
 
 </html>
