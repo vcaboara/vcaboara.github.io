@@ -222,25 +222,8 @@
                 return false;
             }
 
-            function isLikelyUsVisitor() {
-                if (GEO_COUNTRY_OVERRIDE) {
-                    return GEO_COUNTRY_OVERRIDE === "US";
-                }
-
-                var primaryLanguage = (navigator.language || "").toUpperCase();
-                var allLanguages = (navigator.languages || []).join(",").toUpperCase();
-                var localeLooksUs = /-US\b/.test(primaryLanguage) || /-US\b/.test(allLanguages);
-
-                var timezone = "";
-                try {
-                    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-                } catch (error) {
-                    timezone = "";
-                }
-
-                var timezoneLooksUs = /^America\//.test(timezone) && !/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Mexico_City|Monterrey|Cancun|Tijuana|Sao_Paulo|Buenos_Aires|Bogota|Lima|Santiago|Caracas)/.test(timezone);
-
-                return localeLooksUs && timezoneLooksUs;
+            function hasServerProvidedUsCountry() {
+                return GEO_COUNTRY_OVERRIDE === "US";
             }
 
             function shouldAutoGrantConsent() {
@@ -248,7 +231,7 @@
                     return false;
                 }
 
-                return isLikelyUsVisitor();
+                return hasServerProvidedUsCountry();
             }
 
             function hideBanner() {
