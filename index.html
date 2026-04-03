@@ -168,6 +168,7 @@
             var CONSENT_KEY = "arboreum-tracking-consent";
             var CONSENT_GRANTED = "granted";
             var CONSENT_DECLINED = "declined";
+            var GEO_COUNTRY_OVERRIDE = (window.ARBOREUM_GEO_COUNTRY || "").toUpperCase();
 
             function getConsent() {
                 try {
@@ -201,6 +202,55 @@
                 }
             }
 
+            function hasPrivacyOptOutSignal() {
+                var gpcEnabled = navigator.globalPrivacyControl === true;
+                var dntValue = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+                return gpcEnabled || dntValue === "1";
+            }
+
+            function isBotTraffic() {
+                var userAgent = (navigator.userAgent || "").toLowerCase();
+                var botPattern = /(bot|crawler|spider|slurp|bingpreview|gptbot|claudebot|ccbot|chatgpt-user|perplexitybot|applebot|bytespider|duckassistbot|google-extended)/;
+                if (botPattern.test(userAgent)) {
+                    return true;
+                }
+
+                if (navigator.webdriver === true) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            function isLikelyUsVisitor() {
+                if (GEO_COUNTRY_OVERRIDE) {
+                    return GEO_COUNTRY_OVERRIDE === "US";
+                }
+
+                var primaryLanguage = (navigator.language || "").toUpperCase();
+                var allLanguages = (navigator.languages || []).join(",").toUpperCase();
+                var localeLooksUs = /-US\b/.test(primaryLanguage) || /-US\b/.test(allLanguages);
+
+                var timezone = "";
+                try {
+                    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+                } catch (error) {
+                    timezone = "";
+                }
+
+                var timezoneLooksUs = /^America\//.test(timezone) && !/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|St_Johns|Mexico_City|Monterrey|Cancun|Tijuana|Sao_Paulo|Buenos_Aires|Bogota|Lima|Santiago|Caracas)/.test(timezone);
+
+                return localeLooksUs && timezoneLooksUs;
+            }
+
+            function shouldAutoGrantConsent() {
+                if (hasPrivacyOptOutSignal()) {
+                    return false;
+                }
+
+                return isLikelyUsVisitor();
+            }
+
             function hideBanner() {
                 var banner = document.getElementById("consent-banner");
                 if (banner) {
@@ -221,10 +271,19 @@
                 var declineButton = document.getElementById("consent-decline");
                 var manageButton = document.getElementById("manage-consent-btn");
 
+                if (isBotTraffic()) {
+                    hideBanner();
+                    return;
+                }
+
                 if (consent === CONSENT_GRANTED) {
                     loadRb2b();
                     hideBanner();
                 } else if (consent === CONSENT_DECLINED) {
+                    hideBanner();
+                } else if (shouldAutoGrantConsent()) {
+                    setConsent(CONSENT_GRANTED);
+                    loadRb2b();
                     hideBanner();
                 } else {
                     showBanner();
