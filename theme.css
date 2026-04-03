@@ -1,8 +1,10 @@
 /* =============================================================
-   theme.css — Shared light/dark mode styles for all pages.
-   Dark mode is activated by  html[data-theme="dark"]  which is
-    set by each page's inline <head> snippet (reading localStorage
-    or system preference). theme.js handles toggle and persistence.
+   theme.css — Shared theme styles for all pages.
+   This stylesheet defines the visual rules for the default theme
+   and, where present below, for html[data-theme="dark"].
+   The data-theme attribute is not set by this file; any theme
+   activation or persistence must be implemented by the pages/scripts
+   that include this stylesheet.
    ============================================================= */
 
 /* ── Scrollbar gutter stabilization ──────────────────────– */
@@ -141,13 +143,7 @@ html[data-theme="dark"] .links a:hover {
     border-color: #e0e0e0;
 }
 
-/* ── Dark mode — nav bar ────────────────────────────────────── */
-html[data-theme="dark"] .home-link-bar {
-    border-bottom-color: #333;
-}
-html[data-theme="dark"] .home-link-bar a {
-    color: #a8c4e0;
-}
+
 
 /* ── Dark mode — headings & text ───────────────────────────── */
 html[data-theme="dark"] h1,
