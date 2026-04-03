@@ -14,7 +14,7 @@ def check_sensitive_data(file_path):
 
     issues = []
 
-    # Patent number US 19/424,106 is intentionally published in the priority date label
+    # USPTO application number US 19/424,106 is intentionally published in the priority date label
 
     # Check for individual names in email addresses
     names = ['DGause', 'rmoran', 'jlilley', 'Mark Hagler', 'Ryan Elliott']
