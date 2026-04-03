@@ -191,10 +191,10 @@ html[data-theme="dark"] .section-title {
 }
 
 /* ── Dark mode — mandates.html ─────────────────────────────── */
-html[data-theme="dark"] h1 {
+html[data-theme="dark"] #aif-title {
     border-bottom-color: #555;
 }
-html[data-theme="dark"] h2 {
+html[data-theme="dark"] #strategic-mission-heading {
     border-left-color: #555;
 }
 html[data-theme="dark"] .funding-notice {

@@ -4,12 +4,17 @@
  * Place the inline init snippet in <head> to prevent flash of unstyled content.
  */
 
-function applyTheme(theme) {
+function applyTheme(theme, persistPreference) {
+    if (persistPreference === undefined) {
+        persistPreference = true;
+    }
     document.documentElement.setAttribute('data-theme', theme);
-    try {
-        localStorage.setItem('theme', theme);
-    } catch (e) {
-        // Gracefully degrade when storage is blocked (private/restricted modes).
+    if (persistPreference) {
+        try {
+            localStorage.setItem('theme', theme);
+        } catch (e) {
+            // Gracefully degrade when storage is blocked (private/restricted modes).
+        }
     }
     var btn = document.getElementById('theme-toggle');
     if (btn) {
@@ -29,7 +34,7 @@ function applyTheme(theme) {
 
 function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme') || 'light';
-    applyTheme(current === 'dark' ? 'light' : 'dark');
+    applyTheme(current === 'dark' ? 'light' : 'dark', true);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -38,6 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', toggleTheme);
         // Sync button label with currently active theme
         var current = document.documentElement.getAttribute('data-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        applyTheme(current);
+        applyTheme(current, false);
     }
 });
