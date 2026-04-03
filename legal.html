@@ -5,6 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual Patent Marking | Arboreum Commercial Solutions, LLC</title>
+    <script>
+        (function () {
+            var t = 'light';
+            try {
+                var storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'dark' || storedTheme === 'light') {
+                    t = storedTheme;
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            } catch (e) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
     <link rel="stylesheet" href="theme.css">
     <style>
         :root {
@@ -96,6 +114,7 @@
             <a href="ledger.html">Ledger</a>
             <a href="compliance-tracker.html">Compliance</a>
             <a href="legal.html">Legal</a>
+            <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
         </div>
         <h1 id="virtual-patent-marking">Virtual Patent Marking</h1>
 
@@ -124,6 +143,7 @@
             <p><a href="ledger.html">View Ledger</a></p>
         </footer>
     </div>
+    <script src="theme.js"></script>
 </body>
 
 </html>

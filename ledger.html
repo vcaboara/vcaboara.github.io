@@ -5,6 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arboreum Commercial Solutions, LLC | Sovereign Ledger</title>
+    <script>
+        (function () {
+            var t = 'light';
+            try {
+                var storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'dark' || storedTheme === 'light') {
+                    t = storedTheme;
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            } catch (e) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    t = 'dark';
+                }
+            }
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
     <link rel="stylesheet" href="theme.css">
     <style>
         :root {
@@ -266,6 +284,7 @@
             <a href="ledger.html">Ledger</a>
             <a href="compliance-tracker.html">Compliance</a>
             <a href="legal.html">Legal</a>
+            <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
         </div>
         <div class="header" id="ledger-header">
             <div class="label" style="color: var(--blue);">Priority Filing: 12/17/2025 (US 19/424,106) | Patent Pending
@@ -610,6 +629,7 @@
         // Only update values, not structure
         setInterval(updateValues, 200);
     </script>
+    <script src="theme.js"></script>
 </body>
 
 </html>
