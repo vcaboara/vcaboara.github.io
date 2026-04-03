@@ -1,7 +1,8 @@
 /* =============================================================
    theme.css — Shared light/dark mode styles for all pages.
    Dark mode is activated by  html[data-theme="dark"]  which is
-   set via theme.js (reading localStorage or system preference).
+    set by each page's inline <head> snippet (reading localStorage
+    or system preference). theme.js handles toggle and persistence.
    ============================================================= */
 
 /* ── Toggle button ─────────────────────────────────────────── */

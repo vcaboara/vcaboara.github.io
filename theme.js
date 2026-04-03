@@ -18,6 +18,13 @@ function applyTheme(theme) {
         btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
         btn.setAttribute('aria-label', btn.title);
     }
+    var fixedBtn = document.getElementById('theme-toggle-fixed');
+    if (fixedBtn) {
+        var fixedIsDark = theme === 'dark';
+        fixedBtn.textContent = fixedIsDark ? '☀' : '☾';
+        fixedBtn.title = fixedIsDark ? 'Switch to light mode' : 'Switch to dark mode';
+        fixedBtn.setAttribute('aria-label', fixedBtn.title);
+    }
 }
 
 function toggleTheme() {

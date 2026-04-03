@@ -117,8 +117,8 @@ def validate_off_the_shelf(file_path):
             # Check local links exist
             if link in ['index.html', 'standard.html', 'arboreum.html', 'mandates.html', 'off-the-shelf.html', 'legal.html', 'ledger.html', 'compliance-tracker.html']:
                 pass  # These are expected
-            elif link.endswith('.css') or link.endswith('.js'):
-                pass  # Stylesheet and script references are expected
+            elif link in ['theme.css', 'theme.js']:
+                pass  # Known shared theme assets
             else:
                 invalid_links.append(link)
 

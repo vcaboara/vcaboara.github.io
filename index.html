@@ -365,16 +365,26 @@
     <button id="theme-toggle-fixed" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
     <script src="theme.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        function syncThemeToggleFixedButton() {
             var btn = document.getElementById('theme-toggle-fixed');
-            if (btn) {
-                btn.addEventListener('click', toggleTheme);
-                var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-                btn.textContent = isDark ? '☀' : '☾';
-                btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
-                btn.setAttribute('aria-label', btn.title);
+            if (!btn) {
+                return;
             }
-        });
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            btn.textContent = isDark ? '☀' : '☾';
+            btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+            btn.setAttribute('aria-label', btn.title);
+        }
+
+        var themeToggleFixedButton = document.getElementById('theme-toggle-fixed');
+        if (themeToggleFixedButton) {
+            themeToggleFixedButton.addEventListener('click', function () {
+                toggleTheme();
+                syncThemeToggleFixedButton();
+            });
+        }
+
+        syncThemeToggleFixedButton();
     </script>
 
     <section id="consent-banner" class="consent-banner" role="region" aria-labelledby="consent-banner-title"
