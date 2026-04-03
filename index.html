@@ -205,7 +205,8 @@
             function hasPrivacyOptOutSignal() {
                 var gpcEnabled = navigator.globalPrivacyControl === true;
                 var dntValue = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
-                return gpcEnabled || dntValue === "1";
+                var normalizedDntValue = String(dntValue).toLowerCase();
+                return gpcEnabled || normalizedDntValue === "1" || normalizedDntValue === "yes";
             }
 
             function isBotTraffic() {
@@ -283,7 +284,11 @@
                 if (declineButton) {
                     declineButton.addEventListener("click", function () {
                         setConsent(CONSENT_DECLINED);
-                        hideBanner();
+                        if (window.reb2b && window.reb2b.loaded) {
+                            window.location.reload();
+                        } else {
+                            hideBanner();
+                        }
                     });
                 }
 
@@ -317,9 +322,10 @@
         </div>
     </footer>
 
-    <section id="consent-banner" class="consent-banner" role="dialog" aria-label="Tracking consent" hidden>
-        <h2>Privacy Settings</h2>
-        <p>
+    <section id="consent-banner" class="consent-banner" role="region" aria-labelledby="consent-banner-title"
+        aria-describedby="consent-banner-description" hidden>
+        <h2 id="consent-banner-title">Privacy Settings</h2>
+        <p id="consent-banner-description">
             We use RB2B for visit analytics and business attribution. To support international privacy requirements,
             RB2B only loads after you provide consent.
         </p>
