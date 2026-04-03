@@ -1,9 +1,58 @@
 /* =============================================================
-   theme.css — Shared light/dark mode styles for all pages.
-   Dark mode is activated by  html[data-theme="dark"]  which is
-    set by each page's inline <head> snippet (reading localStorage
-    or system preference). theme.js handles toggle and persistence.
+   theme.css — Shared theme styles for all pages.
+   This stylesheet defines the visual rules for the default theme
+   and, where present below, for html[data-theme="dark"].
+   The data-theme attribute is not set by this file; any theme
+   activation or persistence must be implemented by the pages/scripts
+   that include this stylesheet.
    ============================================================= */
+
+/* ── Scrollbar gutter stabilization ──────────────────────– */
+html {
+    scrollbar-gutter: stable;
+}
+
+/* ── Navigation bar baseline ─────────────────────────────– */
+.home-link-bar {
+    margin: 0 0 24px;
+    padding: 8px 12px;
+    border: 1px solid #d4d9df;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 44px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+    box-shadow: 0 6px 20px rgba(18, 30, 49, 0.08);
+    overflow-x: auto;
+}
+
+.home-link-bar a {
+    color: #111827;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.73rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s, text-decoration 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.home-link-bar a:hover {
+    color: #0b1323;
+    background: #e8eef7;
+    text-decoration: none;
+}
+
+.home-link-bar a:focus-visible {
+    outline: 2px solid #1d4ed8;
+    outline-offset: 1px;
+}
 
 /* ── Toggle button ─────────────────────────────────────────── */
 #theme-toggle {
@@ -52,6 +101,26 @@ html[data-theme="dark"] body {
     color: #e0e0e0;
 }
 
+/* ── Dark mode — navigation bar ──────────────────────────– */
+html[data-theme="dark"] .home-link-bar {
+    background: linear-gradient(180deg, #171a20 0%, #121419 100%);
+    border-color: #2b313a;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .home-link-bar a {
+    color: #b9d3ef;
+}
+
+html[data-theme="dark"] .home-link-bar a:hover {
+    color: #e3effc;
+    background: #243142;
+}
+
+html[data-theme="dark"] .home-link-bar a:focus-visible {
+    outline-color: #60a5fa;
+}
+
 /* ── Dark mode — index.html fixed toggle ───────────────────── */
 html[data-theme="dark"] #theme-toggle-fixed {
     background: rgba(40, 40, 40, 0.92);
@@ -74,13 +143,7 @@ html[data-theme="dark"] .links a:hover {
     border-color: #e0e0e0;
 }
 
-/* ── Dark mode — nav bar ────────────────────────────────────── */
-html[data-theme="dark"] .home-link-bar {
-    border-bottom-color: #333;
-}
-html[data-theme="dark"] .home-link-bar a {
-    color: #a8c4e0;
-}
+
 
 /* ── Dark mode — headings & text ───────────────────────────── */
 html[data-theme="dark"] h1,
