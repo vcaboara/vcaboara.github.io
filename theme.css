@@ -73,7 +73,6 @@ html {
 #theme-toggle:hover {
     opacity: 1;
 }
-
 @media (max-width: 1099px) {
     .home-link-bar {
         padding: 7px 10px;
