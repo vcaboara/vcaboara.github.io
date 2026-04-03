@@ -1,0 +1,219 @@
+/* =============================================================
+   theme.css — Shared light/dark mode styles for all pages.
+   Dark mode is activated by  html[data-theme="dark"]  which is
+   set via theme.js (reading localStorage or system preference).
+   ============================================================= */
+
+/* ── Toggle button ─────────────────────────────────────────── */
+#theme-toggle {
+    background: none;
+    border: 1px solid currentColor;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+    line-height: 1.4;
+    opacity: 0.7;
+    transition: opacity 0.2s, background 0.2s, color 0.2s;
+    color: inherit;
+    font-family: inherit;
+    flex-shrink: 0;
+}
+#theme-toggle:hover {
+    opacity: 1;
+}
+
+/* Fixed toggle for index.html (no nav bar) */
+#theme-toggle-fixed {
+    position: fixed;
+    top: 14px;
+    right: 18px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 1.05rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    z-index: 1000;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    color: #1a1a1a;
+    font-family: inherit;
+}
+#theme-toggle-fixed:hover {
+    background: rgba(240, 240, 240, 0.95);
+}
+
+/* ── Dark mode — global resets ─────────────────────────────── */
+html[data-theme="dark"] body {
+    background-color: #121212;
+    background: #121212;
+    color: #e0e0e0;
+}
+
+/* ── Dark mode — index.html fixed toggle ───────────────────── */
+html[data-theme="dark"] #theme-toggle-fixed {
+    background: rgba(40, 40, 40, 0.92);
+    border-color: #555;
+    color: #e0e0e0;
+}
+html[data-theme="dark"] #theme-toggle-fixed:hover {
+    background: rgba(60, 60, 60, 0.95);
+}
+
+/* ── Dark mode — index.html links ──────────────────────────── */
+html[data-theme="dark"] .links a {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #555;
+}
+html[data-theme="dark"] .links a:hover {
+    background: #e0e0e0;
+    color: #121212;
+    border-color: #e0e0e0;
+}
+
+/* ── Dark mode — nav bar ────────────────────────────────────── */
+html[data-theme="dark"] .home-link-bar {
+    border-bottom-color: #333;
+}
+html[data-theme="dark"] .home-link-bar a {
+    color: #a8c4e0;
+}
+
+/* ── Dark mode — headings & text ───────────────────────────── */
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4 {
+    color: #e0e0e0;
+}
+html[data-theme="dark"] .subtitle {
+    color: #999;
+}
+html[data-theme="dark"] footer {
+    color: #888;
+}
+
+/* ── Dark mode — borders & horizontal rules ────────────────── */
+html[data-theme="dark"] header {
+    border-bottom-color: #333;
+}
+html[data-theme="dark"] hr {
+    border-color: #333;
+}
+
+/* ── Dark mode — cards / boxes ─────────────────────────────── */
+html[data-theme="dark"] .brief,
+html[data-theme="dark"] .logic-box,
+html[data-theme="dark"] .pillar-card,
+html[data-theme="dark"] .priority-box,
+html[data-theme="dark"] .section-box,
+html[data-theme="dark"] .notice-card {
+    background: #1e1e1e;
+    border-color: #333;
+}
+html[data-theme="dark"] #ledger-content {
+    background: #1e1e1e;
+    border-color: #333;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Dark mode — standard.html specific ───────────────────── */
+html[data-theme="dark"] .deadline-alert {
+    background: #2a1010;
+    border-left-color: #d00;
+    color: #f0c0c0;
+}
+html[data-theme="dark"] .cta-dark {
+    background: #e0e0e0;
+    color: #121212;
+}
+
+/* ── Dark mode — tables ────────────────────────────────────── */
+html[data-theme="dark"] table {
+    color: #e0e0e0;
+}
+html[data-theme="dark"] th {
+    background: #252525;
+    color: #ccc;
+}
+html[data-theme="dark"] td {
+    border-bottom-color: #333;
+}
+html[data-theme="dark"] th {
+    border-bottom-color: #333;
+}
+html[data-theme="dark"] tr:nth-child(even) td {
+    background: #1a1a1a;
+}
+
+/* ── Dark mode — CSS variable overrides ────────────────────── */
+/* Pages that already use CSS variables (ledger, legal, off-the-shelf) */
+html[data-theme="dark"] {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --border: #333;
+    --text: #e0e0e0;
+    --high-vis: #f0f0f0;
+    --slate: #999;
+    --blue: #7cb8f5;
+    --red: #e57373;
+}
+
+/* ── Dark mode — compliance-tracker.html ───────────────────── */
+html[data-theme="dark"] .master-ticker,
+html[data-theme="dark"] .company-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .controls-bar {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+html[data-theme="dark"] .company-name {
+    color: #e0e0e0;
+}
+html[data-theme="dark"] .ticker-value,
+html[data-theme="dark"] .stat-value {
+    color: #e0e0e0;
+}
+
+/* ── Dark mode — arboreum.html briefs ──────────────────────── */
+html[data-theme="dark"] .brief h2 {
+    color: #e0e0e0;
+}
+html[data-theme="dark"] .brief p {
+    color: #bbb;
+}
+html[data-theme="dark"] .tagline {
+    color: #999;
+}
+html[data-theme="dark"] .section-title {
+    color: #888;
+}
+
+/* ── Dark mode — mandates.html ─────────────────────────────── */
+html[data-theme="dark"] h1 {
+    border-bottom-color: #555;
+}
+html[data-theme="dark"] h2 {
+    border-left-color: #555;
+}
+html[data-theme="dark"] .funding-notice {
+    background: #e0e0e0;
+    color: #121212;
+}
+html[data-theme="dark"] .pillar-card h3 {
+    color: #ccc;
+}
+html[data-theme="dark"] .pillar-card li {
+    color: #bbb;
+}
+
+/* ── Dark mode — legal.html ─────────────────────────────────── */
+html[data-theme="dark"] .container {
+    background: var(--card);
+    border-color: var(--border);
+}
+html[data-theme="dark"] .legal-section {
+    border-color: #333;
+}

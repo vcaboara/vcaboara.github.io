@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Off-the-Shelf Industrial Reference | Arboreum</title>
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="theme.css">
     <style>
         :root {
             --bg: #ffffff;
@@ -224,6 +231,7 @@
         <a href="ledger.html">Ledger</a>
         <a href="compliance-tracker.html">Compliance</a>
         <a href="legal.html">Legal</a>
+        <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
     </div>
 
     <div id="ots-content">
@@ -412,6 +420,7 @@
             <p id="patent-notice"><strong>Patent Pending</strong> | Last updated: February 24, 2026</p>
         </footer>
     </div>
+    <script src="theme.js"></script>
 </body>
 
 </html>

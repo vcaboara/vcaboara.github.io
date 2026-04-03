@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ACS 2026 Compliance Tracker</title>
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="theme.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -393,6 +400,7 @@
             <a href="ledger.html">Ledger</a>
             <a href="compliance-tracker.html">Compliance</a>
             <a href="legal.html">Legal</a>
+            <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
         </div>
         <div class="header" id="tracker-header">
             <h1 id="tracker-title">The ACS 2026 Compliance Tracker</h1>
@@ -592,6 +600,7 @@
         updateMasterTicker(); // Call immediately to avoid $0 display
         setInterval(updateMasterTicker, 100);
     </script>
+    <script src="theme.js"></script>
 </body>
 
 </html>

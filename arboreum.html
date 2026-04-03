@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arboreum Commercial Solutions, LLC</title>
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="theme.css">
     <style>
         * {
             margin: 0;
@@ -237,6 +244,7 @@
             <a href="ledger.html">Ledger</a>
             <a href="compliance-tracker.html">Compliance</a>
             <a href="legal.html">Legal</a>
+            <button id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">☾</button>
         </div>
         <header id="company-header">
             <h1 id="company-title">Arboreum Commercial Solutions, LLC</h1>
@@ -322,6 +330,7 @@
                     href="mailto:partnerships@arboreum.net">partnerships@arboreum.net</a></p>
         </footer>
     </div>
+    <script src="theme.js"></script>
 </body>
 
 </html>
