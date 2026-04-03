@@ -169,6 +169,12 @@
             var CONSENT_GRANTED = "granted";
             var CONSENT_DECLINED = "declined";
             var GEO_COUNTRY_OVERRIDE = (window.ARBOREUM_GEO_COUNTRY || "").toUpperCase();
+            var CONSENT_REQUIRED_COUNTRIES = {
+                AT: true, BE: true, BG: true, HR: true, CY: true, CZ: true, DK: true, EE: true,
+                FI: true, FR: true, DE: true, GR: true, HU: true, IE: true, IT: true, LV: true,
+                LT: true, LU: true, MT: true, NL: true, PL: true, PT: true, RO: true, SK: true,
+                SI: true, ES: true, SE: true, IS: true, LI: true, NO: true, GB: true, CH: true
+            };
 
             function getConsent() {
                 try {
@@ -223,16 +229,28 @@
                 return false;
             }
 
-            function hasServerProvidedUsCountry() {
-                return GEO_COUNTRY_OVERRIDE === "US";
+            function isConsentRequiredRegion() {
+                if (!GEO_COUNTRY_OVERRIDE) {
+                    return true;
+                }
+
+                return CONSENT_REQUIRED_COUNTRIES[GEO_COUNTRY_OVERRIDE] === true;
             }
 
-            function shouldAutoGrantConsent() {
-                if (hasPrivacyOptOutSignal()) {
+            function shouldLoadRb2bWithoutPrompt(currentConsent) {
+                if (hasPrivacyOptOutSignal() || isBotTraffic()) {
                     return false;
                 }
 
-                return hasServerProvidedUsCountry();
+                if (currentConsent === CONSENT_GRANTED) {
+                    return true;
+                }
+
+                if (currentConsent === CONSENT_DECLINED) {
+                    return false;
+                }
+
+                return !isConsentRequiredRegion();
             }
 
             function hideBanner() {
@@ -247,6 +265,11 @@
                 if (banner) {
                     banner.hidden = false;
                 }
+            }
+
+            var initialConsent = getConsent();
+            if (shouldLoadRb2bWithoutPrompt(initialConsent)) {
+                loadRb2b();
             }
 
             document.addEventListener("DOMContentLoaded", function () {
@@ -265,12 +288,10 @@
                     hideBanner();
                 } else if (consent === CONSENT_DECLINED) {
                     hideBanner();
-                } else if (shouldAutoGrantConsent()) {
-                    setConsent(CONSENT_GRANTED);
-                    loadRb2b();
-                    hideBanner();
-                } else {
+                } else if (isConsentRequiredRegion()) {
                     showBanner();
+                } else {
+                    hideBanner();
                 }
 
                 if (acceptButton) {
