@@ -48,7 +48,7 @@ def parse_page_specs(page_specs: list[str]) -> list[tuple[str, str]]:
     return targets
 
 
-def capture_screenshot(url: str, output_path: Path, full_page: bool) -> bool:
+def capture_screenshot(url: str, output_path: Path, full_page: bool, viewport_width: int, viewport_height: int) -> bool:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -60,7 +60,9 @@ def capture_screenshot(url: str, output_path: Path, full_page: bool) -> bool:
     try:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
-            page = browser.new_page(viewport={"width": 1440, "height": 1800})
+            page = browser.new_page(
+                viewport={"width": viewport_width, "height": viewport_height}
+            )
             page.goto(url, wait_until="networkidle")
             page.screenshot(path=str(output_path), full_page=full_page)
             browser.close()
@@ -71,7 +73,14 @@ def capture_screenshot(url: str, output_path: Path, full_page: bool) -> bool:
         return False
 
 
-def generate_screenshots(port: int, output_dir: Path, targets: list[tuple[str, str]], full_page: bool) -> bool:
+def generate_screenshots(
+    port: int,
+    output_dir: Path,
+    targets: list[tuple[str, str]],
+    full_page: bool,
+    viewport_width: int,
+    viewport_height: int,
+) -> bool:
     repo_root = Path(__file__).parent
     server = start_http_server(port=port, cwd=repo_root)
     try:
@@ -85,7 +94,12 @@ def generate_screenshots(port: int, output_dir: Path, targets: list[tuple[str, s
                 continue
             target_path = output_dir / output_name
             ok = capture_screenshot(
-                f"{base_url}/{page}", target_path, full_page=full_page)
+                f"{base_url}/{page}",
+                target_path,
+                full_page=full_page,
+                viewport_width=viewport_width,
+                viewport_height=viewport_height,
+            )
             all_ok = all_ok and ok
 
         if all_ok:
@@ -112,6 +126,10 @@ def main() -> int:
     )
     parser.add_argument("--no-full-page", action="store_true",
                         help="Disable full-page screenshots")
+    parser.add_argument("--viewport-width", type=int, default=1440,
+                        help="Viewport width in pixels (default: 1440)")
+    parser.add_argument("--viewport-height", type=int, default=1800,
+                        help="Viewport height in pixels (default: 1800)")
     args = parser.parse_args()
 
     targets = parse_page_specs(args.page)
@@ -121,6 +139,8 @@ def main() -> int:
         output_dir=output_dir,
         targets=targets,
         full_page=not args.no_full_page,
+        viewport_width=args.viewport_width,
+        viewport_height=args.viewport_height,
     )
     return 0 if ok else 1
 
