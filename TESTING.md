@@ -113,9 +113,9 @@ git commit --no-verify -m "message"
 
 ```bash
 # Run Python validations
-python validate_compliance_tracker.py
-python validate_mandates.py
-python validate_anchors.py
+python test/validate_compliance_tracker.py
+python test/validate_mandates.py
+python test/validate_anchors.py
 
 # Open browser tests
 start test/test_compliance_tracker.html   # Windows
