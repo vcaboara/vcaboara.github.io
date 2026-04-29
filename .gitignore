@@ -13,3 +13,5 @@ pr_body*.txt
 *_main_pr*.html
 index_main*.html
 notes.md
+
+.env
