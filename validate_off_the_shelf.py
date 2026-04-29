@@ -115,7 +115,7 @@ def validate_off_the_shelf(file_path):
         # Skip external links (those starting with http)
         if not link.startswith('http'):
             # Check local links exist
-            if link in ['index.html', 'standard.html', 'arboreum.html', 'mandates.html', 'off-the-shelf.html', 'legal.html', 'ledger.html', 'compliance-tracker.html']:
+            if link in ['index.html', 'standard.html', 'arboreum.html', 'mandates.html', 'off-the-shelf.html', 'legal.html', 'compliance-tracker.html']:
                 pass  # These are expected
             elif link in ['theme.css', 'theme.js']:
                 pass  # Known shared theme assets

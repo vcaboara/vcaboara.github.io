@@ -7,7 +7,6 @@
 
 ## Validation
 
-- [ ] Ran `python validate_ledger.py`
 - [ ] Ran `python validate_compliance_tracker.py`
 - [ ] Ran `python validate_mandates.py`
 - [ ] Ran `python validate_anchors.py`

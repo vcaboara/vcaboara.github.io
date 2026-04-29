@@ -19,7 +19,6 @@
 ## Test Requirements
 
 - For content/layout changes, run:
-  - `python validate_ledger.py`
   - `python validate_compliance_tracker.py`
   - `python validate_mandates.py`
   - `python validate_anchors.py`
