@@ -205,11 +205,7 @@ html[data-theme="dark"] .notice-card {
     background: #1e1e1e;
     border-color: #333;
 }
-html[data-theme="dark"] #ledger-content {
-    background: #1e1e1e;
-    border-color: #333;
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.4);
-}
+
 
 /* ── Dark mode — standard.html specific ───────────────────── */
 html[data-theme="dark"] .deadline-alert {
@@ -239,7 +235,7 @@ html[data-theme="dark"] tr:nth-child(even) td {
 }
 
 /* ── Dark mode — CSS variable overrides ────────────────────── */
-/* Pages that already use CSS variables (ledger, legal, off-the-shelf) */
+/* Pages that already use CSS variables (legal, off-the-shelf) */
 html[data-theme="dark"] {
     --bg: #121212;
     --card: #1e1e1e;

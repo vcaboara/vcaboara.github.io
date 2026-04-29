@@ -64,17 +64,6 @@ ANCHOR_REQUIREMENTS = {
         "about-acs-standard",
         "about-acs-standard-heading",
     ],
-    "ledger.html": [
-        "ledger-header",
-        "ledger-title",
-        "damages-multiplier",
-        "liability-summary",
-        "regulatory-mandates",
-        "path-to-compliance",
-        "documented-notices",
-        "verified-entity-logs",
-        "patent-marking",
-    ],
 }
 
 

@@ -29,19 +29,8 @@ confirm_continue() {
 # Note: Published patent reference usage (e.g., US 19/424,106) is allowed.
 # Keep content style consistent through page-level tests/validators.
 
-# Check for potentially exposed individual names in email addresses
-if git diff --cached --name-only | grep -q "ledger.html"; then
-    if git diff --cached ledger.html | grep -E "\+(.*)(DGause|rmoran|jlilley|stacy|Mark Hagler|Ryan Elliott)" >/dev/null; then
-        echo "⚠️  WARNING: Individual names may be exposed in email addresses"
-        echo "   Please verify names are properly redacted with [REDACTED]"
-        if ! confirm_continue; then
-            exit 1
-        fi
-    fi
-fi
-
 # Validate HTML structure of critical files
-for file in ledger.html legal.html compliance-tracker.html; do
+for file in legal.html compliance-tracker.html; do
     if git diff --cached --name-only | grep -q "^$file$"; then
         if ! git diff --cached "$file" | grep -E "^\+" | grep -v "^\+\+\+" | grep -q "</html>"; then
             if git diff --cached "$file" | tail -20 | grep -q "^\+"; then
@@ -63,15 +52,6 @@ if git diff --cached --name-only | grep -q "compliance-tracker.html"; then
     fi
 fi
 
-# Check that LLC is present in company name references
-if git diff --cached --name-only | grep -q "ledger.html"; then
-    if git diff --cached ledger.html | grep -E "^\+.*Arboreum Commercial Solutions[^L]" | grep -v "LLC" >/dev/null; then
-        echo "⚠️  WARNING: 'Arboreum Commercial Solutions' should include 'LLC'"
-        if ! confirm_continue; then
-            exit 1
-        fi
-    fi
-fi
 
 echo "✓ Pre-commit checks passed"
 exit 0
