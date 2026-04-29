@@ -5,7 +5,7 @@
 ### Browser-based Tests
 
 #### Compliance Tracker Tests
-Open `test_compliance_tracker.html` in a browser to run:
+Open `test/test_compliance_tracker.html` in a browser to run:
 - Master ticker real-time updates (100ms intervals)
 - Toggle switch functionality
 - Card rendering (5 corporate cards)
@@ -19,7 +19,7 @@ Open `test_compliance_tracker.html` in a browser to run:
 
 #### Compliance Tracker Validation
 ```bash
-python validate_compliance_tracker.py
+python test/validate_compliance_tracker.py
 ```
 
 Checks for:
@@ -33,7 +33,7 @@ Checks for:
 
 #### Mandates Validation
 ```bash
-python validate_mandates.py
+python test/validate_mandates.py
 ```
 
 Checks for:
@@ -45,7 +45,7 @@ Checks for:
 
 #### Anchor ID Validation
 ```bash
-python validate_anchors.py
+python test/validate_anchors.py
 ```
 
 Checks for:
@@ -118,15 +118,15 @@ python validate_mandates.py
 python validate_anchors.py
 
 # Open browser tests
-start test_compliance_tracker.html   # Windows
+start test/test_compliance_tracker.html   # Windows
 # or
-open test_compliance_tracker.html    # Mac/Linux
+open test/test_compliance_tracker.html    # Mac/Linux
 ```
 
 ## CI/CD Integration
 
 PR checks are now automated via `.github/workflows/pr-checks.yml`:
-1. Runs Python validators (`validate_compliance_tracker.py`, `validate_mandates.py`, `validate_anchors.py`)
+1. Runs Python validators (`test/validate_compliance_tracker.py`, `test/validate_mandates.py`, `test/validate_anchors.py`)
 2. Enforces UI screenshot policy for PRs touching UI-facing files (`.html/.css/.scss/.sass/.jsx/.tsx`)
 3. Fails PRs missing BEFORE/AFTER screenshot evidence for UI changes
 
