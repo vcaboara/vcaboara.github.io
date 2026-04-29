@@ -97,7 +97,7 @@ def validate_file(file_path, required_ids):
 def main():
     print("🧪 Running Anchor ID Validation\n")
 
-    root = Path(__file__).parent
+    root = Path(__file__).parent.parent
     all_issues = {}
 
     for file_name, required_ids in ANCHOR_REQUIREMENTS.items():

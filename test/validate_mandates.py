@@ -110,7 +110,7 @@ def validate_mandates(file_path):
 
 
 if __name__ == '__main__':
-    file_path = Path(__file__).parent / 'mandates.html'
+    file_path = Path(__file__).parent.parent / 'mandates.html'
 
     if not file_path.exists():
         print(f"❌ File not found: {file_path}")

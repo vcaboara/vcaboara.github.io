@@ -118,7 +118,7 @@ def validate_compliance_tracker(file_path):
 def main():
     print("🧪 Running Compliance Tracker Validation Tests\n")
 
-    tracker_path = Path(__file__).parent / 'compliance-tracker.html'
+    tracker_path = Path(__file__).parent.parent / 'compliance-tracker.html'
 
     if not tracker_path.exists():
         print(f"❌ ERROR: {tracker_path} not found")
