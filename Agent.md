@@ -38,7 +38,6 @@ The Freedom: Once the "10/10" candidate appears, they will be the one thanking y
 - Local hooks are versioned under `.githooks` and installed via `utils/install_git_hooks.ps1`.
 - Commits on `main`/`master` and pushes to `main`/`master` are blocked locally.
 - Core validation suite:
-  - `validate_ledger.py`
   - `validate_compliance_tracker.py`
   - `validate_mandates.py`
   - `validate_anchors.py`

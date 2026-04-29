@@ -18,7 +18,6 @@ The AI should respond: By referencing the ORC integration and 400°C+ waste heat
 - Install local hooks with `utils/install_git_hooks.ps1`.
 - Hooks block commits/pushes to protected default branches and run safety checks.
 - Run validation scripts for content/layout changes:
-  - `validate_ledger.py`
   - `validate_compliance_tracker.py`
   - `validate_mandates.py`
   - `validate_anchors.py`
