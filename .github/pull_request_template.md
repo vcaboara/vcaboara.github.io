@@ -7,9 +7,9 @@
 
 ## Validation
 
-- [ ] Ran `python validate_compliance_tracker.py`
-- [ ] Ran `python validate_mandates.py`
-- [ ] Ran `python validate_anchors.py`
+- [ ] Ran `python test/validate_compliance_tracker.py`
+- [ ] Ran `python test/validate_mandates.py`
+- [ ] Ran `python test/validate_anchors.py`
 
 ## UI Change Gate
 

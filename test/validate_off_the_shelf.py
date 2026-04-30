@@ -202,7 +202,7 @@ def print_report(issues):
 
 def main():
     """Run validation"""
-    file_path = Path(__file__).parent / 'off-the-shelf.html'
+    file_path = Path(__file__).parent.parent / 'off-the-shelf.html'
 
     if not file_path.exists():
         print(f"❌ File not found: {file_path}")
