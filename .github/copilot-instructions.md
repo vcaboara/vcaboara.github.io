@@ -19,10 +19,10 @@
 ## Test Requirements
 
 - For content/layout changes, run:
-  - `python validate_compliance_tracker.py`
-  - `python validate_mandates.py`
-  - `python validate_anchors.py`
-- When changing anchor IDs, update `validate_anchors.py` requirements.
+  - `python test/validate_compliance_tracker.py`
+  - `python test/validate_mandates.py`
+  - `python test/validate_anchors.py`
+- When changing anchor IDs, update `test/validate_anchors.py` requirements.
 - New work should include new tests; updates should include updated tests.
 
 ## PR UI Change Policy

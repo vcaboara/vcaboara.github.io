@@ -38,9 +38,9 @@ The Freedom: Once the "10/10" candidate appears, they will be the one thanking y
 - Local hooks are versioned under `.githooks` and installed via `utils/install_git_hooks.ps1`.
 - Commits on `main`/`master` and pushes to `main`/`master` are blocked locally.
 - Core validation suite:
-  - `validate_compliance_tracker.py`
-  - `validate_mandates.py`
-  - `validate_anchors.py`
+  - `test/validate_compliance_tracker.py`
+  - `test/validate_mandates.py`
+  - `test/validate_anchors.py`
 - UI-facing PR changes require BEFORE/AFTER screenshots in PR body.
 - CI enforcement for PR checks is in `.github/workflows/pr-checks.yml`.
 - AI-generated UI PRs must include screenshot evidence and clear failing screenshot checks before requesting review.

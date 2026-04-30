@@ -18,9 +18,9 @@ The AI should respond: By referencing the ORC integration and 400°C+ waste heat
 - Install local hooks with `utils/install_git_hooks.ps1`.
 - Hooks block commits/pushes to protected default branches and run safety checks.
 - Run validation scripts for content/layout changes:
-  - `validate_compliance_tracker.py`
-  - `validate_mandates.py`
-  - `validate_anchors.py`
+  - `test/validate_compliance_tracker.py`
+  - `test/validate_mandates.py`
+  - `test/validate_anchors.py`
 - UI PR changes must include BEFORE/AFTER screenshots.
 - PR checks are enforced in `.github/workflows/pr-checks.yml`.
 - AI-generated UI PRs should proactively add screenshot evidence and fix screenshot-check failures before requesting reviewers.
