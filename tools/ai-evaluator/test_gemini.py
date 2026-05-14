@@ -27,9 +27,9 @@ try:
         print(f"  - {model.name}")
         if hasattr(model, 'supported_generation_methods'):
             print(f"    Supports: {model.supported_generation_methods}")
-    
+
     print("\n3. Testing simple generation with gemini-3-flash-preview...")
-    
+
     response = client.models.generate_content(
         model='models/gemini-3-flash-preview',
         contents='Say "Hello, World!" in exactly those words.'
