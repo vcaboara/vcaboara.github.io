@@ -4,6 +4,15 @@
 
 ---
 
+## Working Preferences
+
+### Copilot Interaction Style
+- **Execute, don't suggest**: Run commands and create/edit files directly rather than providing copy/paste instructions
+- **Accessibility**: User has limited hand use - Copilot should handle all command execution
+- **Automation first**: Automate tasks wherever possible to minimize manual intervention
+
+---
+
 ## Current Strategic Position (May 2026)
 
 ### Patent Filing
