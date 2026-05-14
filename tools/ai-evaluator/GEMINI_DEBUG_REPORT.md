@@ -47,9 +47,17 @@ python test_gemini.py
 
 ## Status
 ✓ Package updated to latest version (google-genai==2.2.0)
-✓ Code updated to use new API
-✓ Error identified: Invalid API key
-⚠ Action Required: User needs to add valid API key to `.env`
+✓ Code updated to use new API with correct syntax
+✓ API key validated and working
+✓ Gemini 3 Flash Preview tested and working
+✓ Tool fully functional with Gemini provider
+
+## Working Models (Verified May 14, 2026)
+- **gemini-3-flash-preview** - ✓ Working with free tier
+- **gemini-2.5-flash** - ✓ Working with free tier  
+- **gemini-2.5-pro** - ⚠ Quota exhausted (free tier limit reached)
+
+Recommended: Use `gemini-3-flash-preview` for best performance with free tier quota.
 
 ## Next Steps
 1. Obtain valid Gemini API key from Google AI Studio
