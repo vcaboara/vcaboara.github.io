@@ -12,22 +12,14 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, List
 
-# Load .env file if present
-try:
-    from dotenv import load_dotenv
-    load_dotenv()  # Load from .env file in current directory
-except ImportError:
-    pass  # python-dotenv not installed, will use environment variables only
-
-# Requires: pip install openai anthropic google-genai python-dotenv
+# Requires: pip install openai anthropic google-generativeai
 try:
     from openai import OpenAI
     from anthropic import Anthropic
-    from google import genai
-    from google.genai import types
+    import google.generativeai as genai
 except ImportError:
     print("Error: Required packages not installed.")
-    print("Run: pip install -r ai_conversation_requirements.txt")
+    print("Run: pip install openai anthropic google-generativeai")
     sys.exit(1)
 
 
@@ -45,8 +37,11 @@ class AIAgent:
         elif self.provider == "anthropic":
             self.client = Anthropic(api_key=api_key)
         elif self.provider == "gemini":
-            self.client = genai.Client(api_key=api_key)
-            self.model_name = model
+            genai.configure(api_key=api_key)
+            self.client = genai.GenerativeModel(
+                model_name=model,
+                system_instruction=system_prompt
+            )
         else:
             raise ValueError(f"Unsupported provider: {provider}")
 
@@ -75,15 +70,7 @@ class AIAgent:
                 return response.content[0].text
 
             elif self.provider == "gemini":
-                response = self.client.models.generate_content(
-                    model=self.model_name,
-                    contents=message,
-                    config=types.GenerateContentConfig(
-                        system_instruction=self.system_prompt,
-                        temperature=0.7,
-                        max_output_tokens=2000
-                    )
-                )
+                response = self.client.generate_content(message)
                 return response.text
 
         except Exception as e:
@@ -124,8 +111,8 @@ class ConversationManager:
         )
 
         # Check for similarity in length (converged documents tend to be similar length)
-        length_ratio = (min(len(response1), len(response2)) /
-                        max(len(response1), len(response2)))
+        length_ratio = min(len(response1), len(response2)) / \
+            max(len(response1), len(response2))
 
         # Simple convergence: both mention agreement or length is very similar
         return agreement_count >= 2 or length_ratio > self.convergence_threshold
@@ -249,112 +236,48 @@ def main():
     )
     parser.add_argument(
         '--output', '-o',
-        default='output',
-        help='Output directory for results (default: output/)'
-    )
-    parser.add_argument(
-        '--context', '-c',
-        help='Path to knowledge base directory for persistent IP context (e.g., knowledge-base/ip-context)'
+        default='ai_conversations',
+        help='Output directory for results (default: ai_conversations)'
     )
     args = parser.parse_args()
 
-    # Configuration - modify these as needed
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
-    # Currently using Gemini for both agents (OpenAI key invalid)
-    if not GEMINI_API_KEY:
-        print("Error: GEMINI_API_KEY not found.")
-        print("Set GEMINI_API_KEY in your .env file or as an environment variable.")
+    if not any([OPENAI_API_KEY, GEMINI_API_KEY, ANTHROPIC_API_KEY]):
+        print("Error: No API keys found.")
+        print("Set OPENAI_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY environment variables.")
         sys.exit(1)
 
-    # Load knowledge base context if specified
-    kb_context = ""
-    if args.context:
-        kb_dir = Path(args.context)
-        if kb_dir.exists():
-            print(f"Loading knowledge base from: {kb_dir}")
-            kb_files = list(kb_dir.glob("*.md"))
-            if kb_files:
-                kb_content = []
-                for md_file in kb_files:
-                    with open(md_file, 'r', encoding='utf-8') as f:
-                        kb_content.append(f"## {md_file.stem.replace('-', ' ').title()}\n\n{f.read()}\n")
-                
-                kb_context = f"""
-
----
-
-# PERSISTENT IP & BUSINESS CONTEXT
-
-You have access to pre-loaded knowledge base context. Reference this without requiring re-explanation:
-
-{''.join(kb_content)}
-
----
-
-Integrate this knowledge naturally when relevant.
-
-"""
-                print(f"✓ Loaded {len(kb_files)} context files ({sum(len(c) for c in kb_content)} characters)")
-            else:
-                print(f"⚠ No .md files found in {kb_dir}")
-        else:
-            print(f"⚠ Knowledge base directory not found: {kb_dir}")
-
     # Define the two AI agents with different roles - optimized for tech brief evaluation
-    # Using Gemini 3 Flash Preview (verified working)
-    # Agent 1: Gemini - Technical Evaluator
+    # Agent 1: ChatGPT (OpenAI) - Technical Evaluator
     agent1 = AIAgent(
         name="Technical Evaluator",
-        provider="gemini",
-        model="models/gemini-3-flash-preview",
+        provider="openai" if OPENAI_API_KEY else "gemini",
+        model="gpt-4o" if OPENAI_API_KEY else "gemini-1.5-pro",
         system_prompt=(
             "You are a technical evaluator specializing in intellectual property and technology assessment. "
             "Your role is to analyze tech briefs for technical accuracy, innovation potential, "
             "patentability, prior art concerns, and commercial viability. "
             "Provide detailed technical critique and identify strengths, weaknesses, and areas needing clarification. "
             "When you believe the brief is comprehensive and accurate, clearly state your approval."
-        ) + kb_context,
-        api_key=GEMINI_API_KEY
-    )
-
-    # Agent 2: Gemini - Strategic Analyst
-    agent2 = AIAgent(
-        name="Strategic Analyst",
-        provider="gemini",
-        model="models/gemini-3-flash-preview",
-        system_prompt=(
-            "You are a strategic analyst focused on IP strategy, market positioning, and business value. "
-            "Your role is to evaluate tech briefs for market opportunity, competitive advantage, "
-            "strategic alignment, and implementation feasibility. "
-            "Ensure the brief clearly articulates the invention's value proposition and differentiation. "
-            "When the brief meets strategic requirements, explicitly confirm your approval."
-        ) + kb_context,
-        api_key=GEMINI_API_KEY
-    )
-
-    # Get initial prompt from command line, file, or use default
-    initial_topic = None
-
-    # Get initial prompt from command line, file, or use default
-    initial_topic = None
+        ),
+      Get initial prompt from command line, file, or use default
+    initial_topic=None
 
     if args.prompt:
         # Check if it's a file path
-        prompt_path = Path(args.prompt)
+        prompt_path=Path(args.prompt)
         if prompt_path.exists() and prompt_path.suffix in ['.txt', '.md']:
             print(f"Loading prompt from file: {prompt_path}")
             with open(prompt_path, 'r', encoding='utf-8') as f:
-                initial_topic = f.read()
+                initial_topic=f.read()
         else:
             # Treat as direct prompt text
-            initial_topic = args.prompt
+            initial_topic=args.prompt
 
     # Use default template if no prompt provided
     if not initial_topic:
-        initial_topic = """
+        initial_topic="""
 Please evaluate and refine the following technology brief:
 
 [TECHNOLOGY BRIEF]
@@ -387,14 +310,27 @@ comprehensive document ready for IP protection.
         print("For better results, provide your tech brief:")
         print("  python ai_conversation.py --prompt 'your prompt here'")
         print("  python ai_conversation.py --prompt path/to/your_brief.md")
-        print("")
+        print("")scribe your technical approach and innovation]
+
+    Key Features:
+    - [Feature 1]
+    - [Feature 2]
+        max_rounds = args.rounds,
+        convergence_threshold = 0.85
+    )
+
+    # Run the conversation
+    results = manager.run_conversation()
+
+    # Save results
+    manager.save_results(results, output_dir=args.output)    """
 
     # Create conversation manager
     manager = ConversationManager(
         agent1=agent1,
         agent2=agent2,
         initial_prompt=initial_topic,
-        max_rounds=args.rounds,
+        max_rounds=10,
         convergence_threshold=0.85
     )
 
@@ -402,7 +338,7 @@ comprehensive document ready for IP protection.
     results = manager.run_conversation()
 
     # Save results
-    manager.save_results(results, output_dir=args.output)
+    manager.save_results(results)
 
     print(f"\n{'='*80}")
     print("Conversation complete!")
