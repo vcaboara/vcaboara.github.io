@@ -14,4 +14,10 @@ pr_body*.txt
 index_main*.html
 notes.md
 
+# Environment files
 .env
+
+# Duplicate files from tools/ (keep only in tools/)
+/AI_TECH_BRIEF_README.md
+/ai_conversation.py
+/archive/site_with_tech_brief.html
