@@ -18,13 +18,13 @@
 #>
 
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$Prompt,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [int]$Rounds = 10,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]$Output = "tools/ai-evaluator/output"
 )
 
@@ -58,11 +58,12 @@ if ($exitCode -eq 0) {
     if ($outputDir) {
         Write-Host "`nLatest files:" -ForegroundColor Cyan
         Get-ChildItem $outputDir | 
-            Sort-Object LastWriteTime -Descending | 
-            Select-Object -First 3 | 
-            ForEach-Object { Write-Host "  - $($_.Name)" }
+        Sort-Object LastWriteTime -Descending | 
+        Select-Object -First 3 | 
+        ForEach-Object { Write-Host "  - $($_.Name)" }
     }
-} else {
+}
+else {
     Write-Host "`n✗ Error: Exit code $exitCode" -ForegroundColor Red
 }
 
