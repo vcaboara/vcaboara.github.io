@@ -51,7 +51,7 @@ python tools/ai-evaluator/ai_conversation.py `
 $exitCode = $LASTEXITCODE
 
 if ($exitCode -eq 0) {
-    Write-Host "`n✓ Conversation complete!" -ForegroundColor Green
+    Write-Host "`n[SUCCESS] Conversation complete!" -ForegroundColor Green
     
     # Show latest output files
     $outputDir = Get-Item $Output -ErrorAction SilentlyContinue
@@ -64,7 +64,7 @@ if ($exitCode -eq 0) {
     }
 }
 else {
-    Write-Host "`n✗ Error: Exit code $exitCode" -ForegroundColor Red
+    Write-Host "`n[ERROR] Exit code $exitCode" -ForegroundColor Red
 }
 
 exit $exitCode
