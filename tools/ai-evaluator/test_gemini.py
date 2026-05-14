@@ -18,24 +18,26 @@ print(f"API Key loaded: {GEMINI_API_KEY[:10]}...")
 try:
     print("\n1. Creating Gemini client...")
     client = genai.Client(api_key=GEMINI_API_KEY)
-    print("✓ Client created successfully")
+    print("OK Client created successfully")
+
+    print("\n2. Listing available models...")
+    models = client.models.list()
+    print("Available models:")
+    for model in models:
+        print(f"  - {model.name}")
+        if hasattr(model, 'supported_generation_methods'):
+            print(f"    Supports: {model.supported_generation_methods}")
     
-    print("\n2. Testing simple generation...")
+    print("\n3. Testing simple generation with gemini-3-flash-preview...")
+    
     response = client.models.generate_content(
-        model='gemini-1.5-pro',
-        contents='Say "Hello, World!" in exactly those words.',
-        config=types.GenerateContentConfig(
-            temperature=0.1,
-            max_output_tokens=50
-        )
+        model='models/gemini-3-flash-preview',
+        contents='Say "Hello, World!" in exactly those words.'
     )
-    
-    print(f"✓ Response received: {response.text}")
-    print("\n✓ Gemini API connection working!")
-    
+
+    print(f"OK Response received: {response.text}")
+    print("\nOK Gemini API connection working!")
+
 except Exception as e:
-    print(f"\n✗ Error: {type(e).__name__}")
-    print(f"  Message: {str(e)}")
-    print(f"\nFull error details:")
-    import traceback
-    traceback.print_exc()
+    print(f"\nX Error: {type(e).__name__}")
+    print(f"  Message: {str(e)[:200]}")  # Truncate long messages
