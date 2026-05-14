@@ -280,8 +280,9 @@ def main():
                 kb_content = []
                 for md_file in kb_files:
                     with open(md_file, 'r', encoding='utf-8') as f:
-                        kb_content.append(f"## {md_file.stem.replace('-', ' ').title()}\n\n{f.read()}\n")
-                
+                        kb_content.append(
+                            f"## {md_file.stem.replace('-', ' ').title()}\n\n{f.read()}\n")
+
                 kb_context = f"""
 
 ---
@@ -297,7 +298,8 @@ You have access to pre-loaded knowledge base context. Reference this without req
 Integrate this knowledge naturally when relevant.
 
 """
-                print(f"✓ Loaded {len(kb_files)} context files ({sum(len(c) for c in kb_content)} characters)")
+                print(
+                    f"✓ Loaded {len(kb_files)} context files ({sum(len(c) for c in kb_content)} characters)")
             else:
                 print(f"⚠ No .md files found in {kb_dir}")
         else:
