@@ -75,10 +75,7 @@ class AIAgent:
                 return response.content[0].text
 
             elif self.provider == "gemini":
-                response = self.client.generate_content(message)
-                return response.text
-
-        except Exception as e:models.generate_content(
+                response = self.client.models.generate_content(
                     model=self.model_name,
                     contents=message,
                     config=types.GenerateContentConfig(
@@ -86,7 +83,10 @@ class AIAgent:
                         temperature=0.7,
                         max_output_tokens=2000
                     )
-                
+                )
+                return response.text
+
+        except Exception as e:
             return f"Error generating response: {str(e)}"
 
 
@@ -94,38 +94,38 @@ class ConversationManager:
     """Manages the conversation between two AI agents."""
 
     def __init__(self, agent1: AIAgent, agent2: AIAgent,
-                 initial_prompt: str, max_rounds: int = 10,
-                 convergence_threshold: float = 0.85):
-        self.agent1 = agent1
-        self.agent2 = agent2
-        self.initial_prompt = initial_prompt
-        self.max_rounds = max_rounds
-        self.convergence_threshold = convergence_threshold
-        self.conversation_history: List[Dict] = []
+                 initial_prompt: str, max_rounds: int=10,
+                 convergence_threshold: float=0.85):
+        self.agent1=agent1
+        self.agent2=agent2
+        self.initial_prompt=initial_prompt
+        self.max_rounds=max_rounds
+        self.convergence_threshold=convergence_threshold
+        self.conversation_history: List[Dict]=[]
 
     def check_convergence(self, response1: str, response2: str) -> bool:
         """
         Check if the two responses have converged (are similar enough).
         Simple heuristic: check if they contain similar key phrases or agreement markers.
         """
-        response1_lower = response1.lower()
-        response2_lower = response2.lower()
+        response1_lower=response1.lower()
+        response2_lower=response2.lower()
 
         # Check for explicit agreement
-        agreement_phrases = [
+        agreement_phrases=[
             "i agree", "agreed", "looks good", "that works",
             "perfect", "approved", "accepted", "final version",
             "no changes needed", "we have consensus"
         ]
 
-        agreement_count = sum(
+        agreement_count=sum(
             1 for phrase in agreement_phrases
             if phrase in response1_lower or phrase in response2_lower
         )
 
         # Check for similarity in length (converged documents tend to be similar length)
-        length_ratio = min(len(response1), len(response2)) / \
-            max(len(response1), len(response2))
+        length_ratio = (min(len(response1), len(response2)) / 
+                       max(len(response1), len(response2)))
 
         # Simple convergence: both mention agreement or length is very similar
         return agreement_count >= 2 or length_ratio > self.convergence_threshold
@@ -137,12 +137,12 @@ class ConversationManager:
             f"Starting conversation between {self.agent1.name} and {self.agent2.name}")
         print(f"{'='*80}\n")
 
-        current_message = self.initial_prompt
-        current_speaker = self.agent1
-        other_speaker = self.agent2
+        current_message=self.initial_prompt
+        current_speaker=self.agent1
+        other_speaker=self.agent2
 
-        converged = False
-        round_num = 0
+        converged=False
+        round_num=0
 
         while round_num < self.max_rounds and not converged:
             round_num += 1
@@ -150,7 +150,7 @@ class ConversationManager:
             print(f"{current_speaker.name} is responding...\n")
 
             # Get response from current speaker
-            response = current_speaker.respond(current_message)
+            response=current_speaker.respond(current_message)
 
             # Log the exchange
             self.conversation_history.append({
@@ -166,16 +166,16 @@ class ConversationManager:
 
             # Check for convergence if we have at least 2 rounds
             if round_num >= 2:
-                prev_response = self.conversation_history[-2]["message"]
+                prev_response=self.conversation_history[-2]["message"]
                 if self.check_convergence(prev_response, response):
-                    converged = True
+                    converged=True
                     print(
                         f"\n✓ Convergence detected after {round_num} rounds!")
                     break
 
             # Prepare next message and swap speakers
-            current_message = f"Here is the current version from {current_speaker.name}:\n\n{response}\n\nPlease review, provide feedback, and suggest improvements or confirm if this is ready."
-            current_speaker, other_speaker = other_speaker, current_speaker
+            current_message=f"Here is the current version from {current_speaker.name}:\n\n{response}\n\nPlease review, provide feedback, and suggest improvements or confirm if this is ready."
+            current_speaker, other_speaker=other_speaker, current_speaker
 
             # Small delay to avoid rate limits
             time.sleep(1)
@@ -185,7 +185,7 @@ class ConversationManager:
                 f"\n⚠ Reached maximum rounds ({self.max_rounds}) without full convergence.")
 
         # Extract final document (last response)
-        final_document = self.conversation_history[-1]["message"] if self.conversation_history else ""
+        final_document=self.conversation_history[-1]["message"] if self.conversation_history else ""
 
         return {
             "converged": converged,
@@ -194,25 +194,25 @@ class ConversationManager:
             "conversation_history": self.conversation_history
         }
 
-    def save_results(self, results: Dict, output_dir: str = "ai_conversations"):
+    def save_results(self, results: Dict, output_dir: str="ai_conversations"):
         """Save the conversation results to files."""
         os.makedirs(output_dir, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp=datetime.now().strftime("%Y%m%d_%H%M%S")
 
         # Save full conversation log
-        log_file = os.path.join(output_dir, f"conversation_{timestamp}.json")
+        log_file=os.path.join(output_dir, f"conversation_{timestamp}.json")
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
         print(f"\n✓ Conversation log saved to: {log_file}")
 
         # Save final document
-        doc_file = os.path.join(output_dir, f"final_document_{timestamp}.txt")
+        doc_file=os.path.join(output_dir, f"final_document_{timestamp}.txt")
         with open(doc_file, 'w', encoding='utf-8') as f:
             f.write(results["final_document"])
         print(f"✓ Final document saved to: {doc_file}")
 
         # Save readable transcript
-        transcript_file = os.path.join(
+        transcript_file=os.path.join(
             output_dir, f"transcript_{timestamp}.txt")
         with open(transcript_file, 'w', encoding='utf-8') as f:
             f.write(
@@ -234,7 +234,7 @@ def main():
     """Main entry point for the AI conversation script."""
 
     # Parse command line arguments
-    parser = argparse.ArgumentParser(
+    parser=argparse.ArgumentParser(
         description='Run a conversation between two AI agents to evaluate/refine content'
     )
     parser.add_argument(
@@ -252,12 +252,12 @@ def main():
         default='output',
         help='Output directory for results (default: output/)'
     )
-    args = parser.parse_args()
+    args=parser.parse_args()
 
     # Configuration - modify these as needed
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+    OPENAI_API_KEY=os.environ.get("OPENAI_API_KEY", "")
+    GEMINI_API_KEY=os.environ.get("GEMINI_API_KEY", "")
+    ANTHROPIC_API_KEY=os.environ.get("ANTHROPIC_API_KEY", "")
 
     # Currently using OpenAI for both agents
     if not OPENAI_API_KEY:
@@ -268,7 +268,7 @@ def main():
     # Define the two AI agents with different roles - optimized for tech brief evaluation
     # Using OpenAI (ChatGPT) for both agents since Gemini billing is unavailable
     # Agent 1: ChatGPT (OpenAI) - Technical Evaluator
-    agent1 = AIAgent(
+    agent1=AIAgent(
         name="Technical Evaluator",
         provider="openai",
         model="gpt-4o",
@@ -283,7 +283,7 @@ def main():
     )
 
     # Agent 2: ChatGPT (OpenAI) - Strategic Analyst
-    agent2 = AIAgent(
+    agent2=AIAgent(
         name="Strategic Analyst",
         provider="openai",
         model="gpt-4o",
@@ -298,25 +298,25 @@ def main():
     )
 
     # Get initial prompt from command line, file, or use default
-    initial_topic = None
+    initial_topic=None
 
     # Get initial prompt from command line, file, or use default
-    initial_topic = None
+    initial_topic=None
 
     if args.prompt:
         # Check if it's a file path
-        prompt_path = Path(args.prompt)
+        prompt_path=Path(args.prompt)
         if prompt_path.exists() and prompt_path.suffix in ['.txt', '.md']:
             print(f"Loading prompt from file: {prompt_path}")
             with open(prompt_path, 'r', encoding='utf-8') as f:
-                initial_topic = f.read()
+                initial_topic=f.read()
         else:
             # Treat as direct prompt text
-            initial_topic = args.prompt
+            initial_topic=args.prompt
 
     # Use default template if no prompt provided
     if not initial_topic:
-        initial_topic = """
+        initial_topic="""
 Please evaluate and refine the following technology brief:
 
 [TECHNOLOGY BRIEF]
@@ -342,7 +342,7 @@ Potential Applications:
 - [Application 2]
 
 Please review this brief for technical accuracy, completeness, patentability considerations,
-and business value. Identify gaps, suggest improvements, and help refine it into a 
+and business value. Identify gaps, suggest improvements, and help refine it into a
 comprehensive document ready for IP protection.
 """
         print("\n⚠ WARNING: Using default template prompt.")
@@ -352,7 +352,7 @@ comprehensive document ready for IP protection.
         print("")
 
     # Create conversation manager
-    manager = ConversationManager(
+    manager=ConversationManager(
         agent1=agent1,
         agent2=agent2,
         initial_prompt=initial_topic,
@@ -361,7 +361,7 @@ comprehensive document ready for IP protection.
     )
 
     # Run the conversation
-    results = manager.run_conversation()
+    results=manager.run_conversation()
 
     # Save results
     manager.save_results(results, output_dir=args.output)
