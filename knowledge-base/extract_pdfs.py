@@ -1,6 +1,14 @@
 """Extract PDF content to markdown for knowledge base."""
+import logging
 from pypdf import PdfReader
 from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 def extract_pdf_to_md(pdf_path: str, output_path: str, title: str = None):
@@ -21,7 +29,7 @@ def extract_pdf_to_md(pdf_path: str, output_path: str, title: str = None):
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(''.join(content))
 
-    print(f"✓ Extracted {len(reader.pages)} pages to {output_path}")
+    logger.info(f"Extracted {len(reader.pages)} pages to {output_path}")
 
 
 if __name__ == "__main__":
@@ -39,4 +47,4 @@ if __name__ == "__main__":
         "Arboreum Impact Foundation (AIF) Pillars"
     )
 
-    print("\n✓ PDF extraction complete")
+    logger.info("\nPDF extraction complete")

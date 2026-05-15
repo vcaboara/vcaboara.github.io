@@ -3,6 +3,14 @@ import os
 import sys
 import json
 import argparse
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # --- Configuration ---
 # Default paths - these can now be overridden by command-line arguments
@@ -55,10 +63,10 @@ def parse_line(line):
                     "activity_stats": {}
                 }
             except (ValueError, IndexError) as e:
-                print(f"Error parsing D line date/time or structure: {line.strip()} - {e}")
+                logger.error(f"Error parsing D line date/time or structure: {line.strip()} - {e}")
                 return None
         else:
-            print(f"Warning: Malformed D line (too few parts): {line.strip()}")
+            logger.warning(f"Malformed D line (too few parts): {line.strip()}")
             return None
     elif line.startswith('B '):
         parts = line.split()
@@ -71,10 +79,10 @@ def parse_line(line):
                     "values": [int(x) for x in parts[2:9]]  # Assuming 7 values after break_type
                 }
             except (ValueError, IndexError) as e:
-                print(f"Error parsing B line values: {line.strip()} - {e}")
+                logger.error(f"Error parsing B line values: {line.strip()} - {e}")
                 return None
         else:
-            print(f"Warning: Malformed B line (too few parts): {line.strip()}")
+            logger.warning(f"Malformed B line (too few parts): {line.strip()}")
             return None
     elif line.startswith('m '):
         parts = line.split()
@@ -90,10 +98,10 @@ def parse_line(line):
                     "other_metrics": [int(x) for x in parts[5:7]]  # Assuming 2 other metrics
                 }
             except (ValueError, IndexError) as e:
-                print(f"Error parsing m line values: {line.strip()} - {e}")
+                logger.error(f"Error parsing m line values: {line.strip()} - {e}")
                 return None
         else:
-            print(f"Warning: Malformed m line (too few parts): {line.strip()}")
+            logger.warning(f"Malformed m line (too few parts): {line.strip()}")
             return None
     return None
 
@@ -111,12 +119,12 @@ def main(workrave_txt_path, json_output_path):
             with open(workrave_txt_path, 'r', encoding=input_encoding) as f:
                 content_lines = f.readlines()
         except UnicodeDecodeError:
-            print(f"Warning: Failed to decode '{workrave_txt_path}' with {input_encoding}. Trying 'latin-1'...")
+            logger.warning(f"Failed to decode '{workrave_txt_path}' with {input_encoding}. Trying 'latin-1'...")
             try:
                 with open(workrave_txt_path, 'r', encoding='latin-1') as f:
                     content_lines = f.readlines()
             except UnicodeDecodeError:
-                print(f"Error: Failed to decode '{workrave_txt_path}' with 'latin-1' too. Please check your file encoding.")
+                logger.error(f"Failed to decode '{workrave_txt_path}' with 'latin-1' too. Please check your file encoding.")
                 return # Exit if encoding fails
 
         for line in content_lines:
@@ -162,14 +170,14 @@ def main(workrave_txt_path, json_output_path):
         with open(json_output_path, 'w', encoding='utf-8') as json_file:
             json_file.write(json_string)
 
-        print(f"Successfully converted '{workrave_txt_path}' to '{json_output_path}'")
+        logger.info(f"Successfully converted '{workrave_txt_path}' to '{json_output_path}'")
 
     except FileNotFoundError:
-        print(f"Error: The file '{workrave_txt_path}' was not found. Please ensure it's in the same directory as the script or provide the correct path.")
+        logger.error(f"The file '{workrave_txt_path}' was not found. Please ensure it's in the same directory as the script or provide the correct path.")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(f"An unexpected error occurred during conversion: {exc_type.__name__} - {e} at {fname} line {exc_tb.tb_lineno}")
+        logger.error(f"An unexpected error occurred during conversion: {exc_type.__name__} - {e} at {fname} line {exc_tb.tb_lineno}")
 
 
 if __name__ == "__main__":
