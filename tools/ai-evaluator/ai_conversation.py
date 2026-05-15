@@ -15,7 +15,8 @@ from typing import Optional, Dict, List
 # Load .env file if present
 try:
     from dotenv import load_dotenv
-    load_dotenv()  # Load from .env file in current directory
+    # Load .env from the script's directory for deterministic behavior
+    load_dotenv(Path(__file__).parent / '.env')
 except ImportError:
     pass  # python-dotenv not installed, will use environment variables only
 
@@ -85,6 +86,8 @@ class AIAgent:
                     )
                 )
                 return response.text
+            else:
+                raise ValueError(f"Unsupported provider in respond(): {self.provider}")
 
         except Exception as e:
             return f"Error generating response: {str(e)}"
@@ -106,7 +109,8 @@ class ConversationManager:
     def check_convergence(self, response1: str, response2: str) -> bool:
         """
         Check if the two responses have converged (are similar enough).
-        Simple heuristic: check if they contain similar key phrases or agreement markers.
+        Uses agreement phrase detection only to avoid premature convergence
+        based on length similarity alone.
         """
         response1_lower = response1.lower()
         response2_lower = response2.lower()
@@ -123,12 +127,9 @@ class ConversationManager:
             if phrase in response1_lower or phrase in response2_lower
         )
 
-        # Check for similarity in length (converged documents tend to be similar length)
-        length_ratio = (min(len(response1), len(response2)) /
-                        max(len(response1), len(response2)))
-
-        # Simple convergence: both mention agreement or length is very similar
-        return agreement_count >= 2 or length_ratio > self.convergence_threshold
+        # Require strong agreement signal (at least 2 agreement phrases)
+        # Removed length-ratio heuristic to prevent premature convergence
+        return agreement_count >= 2
 
     def run_conversation(self) -> Dict:
         """Run the conversation loop between the two agents."""
@@ -263,11 +264,10 @@ def main():
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
-    # Currently using Gemini (verified working with free tier)
-    # OpenAI and Anthropic keys available but may need updating
-    if not GEMINI_API_KEY:
-        print("Error: GEMINI_API_KEY not found.")
-        print("Set GEMINI_API_KEY in your .env file or as an environment variable.")
+    # Check which providers are available for multi-AI diversity
+    if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
+        print("Error: At least one API key is required (GEMINI, OPENAI, or ANTHROPIC).")
+        print("Set API keys in your .env file or as environment variables.")
         sys.exit(1)
 
     # Load knowledge base context if specified
@@ -307,35 +307,48 @@ Integrate this knowledge naturally when relevant.
             print(f"⚠ Knowledge base directory not found: {kb_dir}")
 
     # Define the two AI agents with different roles and providers for diverse perspectives
-    # Agent 1: Gemini - Technical Evaluator (fast, technically rigorous)
+    # Prefer multi-provider diversity when keys are configured
+    
+    # Agent 1: Primary provider (prefer Gemini if available)
+    if GEMINI_API_KEY:
+        agent1_config = {"provider": "gemini", "model": "models/gemini-3-flash-preview", "api_key": GEMINI_API_KEY}
+    elif OPENAI_API_KEY:
+        agent1_config = {"provider": "openai", "model": "gpt-4", "api_key": OPENAI_API_KEY}
+    else:
+        agent1_config = {"provider": "anthropic", "model": "claude-3-5-sonnet-20241022", "api_key": ANTHROPIC_API_KEY}
+    
     agent1 = AIAgent(
         name="Technical Evaluator",
-        provider="gemini",
-        model="models/gemini-3-flash-preview",
+        **agent1_config,
         system_prompt=(
             "You are a technical evaluator specializing in intellectual property and technology assessment. "
             "Your role is to analyze tech briefs for technical accuracy, innovation potential, "
             "patentability, prior art concerns, and commercial viability. "
             "Provide detailed technical critique and identify strengths, weaknesses, and areas needing clarification. "
             "When you believe the brief is comprehensive and accurate, clearly state your approval."
-        ) + kb_context,
-        api_key=GEMINI_API_KEY
+        ) + kb_context
     )
 
-    # Agent 2: Gemini - Strategic Analyst
-    # Note: Can be configured to use OpenAI or Claude when valid API keys are available
+    # Agent 2: Secondary provider (prefer diversity - use different provider than agent1)
+    if agent1_config["provider"] != "anthropic" and ANTHROPIC_API_KEY:
+        agent2_config = {"provider": "anthropic", "model": "claude-3-5-sonnet-20241022", "api_key": ANTHROPIC_API_KEY}
+    elif agent1_config["provider"] != "openai" and OPENAI_API_KEY:
+        agent2_config = {"provider": "openai", "model": "gpt-4", "api_key": OPENAI_API_KEY}
+    else:
+        # Fall back to same provider if no diversity possible
+        agent2_config = agent1_config.copy()
+        print(f"⚠ Using {agent1_config['provider']} for both agents (configure additional API keys for diversity)")
+    
     agent2 = AIAgent(
         name="Strategic Analyst",
-        provider="gemini",
-        model="models/gemini-3-flash-preview",
+        **agent2_config,
         system_prompt=(
             "You are a strategic analyst focused on IP strategy, market positioning, and business value. "
             "Your role is to evaluate tech briefs for market opportunity, competitive advantage, "
             "strategic alignment, and implementation feasibility. "
             "Ensure the brief clearly articulates the invention's value proposition and differentiation. "
             "When the brief meets strategic requirements, explicitly confirm your approval."
-        ) + kb_context,
-        api_key=GEMINI_API_KEY
+        ) + kb_context
     )
 
     # Get initial prompt from command line, file, or use default

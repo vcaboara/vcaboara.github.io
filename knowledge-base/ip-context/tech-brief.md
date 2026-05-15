@@ -1,167 +1,116 @@
 # Arboreum Technology Brief
 
-*Extracted from: Arboreum_Tech_Brief.pdf*
+*Patent US 19/424,106 - Filed December 17, 2025*
 
 ---
 
-## Page 1
+## Executive Summary
 
-TECHNICAL  DISCUSSION  BRIEF  
-SUBJECT:  Boiler  System  Flexibility  &  Side-Stream  Thermal  Risk  Screening  (Pre-Assessment)  
-TARGET:  Utilities  Manager  /  Energy  Lead  /  Boiler  Operations  Engineer  
-1.  PURPOSE  
-We  are  seeking  to  understand  operational  constraints  relevant  to  potential  future  thermal  
-system
- 
-interactions
- 
-within
- 
-existing
- 
-mill
- 
-boiler
- 
-islands.
- 
-This  is  not  a  project  proposal  and  does  not  assume  any  retrofit  decision.  The  objective  is  to  
-determine
- 
-whether
- 
-a
- 
-structured
- 
-risk-definition
- 
-study
- 
-would
- 
-provide
- 
-any
- 
-incremental
- 
-value
- 
-beyond
- 
-the
- 
-system
- 
-characterization
- 
-your
- 
-team
- 
-already
- 
-maintains
- 
-internally.
- 
-2.  OPERATIONAL  BOUNDARIES  (SITE-SPECIFIC)  
-We  are  looking  to  define  the  margins  that  typically  govern  thermal  integration  decisions  at  the  
-mill
- 
-level:
- 
-A.  Boiler  Operating  Margin  Sensitivity  ●  Identifying  current  limiting  factors  in  flame  stability,  heat  flux  distribution,  and  emissions  
-compliance
- 
-under
- 
-variable
- 
-fuel
- 
-conditions
- 
-(e.g.,
- 
-moisture
- 
-swings
- 
-or
- 
-fuel-mix
- 
-changes).
- B.  Thermal  System  Flexibility  ●  Characterizing  how  close  the  existing  boiler  island  is  to  constrained  operation  during:  ○  Load-following  or  rapid  load  swings.  ○  Scheduled  maintenance/shutdown  cycles.  ○  Emissions  risk  windows  (NOx/VOC/HAP  compliance).  C.  Infrastructure  Headroom  ●  Assessing  constraints  in  site  electrical  infrastructure  (peak  demand,  harmonics,  
-transformer
- 
-margin)
- 
-that
- 
-could
- 
-influence
- 
-auxiliary
- 
-thermal
- 
-loads.
- 
-3.  CONTEXT  &  TRIGGERS  
-This  inquiry  is  designed  to  align  with  site-level  planning  horizons,  including:  ●  Fuel  contract  variability  and  renegotiation  cycles.  ●  Upcoming  emissions  compliance  planning  (MACT  /  local  air  quality  mandates).  ●  Long-term  boiler  reliability  and  lifecycle  strategy.  
-4.  THE  ASK:  15-MINUTE  ALIGNMENT  
-We  are  requesting  a  brief  technical  discussion  (15–20  minutes)  with  your  engineering  or  utilities  
-team
- 
-to
- 
-determine:
- 
+Arboreum has developed a **closed-loop, carbon-negative bio-refinery system** that converts agricultural waste into bio-oils, biochar, and structural materials at source. The system is self-powered using the same agricultural waste feedstock, eliminating fossil fuel dependency in the conversion process itself.
 
-## Page 2
+## Core Technology (Phase 1 - Patent Filed)
 
-1.  Whether  any  obvious  system  constraints  make  further  thermal  analysis  unnecessary.  2.  Whether  there  is  operational  interest  in  quantifying  side-stream  thermal  flexibility  margins  
-to
- 
-support
- 
-future
- 
-planning.
- 3.  If  a  structured  risk-mapping  exercise  would  provide  value  to  your  current  reliability  
-assessments.
- Note  on  Internal  Burden:  We  will  come  fully  prepared  for  this  discussion.  No  pre-read  
-materials,
- 
-data
- 
-exports,
- 
-or
- 
-preparation
- 
-time
- 
-are
- 
-required
- 
-from
- 
-your
- 
-team.
- 
-Arboreum  Commercial  Solutions  (ACS)  Technical  Methodology  for  Boundary  Definition  
-available
- 
-upon
- 
-request.
- 
+### System Components
 
+**1. Self-Powered Agricultural Waste Bio-Refinery**
+- Pyrolyzers powered by same ag-waste feedstock
+- On-site processing eliminates transportation emissions
+- Converts agricultural waste streams into value-added products
+- Closed-loop water reclamation system
+
+**2. Output Products**
+- **Bio-oils**: Drop-in replacements for fossil fuels
+  - Sustainable Aviation Fuel (SAF)
+  - Marine shipping fuel
+  - Industrial feedstock
+- **Biochar**: Multiple applications
+  - Soil amendment
+  - Carbon sequestration
+  - Structural applications
+- **Pulped ag-waste**: Structural materials and industrial inputs
+
+**3. Process Innovation**
+- Novel configuration of existing off-the-shelf industrial hardware
+- Process IP rather than hardware patents
+- Enables rapid deployment using proven equipment
+- Reduces capital expenditure vs. proprietary hardware
+
+## Technology Maturity & Business Model
+
+### Intellectual Property Strategy
+- **US Patent 19/424,106**: Filed December 17, 2025
+- Process patents covering configuration and sequencing
+- Trade secret protection for industrial retrofit applications (Phase 2)
+
+### Commercial Model
+- **100% Licensing** via Arboreum Commercial Solutions (ACS)
+- No hardware manufacturing - "paper architect" strategy
+- License configurations/processes to operators
+- Lower capital requirements, faster market penetration
+
+### Phase 2 (Trade Secret - 60% of Emissions)
+- Heavy industry retrofit applications
+- Closed-loop, carbon-negative industrial processes
+- Trade secret status until first licensee funds additional patent filings
+- Addresses majority of emissions in existing heavy industry
+
+## Market Position & Regulatory Alignment
+
+### Regulatory Context
+- Filed to USDA portal December 31, 2025 (1 day after mandate deadline)
+- Aligns with USDA/DOE/BETO climate technology mandates
+- Provides pathway for agricultural waste valorization
+
+### Competitive Advantage
+- **Self-powered system** eliminates external energy input
+- **At-source processing** eliminates transportation emissions
+- **Drop-in fuel compatibility** leverages existing distribution infrastructure
+- **Off-the-shelf hardware** reduces deployment risk and timeline
+
+## Technical Specifications
+
+### Feedstock
+- Agricultural waste streams (crop residues, processing waste)
+- Eliminates open burning practices
+- Converts waste liability into revenue stream
+
+### Process Flow
+1. Agricultural waste collection at source
+2. Self-powered pyrolysis conversion
+3. Bio-oil extraction and refining
+4. Biochar production and application
+5. Water reclamation and recycling
+6. Pulped material processing
+
+### Carbon Impact
+- **Carbon-negative lifecycle**: Captures more carbon than emitted
+- **Biochar sequestration**: Long-term carbon storage
+- **Fossil fuel displacement**: Bio-oils replace petroleum products
+- **Emissions avoided**: Eliminates open burning of ag-waste
+
+## Implementation Pathway
+
+### Deployment Model
+- License to agricultural cooperatives, processors, and operators
+- Utilize existing industrial equipment suppliers
+- Regional deployment aligned with agricultural waste availability
+- Scalable from pilot to industrial scale
+
+### Technical Support
+- Configuration specifications and process parameters
+- Integration with existing agricultural operations
+- Compliance documentation for regulatory approval
+- Ongoing optimization based on feedstock characteristics
+
+---
+
+## Contact & Licensing
+
+**Arboreum Commercial Solutions (ACS)**
+- Technology licensing inquiries
+- Pilot project partnerships
+- Configuration consulting services
+
+---
+
+*This technology brief is based on US Patent Application 19/424,106 filed December 17, 2025. Additional technical details available under NDA for qualified licensees.*
