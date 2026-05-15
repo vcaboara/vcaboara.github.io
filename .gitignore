@@ -28,3 +28,8 @@ debug-logs/
 /AI_TECH_BRIEF_README.md
 /ai_conversation.py
 /archive/site_with_tech_brief.html
+
+# Personal data processing files
+parse_notices.py
+notices_extracted.json
+gmail_takeout/
