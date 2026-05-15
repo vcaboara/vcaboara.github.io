@@ -262,30 +262,103 @@ def main():
     """Main entry point for the AI conversation script."""
 
     # Parse command line arguments
+    description = """
+AI Conversation Agent - Iterative Multi-Agent Refinement System
+
+Two AI agents (Technical Evaluator and Strategic Analyst) converse and iterate
+on content until they reach consensus. Supports OpenAI, Google Gemini, and
+Anthropic Claude with automatic multi-provider diversity.
+
+The system automatically selects different AI providers when multiple API keys
+are configured to ensure diverse perspectives. Agent 1 (Technical Evaluator)
+analyzes technical accuracy, innovation, and patentability. Agent 2 (Strategic
+Analyst) evaluates market opportunity, IP strategy, and business value.
+"""
+
+    epilog = """
+SETUP:
+  1. Install dependencies:
+     pip install -r ai_conversation_requirements.txt
+
+  2. Set at least one API key (in .env file or environment):
+     OPENAI_API_KEY=your-key      # https://platform.openai.com/api-keys
+     GEMINI_API_KEY=your-key      # https://aistudio.google.com/app/apikey
+     ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
+
+EXAMPLES:
+  # Use default template (warning shown):
+  python ai_conversation.py
+
+  # Provide inline prompt:
+  python ai_conversation.py --prompt "Evaluate this invention: [description]"
+
+  # Load prompt from file:
+  python ai_conversation.py --prompt tech_brief.md
+
+  # Load knowledge base context and limit rounds:
+  python ai_conversation.py --prompt brief.md --context knowledge-base/ip-context --rounds 5
+
+  # Custom output directory:
+  python ai_conversation.py --prompt brief.md --output results/
+
+OUTPUT:
+  Creates timestamped files in output directory (default: output/):
+    - conversation_YYYYMMDD_HHMMSS.json  (Full conversation log)
+    - final_document_YYYYMMDD_HHMMSS.txt (Final agreed document)
+    - transcript_YYYYMMDD_HHMMSS.txt     (Human-readable transcript)
+
+SUPPORTED MODELS:
+  OpenAI:    gpt-4o, gpt-4-turbo, gpt-3.5-turbo
+  Gemini:    models/gemini-3-flash-preview, gemini-1.5-pro, gemini-1.5-flash
+  Anthropic: claude-3-5-sonnet-20241022, claude-3-opus-20240229
+
+CONVERGENCE:
+  Conversation ends when:
+    - Both agents use agreement phrases (e.g., "I agree", "Looks good")
+    - Maximum rounds reached (configurable with --rounds)
+
+USE CASES:
+  - Tech brief evaluation for patents
+  - Document refinement and iteration
+  - Content creation with diverse perspectives
+  - Strategic analysis and validation
+  - Code review and improvement
+"""
+
     parser = argparse.ArgumentParser(
-        description='Run a conversation between two AI agents to '
-                    'evaluate/refine content'
+        description=description,
+        epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         '--prompt', '-p',
-        help='Initial prompt text (or path to .txt/.md file containing '
-             'the prompt)'
+        metavar='TEXT_OR_FILE',
+        help='Initial prompt text, or path to .txt/.md file. If omitted, '
+             'uses default template (with warning).'
     )
     parser.add_argument(
         '--rounds', '-r',
         type=int,
         default=10,
-        help='Maximum number of conversation rounds (default: 10)'
+        metavar='N',
+        help='Maximum conversation rounds before stopping (default: 10). '
+             'Conversation may end earlier if agents converge.'
     )
     parser.add_argument(
         '--output', '-o',
         default='output',
-        help='Output directory for results (default: output/)'
+        metavar='DIR',
+        help='Output directory for conversation results (default: output/). '
+             'Creates timestamped .json, .txt files for logs, transcripts, '
+             'and final documents.'
     )
     parser.add_argument(
         '--context', '-c',
-        help='Path to knowledge base directory for persistent IP context '
-             '(e.g., knowledge-base/ip-context)'
+        metavar='DIR',
+        help='Path to knowledge base directory containing .md files with '
+             'persistent context (e.g., knowledge-base/ip-context). Content '
+             'is loaded into both agents\' system prompts for consistent '
+             'reference across conversations.'
     )
     args = parser.parse_args()
 
