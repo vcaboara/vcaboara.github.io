@@ -64,7 +64,7 @@ CONFIGURATION
       - Falls back to same provider if only one API key configured
 
     Model defaults:
-      - Gemini: gemini-2.0-flash-exp
+      - Gemini: gemini-2.0-flash-exp (default, override with --model)
       - OpenAI: gpt-4o
       - Anthropic: claude-3-5-sonnet-20241022
 
@@ -127,6 +127,11 @@ except ImportError:
     logger.error("Required packages not installed.")
     logger.error("Run: pip install -r ai_conversation_requirements.txt")
     sys.exit(1)
+
+# Default model identifiers — override with --model or by editing these constants
+DEFAULT_GEMINI_MODEL = "gemini-2.0-flash-exp"
+DEFAULT_OPENAI_MODEL = "gpt-4"
+DEFAULT_ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
 
 
 class AIAgent:
@@ -448,6 +453,14 @@ USE CASES:
              'is loaded into both agents\' system prompts for consistent '
              'reference across conversations.'
     )
+    parser.add_argument(
+        '--model',
+        metavar='MODEL_ID',
+        help='Override the default model for the primary agent '
+             '(e.g. gemini-2.0-flash-exp, gpt-4o, claude-3-5-sonnet-20241022). '
+             'Defaults to the constant defined in DEFAULT_*_MODEL for the '
+             'selected provider.'
+    )
     args = parser.parse_args()
 
     # Configuration - modify these as needed
@@ -514,19 +527,19 @@ Integrate this knowledge naturally when relevant.
     if GEMINI_API_KEY:
         agent1_config = {
             "provider": "gemini",
-            "model": "models/gemini-3-flash-preview",
+            "model": args.model or DEFAULT_GEMINI_MODEL,
             "api_key": GEMINI_API_KEY
         }
     elif OPENAI_API_KEY:
         agent1_config = {
             "provider": "openai",
-            "model": "gpt-4",
+            "model": args.model or DEFAULT_OPENAI_MODEL,
             "api_key": OPENAI_API_KEY
         }
     else:
         agent1_config = {
             "provider": "anthropic",
-            "model": "claude-3-5-sonnet-20241022",
+            "model": args.model or DEFAULT_ANTHROPIC_MODEL,
             "api_key": ANTHROPIC_API_KEY
         }
 
