@@ -128,7 +128,8 @@ except ImportError:
     logger.error("Run: pip install -r ai_conversation_requirements.txt")
     sys.exit(1)
 
-# Default model identifiers — override with --model or by editing these constants
+# Default model identifiers — override via env var (GEMINI_MODEL, OPENAI_MODEL,
+# ANTHROPIC_MODEL), --model CLI flag, or by editing these constants.
 DEFAULT_GEMINI_MODEL = "gemini-2.0-flash-exp"
 DEFAULT_OPENAI_MODEL = "gpt-4"
 DEFAULT_ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
@@ -463,10 +464,15 @@ USE CASES:
     )
     args = parser.parse_args()
 
-    # Configuration - modify these as needed
+    # API keys
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
+    # Model overrides: env var > --model flag > built-in default
+    GEMINI_MODEL = os.environ.get("GEMINI_MODEL") or args.model or DEFAULT_GEMINI_MODEL
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or args.model or DEFAULT_OPENAI_MODEL
+    ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL") or args.model or DEFAULT_ANTHROPIC_MODEL
 
     # Check which providers are available for multi-AI diversity
     if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
@@ -527,19 +533,19 @@ Integrate this knowledge naturally when relevant.
     if GEMINI_API_KEY:
         agent1_config = {
             "provider": "gemini",
-            "model": args.model or DEFAULT_GEMINI_MODEL,
+            "model": GEMINI_MODEL,
             "api_key": GEMINI_API_KEY
         }
     elif OPENAI_API_KEY:
         agent1_config = {
             "provider": "openai",
-            "model": args.model or DEFAULT_OPENAI_MODEL,
+            "model": OPENAI_MODEL,
             "api_key": OPENAI_API_KEY
         }
     else:
         agent1_config = {
             "provider": "anthropic",
-            "model": args.model or DEFAULT_ANTHROPIC_MODEL,
+            "model": ANTHROPIC_MODEL,
             "api_key": ANTHROPIC_API_KEY
         }
 
@@ -563,13 +569,13 @@ Integrate this knowledge naturally when relevant.
     if agent1_config["provider"] != "anthropic" and ANTHROPIC_API_KEY:
         agent2_config = {
             "provider": "anthropic",
-            "model": "claude-3-5-sonnet-20241022",
+            "model": ANTHROPIC_MODEL,
             "api_key": ANTHROPIC_API_KEY
         }
     elif agent1_config["provider"] != "openai" and OPENAI_API_KEY:
         agent2_config = {
             "provider": "openai",
-            "model": "gpt-4",
+            "model": OPENAI_MODEL,
             "api_key": OPENAI_API_KEY
         }
     else:
