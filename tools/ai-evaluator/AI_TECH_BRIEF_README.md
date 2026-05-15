@@ -49,18 +49,19 @@ setup_ai_conversation.bat
    python ai_conversation.py --prompt your_brief.md
    ```
 
-### Command Lin - Alternating Conversation
+### Command Line Usage
 
 The script uses an **alternating conversation model**:
 
 1. **You provide** the initial tech brief (via file or command line)
-2. **Agent 1 (ChatGPT)** receives it first and provides technical evaluation
-3. **Agent 2 (Gemini)** receives Agent 1's response and adds strategic feedback
+2. **Agent 1 (Technical Evaluator)** receives it first and provides technical evaluation
+3. **Agent 2 (Strategic Analyst)** receives Agent 1's response and adds strategic feedback
 4. **Agent 1** receives Agent 2's feedback and refines the brief
 5. **Agent 2** reviews the refinement
 6. **Continues alternating** until they agree (convergence) or reach max rounds
 
-**Two AI agents collaborate to evaluate and refine:**
+**Command Line Examples:**
+```powershell
 # Use a file
 python ai_conversation.py --prompt my_brief.md
 
