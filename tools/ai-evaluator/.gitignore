@@ -17,6 +17,11 @@ ai_conversations/
 output/
 results/
 
+# Personal prompt files (working content, not documentation)
+strategy_review_prompt.md
+critical_review_prompt.txt
+*_personal.*
+
 # IDE
 .vscode/
 .idea/
