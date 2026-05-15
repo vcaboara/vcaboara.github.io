@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def validate_compliance_tracker(file_path):
     """Validate the compliance tracker HTML file"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding='utf-8') as f:
         content = f.read()
 
     issues = []
@@ -132,7 +132,8 @@ def main():
         logger.error(f"ERROR: {tracker_path} not found")
         return 1
 
-    logger.info("Validating compliance-tracker.html structure and calculations...")
+    logger.info(
+        "Validating compliance-tracker.html structure and calculations...")
     issues = validate_compliance_tracker(tracker_path)
 
     logger.info("")

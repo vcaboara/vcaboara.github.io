@@ -10,10 +10,10 @@ QUICK START
 -----------
     # Basic usage
     python ai_conversation.py --prompt "your prompt or question"
-    
+
     # From file
     python ai_conversation.py --prompt input.md
-    
+
     # With knowledge base context
     python ai_conversation.py --prompt input.md --context ../../knowledge-base/ip-context
 
@@ -21,13 +21,14 @@ SETUP
 -----
     1. Install dependencies:
        pip install -r ai_conversation_requirements.txt
-    
+
     2. Create .env file with API keys:
        GEMINI_API_KEY=your-key-here       # FREE tier available
        OPENAI_API_KEY=your-key-here       # Optional
        ANTHROPIC_API_KEY=your-key-here    # Optional
-    
-    See GET_API_KEYS.md for detailed setup instructions.
+
+    Set GEMINI_API_KEY, OPENAI_API_KEY, and/or ANTHROPIC_API_KEY in .env.
+    Copy .env.example to .env to get started.
 
 HOW IT WORKS
 ------------
@@ -35,16 +36,16 @@ HOW IT WORKS
       - Receives your initial prompt
       - Analyzes technical details, accuracy, innovation
       - Generates initial evaluation
-    
+
     Agent 2 (Strategic Analyst):
       - Receives Agent 1's response (not your original prompt)
       - Evaluates business value, IP strategy, market positioning
       - Provides critique and refinement suggestions
-    
+
     Iteration continues until:
       - Both agents agree (detect phrases like "approved", "looks good")
       - Maximum rounds reached (default: 10, configurable with --rounds)
-    
+
     See CONVERSATION_FLOW.md for visual diagram.
 
 OUTPUT
@@ -61,7 +62,7 @@ CONFIGURATION
       - Agent 1 prefers: Gemini > OpenAI > Anthropic
       - Agent 2 prefers: Different provider than Agent 1
       - Falls back to same provider if only one API key configured
-    
+
     Model defaults:
       - Gemini: gemini-2.0-flash-exp
       - OpenAI: gpt-4o
@@ -71,10 +72,10 @@ EXAMPLES
 --------
     # Quick analysis with default settings
     python ai_conversation.py --prompt "Analyze patent US 19/424,106"
-    
+
     # Extended conversation with more rounds
     python ai_conversation.py --prompt brief.md --rounds 15
-    
+
     # With persistent knowledge base context
     python ai_conversation.py \\
         --prompt strategy.md \\
@@ -91,15 +92,14 @@ REQUIREMENTS
 See ai_conversation_requirements.txt for complete list.
 """
 
+import argparse
+import json
+import logging
 import os
 import sys
-import json
 import time
-import logging
-import argparse
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict, List
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(
@@ -119,10 +119,10 @@ except ImportError:
 
 # Requires: pip install openai anthropic google-genai python-dotenv
 try:
-    from openai import OpenAI
     from anthropic import Anthropic
     from google import genai
     from google.genai import types
+    from openai import OpenAI
 except ImportError:
     logger.error("Required packages not installed.")
     logger.error("Run: pip install -r ai_conversation_requirements.txt")
@@ -185,7 +185,8 @@ class AIAgent:
                 )
                 return response.text
             else:
-                raise ValueError(f"Unsupported provider in respond(): {self.provider}")
+                raise ValueError(
+                    f"Unsupported provider in respond(): {self.provider}")
 
         except Exception as e:
             return f"Error generating response: {str(e)}"
@@ -202,7 +203,7 @@ class ConversationManager:
         self.initial_prompt = initial_prompt
         self.max_rounds = max_rounds
         self.convergence_threshold = convergence_threshold
-        self.conversation_history: List[Dict] = []
+        self.conversation_history: list[dict] = []
 
     def check_convergence(self, response1: str, response2: str) -> bool:
         """
@@ -229,7 +230,7 @@ class ConversationManager:
         # Removed length-ratio heuristic to prevent premature convergence
         return agreement_count >= 2
 
-    def run_conversation(self) -> Dict:
+    def run_conversation(self) -> dict:
         """Run the conversation loop between the two agents."""
         logger.info("="*80)
         logger.info(
@@ -302,7 +303,7 @@ class ConversationManager:
             "conversation_history": self.conversation_history
         }
 
-    def save_results(self, results: Dict, output_dir: str = "ai_conversations"):
+    def save_results(self, results: dict, output_dir: str = "ai_conversations"):
         """Save the conversation results to files."""
         os.makedirs(output_dir, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -474,7 +475,7 @@ USE CASES:
             if kb_files:
                 kb_content = []
                 for md_file in kb_files:
-                    with open(md_file, 'r', encoding='utf-8') as f:
+                    with open(md_file, encoding='utf-8') as f:
                         kb_content.append(
                             f"## {md_file.stem.replace('-', ' ').title()}"
                             f"\n\n{f.read()}\n"
@@ -528,7 +529,7 @@ Integrate this knowledge naturally when relevant.
             "model": "claude-3-5-sonnet-20241022",
             "api_key": ANTHROPIC_API_KEY
         }
-    
+
     agent1 = AIAgent(
         name="Technical Evaluator",
         **agent1_config,
@@ -565,7 +566,7 @@ Integrate this knowledge naturally when relevant.
             f"Using {agent1_config['provider']} for both agents (configure "
             f"additional API keys for diversity)"
         )
-    
+
     agent2 = AIAgent(
         name="Strategic Analyst",
         **agent2_config,
@@ -588,7 +589,7 @@ Integrate this knowledge naturally when relevant.
         prompt_path = Path(args.prompt)
         if prompt_path.exists() and prompt_path.suffix in ['.txt', '.md']:
             logger.info(f"Loading prompt from file: {prompt_path}")
-            with open(prompt_path, 'r', encoding='utf-8') as f:
+            with open(prompt_path, encoding='utf-8') as f:
                 initial_topic = f.read()
         else:
             # Treat as direct prompt text

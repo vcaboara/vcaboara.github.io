@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def validate_mandates(file_path):
     """Validate the mandates.html file"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding='utf-8') as f:
         content = f.read()
 
     issues = []
@@ -125,7 +125,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     logger.info("Running Mandates Validation Tests\n")
-    logger.info("Checking pillar structure, content integrity, and HTML validity...\n")
+    logger.info(
+        "Checking pillar structure, content integrity, and HTML validity...\n")
 
     issues, critical_count, warning_count = validate_mandates(file_path)
 

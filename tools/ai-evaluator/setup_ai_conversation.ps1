@@ -59,7 +59,7 @@ Write-Host "Get your FREE API keys from:" -ForegroundColor Cyan
 Write-Host "  - OpenAI (ChatGPT): https://platform.openai.com/api-keys"
 Write-Host "  - Google Gemini:    https://aistudio.google.com/app/apikey (FREE!)"
 Write-Host ""
-Write-Host "See GET_API_KEYS.md for detailed step-by-step instructions" -ForegroundColor Gray
+Write-Host "  - Anthropic (Claude): https://console.anthropic.com/" -ForegroundColor Gray
 Write-Host ""
 
 $setupKeys = Read-Host "Do you want to enter API keys now? (y/n)"
@@ -107,12 +107,6 @@ Write-Host "3. Run: python ai_conversation.py --prompt example_tech_brief.md"
 Write-Host "4. Check output/ folder for results"
 Write-Host ""
 Write-Host "Documentation:" -ForegroundColor Yellow
-Write-Host "  - README.md            - Getting started" -ForegroundColor Gray
-Write-Host "  - GET_API_KEYS.md      - How to get API keys" -ForegroundColor Gray
-Write-Host "  - python ai_conversation.py --help  - Command reference" -ForegroundColor Gray
+Write-Host "  - README.md                             - Overview" -ForegroundColor Gray
+Write-Host "  - python ai_conversation.py --help      - Full usage guide" -ForegroundColor Gray
 Write-Host ""
-
-$viewDocs = Read-Host "Open GET_API_KEYS.md for instructions? (y/n)"
-if ($viewDocs -eq 'y' -or $viewDocs -eq 'Y') {
-    Start-Process "GET_API_KEYS.md"
-}

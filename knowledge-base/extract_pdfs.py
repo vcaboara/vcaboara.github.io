@@ -1,7 +1,8 @@
 """Extract PDF content to markdown for knowledge base."""
 import logging
-from pypdf import PdfReader
 from pathlib import Path
+
+from pypdf import PdfReader
 
 # Configure logging
 logging.basicConfig(

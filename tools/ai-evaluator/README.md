@@ -24,6 +24,6 @@ This tool follows the principle: **code documents itself**. Instead of maintaini
 
 1. **Comprehensive module docstrings** - Run `python ai_conversation.py --help` or use Python's built-in `help()` function
 2. **Rich argparse help** - Detailed `--help` output with examples
-3. **Minimal external docs** - Only for setup (GET_API_KEYS.md) or visual aids (CONVERSATION_FLOW.md)
+3. **Minimal external docs** - Only for visual aids (CONVERSATION_FLOW.md)
 
 This reduces documentation overhead and ensures information stays current with the code.

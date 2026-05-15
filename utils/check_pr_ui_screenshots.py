@@ -55,7 +55,8 @@ def main() -> int:
     ui_changed_files = [f for f in changed_files if is_ui_file(f)]
 
     if not ui_changed_files:
-        logger.info("No UI-facing file changes detected; screenshot policy not required.")
+        logger.info(
+            "No UI-facing file changes detected; screenshot policy not required.")
         return 0
 
     pr_body = os.environ.get("PR_BODY", "")
@@ -71,7 +72,8 @@ def main() -> int:
     labeled = has_before_after_labels(pr_body)
 
     if not labeled or image_count < 2:
-        logger.error("UI changes detected, but screenshot evidence is incomplete.")
+        logger.error(
+            "UI changes detected, but screenshot evidence is incomplete.")
         logger.error("UI-changed files:")
         for file in ui_changed_files:
             logger.error(f"  - {file}")
