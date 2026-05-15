@@ -6,7 +6,7 @@
 
 ## Overview
 
-**The Social Shield of Arboreum Commercial Solutions (ACS)**
+**The Social Shield of Arboreum Commercial Solutions, LLC (ACS)**
 
 Priority: 12/17/2025 | Compliance: 12/30 USDA/DOE
 

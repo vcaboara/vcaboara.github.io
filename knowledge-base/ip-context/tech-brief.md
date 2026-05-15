@@ -43,7 +43,7 @@ Arboreum has developed a **closed-loop, carbon-negative bio-refinery system** th
 - Trade secret protection for industrial retrofit applications (Phase 2)
 
 ### Commercial Model
-- **100% Licensing** via Arboreum Commercial Solutions (ACS)
+- **100% Licensing** via Arboreum Commercial Solutions, LLC (ACS)
 - No hardware manufacturing - "paper architect" strategy
 - License configurations/processes to operators
 - Lower capital requirements, faster market penetration
@@ -106,7 +106,7 @@ Arboreum has developed a **closed-loop, carbon-negative bio-refinery system** th
 
 ## Contact & Licensing
 
-**Arboreum Commercial Solutions (ACS)**
+**Arboreum Commercial Solutions, LLC (ACS)**
 - Technology licensing inquiries
 - Pilot project partnerships
 - Configuration consulting services
