@@ -10,7 +10,7 @@
                          │
                          ▼
          ┌───────────────────────────────┐
-         │  AGENT 1: ChatGPT (GPT-4o)   │
+         │  AGENT 1: Gemini 3 Flash     │
          │  Role: Technical Evaluator    │
          │                               │
          │  • Analyzes technical details │
@@ -20,7 +20,7 @@
                      │ Response 1
                      ▼
          ┌───────────────────────────────┐
-         │  AGENT 2: Gemini (1.5 Pro)   │
+         │  AGENT 2: GPT-4o / Claude 3.5│
          │  Role: Strategic Analyst      │
          │                               │
          │  • Evaluates business value   │
@@ -30,14 +30,14 @@
                      │ Critique/Refinement
                      ▼
          ┌───────────────────────────────┐
-         │  AGENT 1: ChatGPT            │
+         │  AGENT 1: Gemini 3 Flash     │
          │  Addresses feedback          │
          │  Refines technical aspects   │
          └───────────┬───────────────────┘
                      │ Refined version
                      ▼
          ┌───────────────────────────────┐
-         │  AGENT 2: Gemini             │
+         │  AGENT 2: GPT-4o / Claude 3.5│
          │  Reviews refinements         │
          │  Adds strategic input        │
          └───────────┬───────────────────┘
@@ -91,13 +91,13 @@ The conversation ends when:
 ## Example Round Flow
 
 **Round 1:**
-- Agent 1 (ChatGPT) reads your brief → Creates initial technical evaluation
+- Agent 1 (Gemini 3 Flash) reads your brief → Creates initial technical evaluation
 
 **Round 2:**
-- Agent 2 (Gemini) reads ChatGPT's evaluation → Adds strategic perspective
+- Agent 2 (GPT-4o/Claude 3.5) reads Agent 1's evaluation → Adds strategic perspective
 
 **Round 3:**
-- Agent 1 reads Gemini's additions → Refines technical details based on feedback
+- Agent 1 reads Agent 2's additions → Refines technical details based on feedback
 
 **Round 4:**
 - Agent 2 reads refined version → Confirms or suggests more improvements
