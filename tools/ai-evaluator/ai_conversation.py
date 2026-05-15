@@ -130,9 +130,9 @@ except ImportError:
 
 # Default model identifiers — override via env var (GEMINI_MODEL, OPENAI_MODEL,
 # ANTHROPIC_MODEL), --model CLI flag, or by editing these constants.
-DEFAULT_GEMINI_MODEL = "gemini-2.0-flash-exp"
-DEFAULT_OPENAI_MODEL = "gpt-4"
-DEFAULT_ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
+DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_OPENAI_MODEL = "gpt-4o"
+DEFAULT_ANTHROPIC_MODEL = "claude-opus-4-5"
 
 
 class AIAgent:
