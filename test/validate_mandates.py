@@ -10,7 +10,8 @@ from pathlib import Path
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(message)s'
+    format='%(message)s',
+    stream=sys.stdout
 )
 logger = logging.getLogger(__name__)
 
