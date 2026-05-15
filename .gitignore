@@ -5,6 +5,8 @@ __pycache__/
 *.bak
 *.zip
 *.pdf
+# Exception: Tech brief PDF needed for site download
+!Arboreum_Tech_Brief.pdf
 .vscode/
 pdf_content.txt
 
