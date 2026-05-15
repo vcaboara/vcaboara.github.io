@@ -61,7 +61,7 @@ jobs:
 
             - name: Enforce BEFORE/AFTER screenshots for UI changes
               run: |
-                  python utils/check_pr_ui_screenshots.py \
+                  python tools/check_pr_ui_screenshots.py \
                     --base-sha "${{ github.event.pull_request.base.sha }}" \
                     --head-sha "${{ github.event.pull_request.head.sha }}"
 
@@ -91,7 +91,7 @@ jobs:
 
             - name: Compare base/head UI screenshots
               run: |
-                  python utils/compare_ui_screenshots.py \
+                  python tools/compare_ui_screenshots.py \
                     --base-sha "${{ github.event.pull_request.base.sha }}" \
                     --head-sha "${{ github.event.pull_request.head.sha }}" \
                     --output-markdown "ui-screenshot-diff-summary.md" \
