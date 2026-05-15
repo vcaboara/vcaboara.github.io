@@ -1,4 +1,60 @@
-"""Context loader for AI conversations with knowledge base."""
+"""Knowledge base context loader for AI conversations.
+
+This module loads persistent IP and business context from markdown files into AI
+agent system prompts. Enables agents to maintain context across sessions without
+re-explaining your IP, patent details, or business strategy.
+
+USAGE
+-----
+    from knowledge_base.context_loader import KnowledgeBase
+    
+    # Load all context files
+    kb = KnowledgeBase("knowledge-base/ip-context")
+    kb.load_all()
+    
+    # Build enhanced system prompt
+    base_prompt = "You are a technical evaluator..."
+    enhanced_prompt = kb.build_system_prompt(base_prompt)
+    
+    # Enhanced prompt now includes tech brief, AIF pillars, strategy notes
+
+DIRECTORY STRUCTURE
+-------------------
+    knowledge-base/
+    ├── ip-context/
+    │   ├── tech-brief.md      Patent/technology details
+    │   ├── aif-pillars.md     Impact foundation structure
+    │   └── context.md         Strategy notes, insights
+    └── context_loader.py      This module
+
+INTEGRATION WITH AI_CONVERSATION
+---------------------------------
+    python tools/ai-evaluator/ai_conversation.py \\
+        --prompt "your question" \\
+        --context knowledge-base/ip-context
+    
+    The --context flag automatically loads all .md files from the directory and
+    prepends them to agent system prompts.
+
+UPDATING CONTEXT
+----------------
+    # Edit context files directly
+    notepad knowledge-base/ip-context/context.md
+    
+    # Append programmatically
+    kb.append_to_context("## New Finding\\nYour notes here")
+    
+    # All changes are git-tracked
+    git add knowledge-base/ip-context/
+    git commit -m "Update: [description]"
+
+BENEFITS
+--------
+    - No re-explaining IP/patent details each conversation
+    - Version-controlled knowledge updates
+    - Persistent context across RDP sessions
+    - Agents stay current with latest strategy
+"""
 import importlib.util
 import logging
 import os
