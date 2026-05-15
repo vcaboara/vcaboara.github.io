@@ -15,13 +15,15 @@ logger = logging.getLogger(__name__)
 
 def _find_ai_conversation_path() -> Path:
     """Locate tools/ai-evaluator/ai_conversation.py from this file upward."""
-    for parent in Path(__file__).resolve().parents:
+    start_path = Path(__file__).resolve()
+    for parent in start_path.parents:
         candidate = parent / "tools" / "ai-evaluator" / "ai_conversation.py"
         if candidate.exists():
             return candidate
 
     raise ImportError(
-        "AIAgent module not found in any parent tools/ai-evaluator directory"
+        "AIAgent module not found in any parent tools/ai-evaluator directory. "
+        f"Search started from: {start_path}"
     )
 
 
