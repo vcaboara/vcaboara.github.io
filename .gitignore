@@ -17,6 +17,11 @@ notes.md
 # Environment files
 .env
 
+# Debug files
+*.log
+*DEBUG*.md
+debug-logs/
+
 # Duplicate files from tools/ (keep only in tools/)
 /AI_TECH_BRIEF_README.md
 /ai_conversation.py
