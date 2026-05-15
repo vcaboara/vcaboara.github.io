@@ -202,13 +202,11 @@ class ConversationManager:
     """Manages the conversation between two AI agents."""
 
     def __init__(self, agent1: AIAgent, agent2: AIAgent,
-                 initial_prompt: str, max_rounds: int = 10,
-                 convergence_threshold: float = 0.85):
+                 initial_prompt: str, max_rounds: int = 10):
         self.agent1 = agent1
         self.agent2 = agent2
         self.initial_prompt = initial_prompt
         self.max_rounds = max_rounds
-        self.convergence_threshold = convergence_threshold
         self.conversation_history: list[dict] = []
 
     def check_convergence(self, response1: str, response2: str) -> bool:
@@ -457,10 +455,12 @@ USE CASES:
     parser.add_argument(
         '--model',
         metavar='MODEL_ID',
-        help='Override the default model for the primary agent '
-             '(e.g. gemini-2.0-flash-exp, gpt-4o, claude-3-5-sonnet-20241022). '
-             'Defaults to the constant defined in DEFAULT_*_MODEL for the '
-             'selected provider.'
+        help='Override the default model for the primary agent (Agent 1) only. '
+             'The model ID must match the provider that is auto-selected for '
+             'Agent 1 (Gemini > OpenAI > Anthropic based on available API keys). '
+             'Examples: gemini-2.0-flash-exp, gpt-4o, claude-3-5-sonnet-20241022. '
+             'Use the GEMINI_MODEL / OPENAI_MODEL / ANTHROPIC_MODEL env vars to '
+             'override individual provider models without this restriction.'
     )
     args = parser.parse_args()
 
@@ -469,10 +469,13 @@ USE CASES:
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
-    # Model overrides: env var > --model flag > built-in default
-    GEMINI_MODEL = os.environ.get("GEMINI_MODEL") or args.model or DEFAULT_GEMINI_MODEL
-    OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or args.model or DEFAULT_OPENAI_MODEL
-    ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL") or args.model or DEFAULT_ANTHROPIC_MODEL
+    # Model defaults: env var overrides the built-in constant.
+    # --model is applied only to the provider that is actually selected
+    # (after provider selection below) to avoid sending e.g. a Gemini model
+    # ID to the OpenAI client.
+    GEMINI_MODEL = os.environ.get("GEMINI_MODEL") or DEFAULT_GEMINI_MODEL
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL
+    ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_ANTHROPIC_MODEL
 
     # Check which providers are available for multi-AI diversity
     if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
@@ -548,6 +551,11 @@ Integrate this knowledge naturally when relevant.
             "model": ANTHROPIC_MODEL,
             "api_key": ANTHROPIC_API_KEY
         }
+
+    # Apply --model override only to agent1's selected provider so a
+    # provider-specific model ID isn't accidentally sent to a different client.
+    if args.model:
+        agent1_config["model"] = args.model
 
     agent1 = AIAgent(
         name="Technical Evaluator",
@@ -658,7 +666,6 @@ comprehensive document ready for IP protection.
         agent2=agent2,
         initial_prompt=initial_topic,
         max_rounds=args.rounds,
-        convergence_threshold=0.85
     )
 
     # Run the conversation

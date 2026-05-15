@@ -30,6 +30,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# If the prompt looks like a file path, verify it exists before proceeding
+if ($Prompt -match '\.(md|txt)$') {
+    if (-not (Test-Path $Prompt)) {
+        Write-Host "[ERROR] Prompt file not found: $Prompt" -ForegroundColor Red
+        Write-Host "        Check the path and try again, or pass an inline text prompt." -ForegroundColor Yellow
+        exit 1
+    }
+}
+
 # Activate virtual environment if it exists
 if (Test-Path ".venv\Scripts\Activate.ps1") {
     Write-Host "Activating virtual environment..." -ForegroundColor Cyan
