@@ -166,9 +166,13 @@
 When user requests Copilot to "make sure work is being done":
 
 1. **Check PR Status**: Use `gh` CLI to fetch PR details, comments, and review status
-2. **Address Review Comments**: Create fix branch, implement all requested changes, test
-3. **Update PR**: Merge fixes into feature branch, push to origin, comment resolution summary
-4. **Notify User**: Tag user on GitHub when PR ready for merge (not in chat - reduces context burn)
+2. **Address Review Comments**: Work directly on the PR's feature branch (don't create separate fix branches)
+3. **Commit & Push**: Commit fixes directly to PR branch, push to origin to update PR automatically
+4. **Post Summary**: Comment on PR documenting what was fixed (references commit SHA)
+5. **Mark Resolved**: GitHub auto-marks comments as "outdated" when those lines change; PR author must manually click "Resolve conversation" in UI
+6. **Notify User**: Tag user on GitHub when PR ready for merge (not in chat - reduces context burn)
+
+**Critical**: When addressing PR feedback, always work on the same branch as the PR. Don't create separate fix branches - they add unnecessary merge steps.
 
 **Rationale**: User has limited hand use - Copilot should autonomously manage entire PR lifecycle including addressing reviews, running tests, and notifying when ready for final approval.
 
