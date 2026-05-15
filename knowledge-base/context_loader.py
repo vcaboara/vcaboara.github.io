@@ -17,10 +17,14 @@ def _load_ai_agent_class():
     """Load AIAgent from tools/ai-evaluator/ai_conversation.py."""
     repo_root = Path(__file__).resolve().parents[1]
     module_path = repo_root / "tools" / "ai-evaluator" / "ai_conversation.py"
+    if not module_path.exists():
+        raise ImportError(f"AIAgent module not found at {module_path}")
 
     spec = importlib.util.spec_from_file_location("ai_conversation", module_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Could not load AIAgent from {module_path}")
+        raise ImportError(
+            f"Could not create a module spec for AIAgent from {module_path}"
+        )
 
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
