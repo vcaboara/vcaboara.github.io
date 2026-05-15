@@ -1,16 +1,26 @@
 #!/usr/bin/env python3
 """
-Script to facilitate a conversation between two AI agents until they converge on a final document.
+Script to facilitate a conversation between two AI agents until they converge
+on a final document.
 """
 
 import os
 import sys
 import json
 import time
+import logging
 import argparse
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, List
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 # Load .env file if present
 try:
@@ -27,15 +37,16 @@ try:
     from google import genai
     from google.genai import types
 except ImportError:
-    print("Error: Required packages not installed.")
-    print("Run: pip install -r ai_conversation_requirements.txt")
+    logger.error("Required packages not installed.")
+    logger.error("Run: pip install -r ai_conversation_requirements.txt")
     sys.exit(1)
 
 
 class AIAgent:
     """Represents an AI agent with a specific role and personality."""
 
-    def __init__(self, name: str, provider: str, model: str, system_prompt: str, api_key: str):
+    def __init__(self, name: str, provider: str, model: str,
+                 system_prompt: str, api_key: str):
         self.name = name
         self.provider = provider.lower()
         self.model = model
@@ -133,10 +144,11 @@ class ConversationManager:
 
     def run_conversation(self) -> Dict:
         """Run the conversation loop between the two agents."""
-        print(f"\n{'='*80}")
-        print(
-            f"Starting conversation between {self.agent1.name} and {self.agent2.name}")
-        print(f"{'='*80}\n")
+        logger.info("="*80)
+        logger.info(
+            f"Starting conversation between {self.agent1.name} and "
+            f"{self.agent2.name}")
+        logger.info("="*80)
 
         current_message = self.initial_prompt
         current_speaker = self.agent1
@@ -147,8 +159,8 @@ class ConversationManager:
 
         while round_num < self.max_rounds and not converged:
             round_num += 1
-            print(f"\n--- Round {round_num} ---")
-            print(f"{current_speaker.name} is responding...\n")
+            logger.info(f"--- Round {round_num} ---")
+            logger.info(f"{current_speaker.name} is responding...")
 
             # Get response from current speaker
             response = current_speaker.respond(current_message)
@@ -161,32 +173,40 @@ class ConversationManager:
                 "timestamp": datetime.now().isoformat()
             })
 
-            print(f"{current_speaker.name}: {response[:200]}...")
+            logger.info(f"{current_speaker.name}: {response[:200]}...")
             if len(response) > 200:
-                print(f"  ... ({len(response)} characters total)")
+                logger.info(f"  ... ({len(response)} characters total)")
 
             # Check for convergence if we have at least 2 rounds
             if round_num >= 2:
                 prev_response = self.conversation_history[-2]["message"]
                 if self.check_convergence(prev_response, response):
                     converged = True
-                    print(
-                        f"\n✓ Convergence detected after {round_num} rounds!")
+                    logger.info(
+                        f"✓ Convergence detected after {round_num} rounds!")
                     break
 
             # Prepare next message and swap speakers
-            current_message = f"Here is the current version from {current_speaker.name}:\n\n{response}\n\nPlease review, provide feedback, and suggest improvements or confirm if this is ready."
+            current_message = (
+                f"Here is the current version from {current_speaker.name}:\n\n"
+                f"{response}\n\nPlease review, provide feedback, and suggest "
+                f"improvements or confirm if this is ready."
+            )
             current_speaker, other_speaker = other_speaker, current_speaker
 
             # Small delay to avoid rate limits
             time.sleep(1)
 
         if not converged:
-            print(
-                f"\n⚠ Reached maximum rounds ({self.max_rounds}) without full convergence.")
+            logger.warning(
+                f"Reached maximum rounds ({self.max_rounds}) without full "
+                f"convergence.")
 
         # Extract final document (last response)
-        final_document = self.conversation_history[-1]["message"] if self.conversation_history else ""
+        final_document = (
+            self.conversation_history[-1]["message"]
+            if self.conversation_history else ""
+        )
 
         return {
             "converged": converged,
@@ -204,21 +224,28 @@ class ConversationManager:
         log_file = os.path.join(output_dir, f"conversation_{timestamp}.json")
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
-        print(f"\n✓ Conversation log saved to: {log_file}")
+        logger.info(f"✓ Conversation log saved to: {log_file}")
 
         # Save final document
-        doc_file = os.path.join(output_dir, f"final_document_{timestamp}.txt")
+        doc_file = os.path.join(
+            output_dir, f"final_document_{timestamp}.txt"
+        )
         with open(doc_file, 'w', encoding='utf-8') as f:
             f.write(results["final_document"])
-        print(f"✓ Final document saved to: {doc_file}")
+        logger.info(f"✓ Final document saved to: {doc_file}")
 
         # Save readable transcript
         transcript_file = os.path.join(
-            output_dir, f"transcript_{timestamp}.txt")
+            output_dir, f"transcript_{timestamp}.txt"
+        )
         with open(transcript_file, 'w', encoding='utf-8') as f:
             f.write(
-                f"Conversation between {self.agent1.name} and {self.agent2.name}\n")
-            f.write(f"Started: {self.conversation_history[0]['timestamp']}\n")
+                f"Conversation between {self.agent1.name} and "
+                f"{self.agent2.name}\n"
+            )
+            f.write(
+                f"Started: {self.conversation_history[0]['timestamp']}\n"
+            )
             f.write(f"Rounds: {results['rounds']}\n")
             f.write(f"Converged: {results['converged']}\n")
             f.write("="*80 + "\n\n")
@@ -228,7 +255,7 @@ class ConversationManager:
                 f.write("-"*80 + "\n")
                 f.write(f"{entry['message']}\n\n")
 
-        print(f"✓ Transcript saved to: {transcript_file}")
+        logger.info(f"✓ Transcript saved to: {transcript_file}")
 
 
 def main():
@@ -236,11 +263,13 @@ def main():
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Run a conversation between two AI agents to evaluate/refine content'
+        description='Run a conversation between two AI agents to '
+                    'evaluate/refine content'
     )
     parser.add_argument(
         '--prompt', '-p',
-        help='Initial prompt text (or path to .txt/.md file containing the prompt)'
+        help='Initial prompt text (or path to .txt/.md file containing '
+             'the prompt)'
     )
     parser.add_argument(
         '--rounds', '-r',
@@ -255,7 +284,8 @@ def main():
     )
     parser.add_argument(
         '--context', '-c',
-        help='Path to knowledge base directory for persistent IP context (e.g., knowledge-base/ip-context)'
+        help='Path to knowledge base directory for persistent IP context '
+             '(e.g., knowledge-base/ip-context)'
     )
     args = parser.parse_args()
 
@@ -266,8 +296,12 @@ def main():
 
     # Check which providers are available for multi-AI diversity
     if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
-        print("Error: At least one API key is required (GEMINI, OPENAI, or ANTHROPIC).")
-        print("Set API keys in your .env file or as environment variables.")
+        logger.error(
+            "At least one API key is required (GEMINI, OPENAI, or ANTHROPIC)."
+        )
+        logger.error(
+            "Set API keys in your .env file or as environment variables."
+        )
         sys.exit(1)
 
     # Load knowledge base context if specified
@@ -275,14 +309,16 @@ def main():
     if args.context:
         kb_dir = Path(args.context)
         if kb_dir.exists():
-            print(f"Loading knowledge base from: {kb_dir}")
+            logger.info(f"Loading knowledge base from: {kb_dir}")
             kb_files = list(kb_dir.glob("*.md"))
             if kb_files:
                 kb_content = []
                 for md_file in kb_files:
                     with open(md_file, 'r', encoding='utf-8') as f:
                         kb_content.append(
-                            f"## {md_file.stem.replace('-', ' ').title()}\n\n{f.read()}\n")
+                            f"## {md_file.stem.replace('-', ' ').title()}"
+                            f"\n\n{f.read()}\n"
+                        )
 
                 kb_context = f"""
 
@@ -299,55 +335,88 @@ You have access to pre-loaded knowledge base context. Reference this without req
 Integrate this knowledge naturally when relevant.
 
 """
-                print(
-                    f"✓ Loaded {len(kb_files)} context files ({sum(len(c) for c in kb_content)} characters)")
+                total_chars = sum(len(c) for c in kb_content)
+                logger.info(
+                    f"✓ Loaded {len(kb_files)} context files "
+                    f"({total_chars} characters)"
+                )
             else:
-                print(f"⚠ No .md files found in {kb_dir}")
+                logger.warning(f"No .md files found in {kb_dir}")
         else:
-            print(f"⚠ Knowledge base directory not found: {kb_dir}")
+            logger.warning(f"Knowledge base directory not found: {kb_dir}")
 
-    # Define the two AI agents with different roles and providers for diverse perspectives
-    # Prefer multi-provider diversity when keys are configured
-    
+    # Define the two AI agents with different roles and providers for
+    # diverse perspectives. Prefer multi-provider diversity when keys are
+    # configured
+
     # Agent 1: Primary provider (prefer Gemini if available)
     if GEMINI_API_KEY:
-        agent1_config = {"provider": "gemini", "model": "models/gemini-3-flash-preview", "api_key": GEMINI_API_KEY}
+        agent1_config = {
+            "provider": "gemini",
+            "model": "models/gemini-3-flash-preview",
+            "api_key": GEMINI_API_KEY
+        }
     elif OPENAI_API_KEY:
-        agent1_config = {"provider": "openai", "model": "gpt-4", "api_key": OPENAI_API_KEY}
+        agent1_config = {
+            "provider": "openai",
+            "model": "gpt-4",
+            "api_key": OPENAI_API_KEY
+        }
     else:
-        agent1_config = {"provider": "anthropic", "model": "claude-3-5-sonnet-20241022", "api_key": ANTHROPIC_API_KEY}
+        agent1_config = {
+            "provider": "anthropic",
+            "model": "claude-3-5-sonnet-20241022",
+            "api_key": ANTHROPIC_API_KEY
+        }
     
     agent1 = AIAgent(
         name="Technical Evaluator",
         **agent1_config,
         system_prompt=(
-            "You are a technical evaluator specializing in intellectual property and technology assessment. "
-            "Your role is to analyze tech briefs for technical accuracy, innovation potential, "
+            "You are a technical evaluator specializing in intellectual "
+            "property and technology assessment. Your role is to analyze "
+            "tech briefs for technical accuracy, innovation potential, "
             "patentability, prior art concerns, and commercial viability. "
-            "Provide detailed technical critique and identify strengths, weaknesses, and areas needing clarification. "
-            "When you believe the brief is comprehensive and accurate, clearly state your approval."
+            "Provide detailed technical critique and identify strengths, "
+            "weaknesses, and areas needing clarification. When you believe "
+            "the brief is comprehensive and accurate, clearly state your "
+            "approval."
         ) + kb_context
     )
 
-    # Agent 2: Secondary provider (prefer diversity - use different provider than agent1)
+    # Agent 2: Secondary provider (prefer diversity - use different
+    # provider than agent1)
     if agent1_config["provider"] != "anthropic" and ANTHROPIC_API_KEY:
-        agent2_config = {"provider": "anthropic", "model": "claude-3-5-sonnet-20241022", "api_key": ANTHROPIC_API_KEY}
+        agent2_config = {
+            "provider": "anthropic",
+            "model": "claude-3-5-sonnet-20241022",
+            "api_key": ANTHROPIC_API_KEY
+        }
     elif agent1_config["provider"] != "openai" and OPENAI_API_KEY:
-        agent2_config = {"provider": "openai", "model": "gpt-4", "api_key": OPENAI_API_KEY}
+        agent2_config = {
+            "provider": "openai",
+            "model": "gpt-4",
+            "api_key": OPENAI_API_KEY
+        }
     else:
         # Fall back to same provider if no diversity possible
         agent2_config = agent1_config.copy()
-        print(f"⚠ Using {agent1_config['provider']} for both agents (configure additional API keys for diversity)")
+        logger.warning(
+            f"Using {agent1_config['provider']} for both agents (configure "
+            f"additional API keys for diversity)"
+        )
     
     agent2 = AIAgent(
         name="Strategic Analyst",
         **agent2_config,
         system_prompt=(
-            "You are a strategic analyst focused on IP strategy, market positioning, and business value. "
-            "Your role is to evaluate tech briefs for market opportunity, competitive advantage, "
-            "strategic alignment, and implementation feasibility. "
-            "Ensure the brief clearly articulates the invention's value proposition and differentiation. "
-            "When the brief meets strategic requirements, explicitly confirm your approval."
+            "You are a strategic analyst focused on IP strategy, market "
+            "positioning, and business value. Your role is to evaluate tech "
+            "briefs for market opportunity, competitive advantage, strategic "
+            "alignment, and implementation feasibility. Ensure the brief "
+            "clearly articulates the invention's value proposition and "
+            "differentiation. When the brief meets strategic requirements, "
+            "explicitly confirm your approval."
         ) + kb_context
     )
 
@@ -361,7 +430,7 @@ Integrate this knowledge naturally when relevant.
         # Check if it's a file path
         prompt_path = Path(args.prompt)
         if prompt_path.exists() and prompt_path.suffix in ['.txt', '.md']:
-            print(f"Loading prompt from file: {prompt_path}")
+            logger.info(f"Loading prompt from file: {prompt_path}")
             with open(prompt_path, 'r', encoding='utf-8') as f:
                 initial_topic = f.read()
         else:
@@ -399,11 +468,12 @@ Please review this brief for technical accuracy, completeness, patentability con
 and business value. Identify gaps, suggest improvements, and help refine it into a
 comprehensive document ready for IP protection.
 """
-        print("\n⚠ WARNING: Using default template prompt.")
-        print("For better results, provide your tech brief:")
-        print("  python ai_conversation.py --prompt 'your prompt here'")
-        print("  python ai_conversation.py --prompt path/to/your_brief.md")
-        print("")
+        logger.warning("Using default template prompt.")
+        logger.info("For better results, provide your tech brief:")
+        logger.info("  python ai_conversation.py --prompt 'your prompt here'")
+        logger.info(
+            "  python ai_conversation.py --prompt path/to/your_brief.md"
+        )
 
     # Create conversation manager
     manager = ConversationManager(
@@ -420,9 +490,9 @@ comprehensive document ready for IP protection.
     # Save results
     manager.save_results(results, output_dir=args.output)
 
-    print(f"\n{'='*80}")
-    print("Conversation complete!")
-    print(f"{'='*80}\n")
+    logger.info("="*80)
+    logger.info("Conversation complete!")
+    logger.info("="*80)
 
 
 if __name__ == "__main__":
