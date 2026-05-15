@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def validate_off_the_shelf(file_path):
     """Validate the off-the-shelf.html file"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding='utf-8') as f:
         content = f.read()
 
     issues = []

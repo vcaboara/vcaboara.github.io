@@ -1,9 +1,9 @@
 """Quick test script to debug Gemini API connection."""
-import os
 import logging
+import os
+
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types
 
 # Configure logging
 logging.basicConfig(

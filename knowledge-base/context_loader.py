@@ -7,15 +7,15 @@ re-explaining your IP, patent details, or business strategy.
 USAGE
 -----
     from knowledge_base.context_loader import KnowledgeBase
-    
+
     # Load all context files
     kb = KnowledgeBase("knowledge-base/ip-context")
     kb.load_all()
-    
+
     # Build enhanced system prompt
     base_prompt = "You are a technical evaluator..."
     enhanced_prompt = kb.build_system_prompt(base_prompt)
-    
+
     # Enhanced prompt now includes tech brief, AIF pillars, strategy notes
 
 DIRECTORY STRUCTURE
@@ -32,7 +32,7 @@ INTEGRATION WITH AI_CONVERSATION
     python tools/ai-evaluator/ai_conversation.py \\
         --prompt "your question" \\
         --context knowledge-base/ip-context
-    
+
     The --context flag automatically loads all .md files from the directory and
     prepends them to agent system prompts.
 
@@ -40,10 +40,10 @@ UPDATING CONTEXT
 ----------------
     # Edit context files directly
     notepad knowledge-base/ip-context/context.md
-    
+
     # Append programmatically
     kb.append_to_context("## New Finding\\nYour notes here")
-    
+
     # All changes are git-tracked
     git add knowledge-base/ip-context/
     git commit -m "Update: [description]"
@@ -57,9 +57,7 @@ BENEFITS
 """
 import importlib.util
 import logging
-import os
 from pathlib import Path
-from typing import List, Dict
 
 # Configure logging
 logging.basicConfig(
@@ -107,14 +105,14 @@ class KnowledgeBase:
         self.context_dir = Path(context_dir)
         self.contexts = {}
 
-    def load_all(self) -> Dict[str, str]:
+    def load_all(self) -> dict[str, str]:
         """Load all markdown files from context directory."""
         if not self.context_dir.exists():
             raise FileNotFoundError(
                 f"Knowledge base not found: {self.context_dir}")
 
         for md_file in self.context_dir.glob("*.md"):
-            with open(md_file, 'r', encoding='utf-8') as f:
+            with open(md_file, encoding='utf-8') as f:
                 self.contexts[md_file.stem] = f.read()
 
         return self.contexts
@@ -125,7 +123,7 @@ class KnowledgeBase:
             self.load_all()
         return self.contexts.get(name, "")
 
-    def build_system_prompt(self, base_prompt: str, include: List[str] = None) -> str:
+    def build_system_prompt(self, base_prompt: str, include: list[str] = None) -> str:
         """Build enhanced system prompt with knowledge base context.
 
         Args:
@@ -197,7 +195,7 @@ Refer to this context when relevant, and ask clarifying questions to build upon 
 def create_context_aware_agent(name: str, provider: str, model: str,
                                base_system_prompt: str, api_key: str,
                                knowledge_base: KnowledgeBase = None,
-                               include_contexts: List[str] = None):
+                               include_contexts: list[str] = None):
     """Factory function to create an AIAgent with knowledge base context.
 
     Args:

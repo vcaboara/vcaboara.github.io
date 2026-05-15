@@ -85,7 +85,7 @@ class LocalServer:
         self.httpd: ThreadingHTTPServer | None = None
         self.thread: threading.Thread | None = None
 
-    def __enter__(self) -> "LocalServer":
+    def __enter__(self) -> LocalServer:
         handler = functools.partial(
             SimpleHTTPRequestHandler, directory=str(self.directory))
         self.httpd = ThreadingHTTPServer(("127.0.0.1", self.port), handler)
