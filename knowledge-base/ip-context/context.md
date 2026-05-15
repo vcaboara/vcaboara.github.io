@@ -154,3 +154,33 @@
 - **Key Insight**: Judge as 5-month-old filing by individual inventor facing structural gatekeeping, not as mature commercial venture
 
 ---
+
+## GitHub Workflow & Autonomous Operations (May 14, 2026)
+
+### Repository Structure
+- **Main Branch**: Live site at arboreum.net (via Cloudflare → GitHub Pages)
+- **PR/Branch Protocol**: Never commit directly to main - use PRs with reviews
+- **Pre-commit Hooks**: Enforce branch protection, sensitive data checks, structural validation
+
+### Copilot Autonomous PR/Issue Management
+When user requests Copilot to "make sure work is being done":
+
+1. **Check PR Status**: Use `gh` CLI to fetch PR details, comments, and review status
+2. **Address Review Comments**: Create fix branch, implement all requested changes, test
+3. **Update PR**: Merge fixes into feature branch, push to origin, comment resolution summary
+4. **Notify User**: Tag user on GitHub when PR ready for merge (not in chat - reduces context burn)
+
+**Rationale**: User has limited hand use - Copilot should autonomously manage entire PR lifecycle including addressing reviews, running tests, and notifying when ready for final approval.
+
+### Issue Tracking for Future Work
+- Use GitHub Issues for multi-step work that doesn't need immediate resolution
+- Allows async work by different Copilot sessions without burning main conversation context
+- Issues can reference knowledge base for persistent context
+
+**Active PRs/Issues (May 14, 2026)**:
+- **PR #20**: Knowledge base system (under review, fixes pushed)
+- **Issue #21**: Multi-AI consultation for outreach strategy
+- **Issue #22**: WIPO GREEN DB entry reconstruction
+- **Issue #23**: Contact list generation and outreach automation
+
+---
