@@ -5,12 +5,12 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  YOU: Provide initial tech brief                            │
-│  (via file: --prompt my_brief.md OR inline text)           │
+│  (via file: --prompt my_brief.md OR inline text)            │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
          ┌───────────────────────────────┐
-         │  AGENT 1: Gemini 3 Flash     │
+         │  AGENT 1: Gemini 3 Flash      │
          │  Role: Technical Evaluator    │
          │                               │
          │  • Analyzes technical details │
@@ -20,7 +20,7 @@
                      │ Response 1
                      ▼
          ┌───────────────────────────────┐
-         │  AGENT 2: GPT-4o / Claude 3.5│
+         │  AGENT 2: GPT-4o / Claude 3.5 │
          │  Role: Strategic Analyst      │
          │                               │
          │  • Evaluates business value   │
@@ -30,16 +30,16 @@
                      │ Critique/Refinement
                      ▼
          ┌───────────────────────────────┐
-         │  AGENT 1: Gemini 3 Flash     │
-         │  Addresses feedback          │
-         │  Refines technical aspects   │
+         │  AGENT 1: Gemini 3 Flash      │
+         │  Addresses feedback           │
+         │  Refines technical aspects    │
          └───────────┬───────────────────┘
                      │ Refined version
                      ▼
          ┌───────────────────────────────┐
-         │  AGENT 2: GPT-4o / Claude 3.5│
-         │  Reviews refinements         │
-         │  Adds strategic input        │
+         │  AGENT 2: GPT-4o / Claude 3.5 │
+         │  Reviews refinements          │
+         │  Adds strategic input         │
          └───────────┬───────────────────┘
                      │
                      ▼
@@ -56,7 +56,7 @@
                             └───────┬───────┘
                                     │
                                     ▼
-                    ┌───────────────────────────────┐
+                    ┌──────────────────────────────┐
                     │  FINAL OUTPUT                │
                     │  • Final document            │
                     │  • Full transcript           │
