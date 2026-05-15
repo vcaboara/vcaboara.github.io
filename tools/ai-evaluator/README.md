@@ -1,202 +1,58 @@
 # AI Tech Brief Evaluator
 
-Automated system for evaluating and refining technology briefs using ChatGPT and Gemini AI agents working collaboratively.
+Automated system for evaluating and refining technology briefs using multi-AI agent collaboration (Gemini, ChatGPT, Claude).
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
-```powershell
+```bash
 pip install -r ai_conversation_requirements.txt
 ```
 
-### 2. Set Up API Keys
+### 2. Configure API Keys
 
-**Copy the example file:**
-```powershell
-Copy-Item .env.example .env
-```
-
-**Get your API keys** (see [GET_API_KEYS.md](GET_API_KEYS.md) for detailed instructions):
-- **OpenAI (ChatGPT)**: https://platform.openai.com/api-keys
-- **Google Gemini**: https://aistudio.google.com/app/apikey (FREE tier available!)
-
-**Edit `.env` and add your keys:**
+Create `.env` file (copy from `.env.example`):
 ```env
-OPENAI_API_KEY=sk-proj-your-key-here
-GEMINI_API_KEY=AIza-your-key-here
+GEMINI_API_KEY=your-key-here       # FREE tier available!
+OPENAI_API_KEY=your-key-here       # Optional
+ANTHROPIC_API_KEY=your-key-here    # Optional
 ```
 
-### 3. Create Your Tech Brief
-```powershell
-# Copy the template
-Copy-Item example_tech_brief.md my_invention.md
+**Get API keys:** See [GET_API_KEYS.md](GET_API_KEYS.md) for step-by-step instructions.
 
-# Edit with your invention details
-notepad my_invention.md
-```
-
-### 4. Run Evaluation
-```powershell
-python ai_conversation.py --prompt my_invention.md
-```
-
-### 5. Get Results
-Check the `output/` folder for:
-- `final_document_*.txt` - Refined tech brief (ready for hosting/download)
-- `transcript_*.txt` - Full conversation showing iteration
-- `conversation_*.json` - Complete data log
-
----
-
-## 📖 How It Works
-
-Two AI agents **alternate** to evaluate and refine your tech brief:
-
-```
-Your Brief → ChatGPT (Technical) → Gemini (Strategic) → ChatGPT → Gemini → ...
-```
-
-**Agent 1: ChatGPT (GPT-4o)** - Technical Evaluator
-- Technical accuracy & innovation assessment
-- Patentability analysis
-- Prior art concerns
-- Implementation feasibility
-
-**Agent 2: Gemini (1.5 Pro)** - Strategic Analyst  
-- Market opportunity & business value
-- Competitive positioning
-- IP strategy & defensibility
-- Commercial viability
-
-They iterate until reaching consensus on a comprehensive, patent-ready tech brief.
-
-**See [CONVERSATION_FLOW.md](CONVERSATION_FLOW.md) for detailed flow diagram.**
-
----
-
-## 💻 Usage
-
-### Basic Usage
-```powershell
-# Evaluate from file (recommended)
-python ai_conversation.py --prompt my_invention.md
-
-# Quick inline evaluation
-python ai_conversation.py --prompt "Evaluate: AI-powered XYZ system..."
-```
-
-### Advanced Options
-```powershell
-# More rounds for complex inventions
-python ai_conversation.py --prompt complex_invention.md --rounds 20
-
-# Custom output location (e.g., for hosting)
-python ai_conversation.py --prompt invention.md --output ../../downloads/evaluations/
-
-# Show help
+### 3. Run Evaluation
+```bash
+# See all options and examples
 python ai_conversation.py --help
+
+# Quick start with template
+python ai_conversation.py --prompt example_tech_brief.md
 ```
 
-**See [QUICK_REFERENCE.md](QUICK_REFERENCE.md) for all commands.**
+## What It Does
 
----
+Two AI agents alternate analyzing your tech brief:
+- **Agent 1**: Technical evaluation (accuracy, patentability, innovation)
+- **Agent 2**: Strategic analysis (market value, IP strategy, positioning)
 
-## 📁 File Structure
+They iterate until reaching consensus on a refined, patent-ready document.
 
-```
-tools/ai-evaluator/
-├── ai_conversation.py              # Main script
-├── ai_conversation_requirements.txt # Dependencies
-├── .env.example                    # API key template
-├── .env                           # Your API keys (create this!)
-├── example_tech_brief.md          # Example template
-├── tech_brief_template.md         # Detailed template
-├── README.md                      # This file
-├── GET_API_KEYS.md               # How to get API keys
-├── QUICK_REFERENCE.md            # Command reference
-├── CONVERSATION_FLOW.md          # How the AI conversation works
-└── output/                       # Generated evaluations (for hosting)
-```
+**See [CONVERSATION_FLOW.md](CONVERSATION_FLOW.md) for detailed flow.**
 
----
+## Documentation
 
-## 🎯 Output for Website Hosting
-
-By default, outputs go to `output/` folder. To make them available for download on your site:
-
-```powershell
-# Generate evaluation in downloads folder
-python ai_conversation.py --prompt invention.md --output ../../downloads/tech-briefs/
-
-# Then link from your HTML:
-# <a href="downloads/tech-briefs/final_document_20260428_143022.txt">Download Tech Brief</a>
-```
-
----
-
-## 💰 Cost
-
-**Recommended setup (ChatGPT + Gemini):**
-- Gemini: **FREE** (generous daily limits)
-- OpenAI: ~$0.02-0.05 per evaluation (or use free credits)
-
-**Per evaluation:** ~$0.02-0.05 (or free with Gemini only)
-
-See [GET_API_KEYS.md](GET_API_KEYS.md) for detailed pricing.
-
----
-
-## 🔧 Configuration
-
-Edit [ai_conversation.py](ai_conversation.py) to customize:
-
-```python
-# Change models
-model="gpt-4o-mini"  # Cheaper OpenAI model
-model="gemini-1.5-flash"  # Faster Gemini model
-
-# Adjust agent roles
-agent1.system_prompt = "Your custom technical evaluator instructions..."
-agent2.system_prompt = "Your custom strategic analyst instructions..."
-```
-
----
-
-## 📚 Documentation
-
-- **[GET_API_KEYS.md](GET_API_KEYS.md)** - Step-by-step API key setup
-- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Command cheat sheet
+- **`python ai_conversation.py --help`** - Complete usage guide with examples
+- **[GET_API_KEYS.md](GET_API_KEYS.md)** - API key setup instructions
 - **[CONVERSATION_FLOW.md](CONVERSATION_FLOW.md)** - How the AI conversation works
-- **[AI_CONVERSATION_USAGE.md](AI_CONVERSATION_USAGE.md)** - Detailed usage guide
+- **[example_tech_brief.md](example_tech_brief.md)** - Quick-start template
+- **[tech_brief_template.md](tech_brief_template.md)** - Detailed template
 
----
+## Output
 
-## 🛡️ Security
-
-- `.env` file is git-ignored (your keys stay private)
-- Never commit API keys to version control
-- Set usage limits in provider dashboards
-
----
-
-## ✅ Verification
-
-Test your setup:
-```powershell
-# Check API keys are loaded
-python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('Keys loaded:', bool(os.getenv('OPENAI_API_KEY') or os.getenv('GEMINI_API_KEY')))"
-
-# Run with example
-python ai_conversation.py --prompt example_tech_brief.md --rounds 5
-```
-
----
-
-## 🤝 Contributing
-
-This tool is part of [vcaboara.github.io](https://vcaboara.github.io). Generated tech briefs can be hosted in the `downloads/` folder for public access.
-
----
+Results saved to `output/` directory:
+- `final_document_*.txt` - Refined tech brief
+- `transcript_*.txt` - Full conversation
+- `conversation_*.json` - Complete data log
 
 ## 📄 License
 
