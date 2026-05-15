@@ -3,6 +3,7 @@ venv*/
 __pycache__/
 *.py[cod]
 *.bak
+*.diff
 *.zip
 *.pdf
 # Exception: Tech brief PDF needed for site download
@@ -33,3 +34,16 @@ debug-logs/
 parse_notices.py
 notices_extracted.json
 gmail_takeout/
+
+# Personal productivity tracking (workrave)
+workrave_stats.*
+data_fetcher.js
+utils/convert_workrave.py
+utils/samples/
+
+# Experimental/unrelated projects
+CIIRL*.html
+psych_notes
+docker/
+docker-compose.yml
+mcpo-config.json

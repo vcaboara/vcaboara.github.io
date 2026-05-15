@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import logging
 import shutil
 import subprocess
 import sys
@@ -24,20 +25,14 @@ from pathlib import Path
 
 from PIL import Image, ImageChops
 
+from ui_utils import is_ui_file, run_git_diff
 
-UI_FILE_PATTERNS = (
-    ".html",
-    ".css",
-    ".scss",
-    ".sass",
-    ".jsx",
-    ".tsx",
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s - %(message)s'
 )
-
-UI_EXCLUDE_PATTERNS = (
-    "test_",
-    "TESTING.md",
-)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -48,22 +43,9 @@ class PageDiffResult:
     notes: str
 
 
-def run_git_diff(base_sha: str, head_sha: str) -> list[str]:
-    cmd = ["git", "diff", "--name-only", f"{base_sha}...{head_sha}"]
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
-
-
-def is_ui_file(path: str) -> bool:
-    lower = path.lower()
-    if not lower.endswith(UI_FILE_PATTERNS):
-        return False
-    return not any(excluded.lower() in lower for excluded in UI_EXCLUDE_PATTERNS)
-
-
 def is_comparable_html(path: str) -> bool:
     lower = path.lower()
-    return lower.endswith(".html") and not any(excluded.lower() in lower for excluded in UI_EXCLUDE_PATTERNS)
+    return lower.endswith(".html") and is_ui_file(path)
 
 
 def export_revision(revision: str, out_dir: Path) -> None:

@@ -9,45 +9,20 @@ Rules:
 from __future__ import annotations
 
 import argparse
+import logging
 import os
 import re
 import subprocess
 import sys
 
+from ui_utils import is_ui_file, run_git_diff
 
-UI_FILE_PATTERNS = (
-    ".html",
-    ".css",
-    ".scss",
-    ".sass",
-    ".jsx",
-    ".tsx",
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s - %(message)s'
 )
-
-UI_EXCLUDE_PATTERNS = (
-    "test_",
-    "TESTING.md",
-)
-
-
-def run_git_diff(base_sha: str, head_sha: str) -> list[str]:
-    cmd = ["git", "diff", "--name-only", f"{base_sha}...{head_sha}"]
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    files = [line.strip()
-             for line in result.stdout.splitlines() if line.strip()]
-    return files
-
-
-def is_ui_file(path: str) -> bool:
-    lower = path.lower()
-    if not lower.endswith(UI_FILE_PATTERNS):
-        return False
-
-    for excluded in UI_EXCLUDE_PATTERNS:
-        if excluded.lower() in lower:
-            return False
-
-    return True
+logger = logging.getLogger(__name__)
 
 
 def count_images(pr_body: str) -> int:
