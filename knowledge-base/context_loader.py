@@ -1,7 +1,15 @@
 """Context loader for AI conversations with knowledge base."""
+import logging
 import os
 from pathlib import Path
 from typing import List, Dict
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 class KnowledgeBase:
@@ -95,7 +103,7 @@ Refer to this context when relevant, and ask clarifying questions to build upon 
         self.contexts[filepath.stem] = (
             self.context_dir / filename).read_text(encoding='utf-8')
 
-        print(f"✓ Appended to {filename}")
+        logger.info(f"Appended to {filename}")
 
 
 def create_context_aware_agent(name: str, provider: str, model: str,
@@ -138,8 +146,8 @@ if __name__ == "__main__":
     kb = KnowledgeBase()
     kb.load_all()
 
-    print("Loaded contexts:")
+    logger.info("Loaded contexts:")
     for name, content in kb.contexts.items():
-        print(f"  - {name}: {len(content)} characters")
+        logger.info(f"  - {name}: {len(content)} characters")
 
-    print("\n✓ Knowledge base system ready")
+    logger.info("\nKnowledge base system ready")

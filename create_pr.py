@@ -11,8 +11,16 @@ This helper intentionally stays lightweight:
 from __future__ import annotations
 
 import argparse
+import logging
 import subprocess
 import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 def run_command(command: list[str], capture: bool = False) -> subprocess.CompletedProcess[str]:
@@ -41,30 +49,30 @@ def gh_available() -> bool:
 
 def create_pr(base: str, head: str, title: str, body_file: str | None, draft: bool, push: bool) -> int:
     if not gh_available():
-        print("❌ GitHub CLI (gh) not found. Install from https://cli.github.com")
+        logger.error("GitHub CLI (gh) not found. Install from https://cli.github.com")
         return 1
 
     if not head:
-        print("❌ Could not detect current branch.")
+        logger.error("Could not detect current branch.")
         return 1
 
     if head in {"main", "master"}:
-        print("❌ Refusing to create PR from protected branch.")
+        logger.error("Refusing to create PR from protected branch.")
         return 1
 
     if has_uncommitted_changes():
-        print("⚠️ Working tree has uncommitted changes. Commit or stash first for predictable PR content.")
+        logger.warning("Working tree has uncommitted changes. Commit or stash first for predictable PR content.")
 
     if push:
-        print(f"📤 Pushing branch '{head}'...")
+        logger.info(f"Pushing branch '{head}'...")
         push_result = run_command(
             ["git", "push", "-u", "origin", head], capture=True)
         if push_result.returncode != 0:
-            print("❌ Failed to push branch.")
+            logger.error("Failed to push branch.")
             if push_result.stderr:
-                print(push_result.stderr.strip())
+                logger.error(push_result.stderr.strip())
             elif push_result.stdout:
-                print(push_result.stdout.strip())
+                logger.error(push_result.stdout.strip())
             return 1
 
     cmd = [
@@ -84,17 +92,17 @@ def create_pr(base: str, head: str, title: str, body_file: str | None, draft: bo
     if draft:
         cmd.append("--draft")
 
-    print(f"📝 Creating PR from '{head}' to '{base}'...")
+    logger.info(f"Creating PR from '{head}' to '{base}'...")
     result = run_command(cmd, capture=True)
 
     if result.returncode != 0:
-        print("❌ PR creation failed.")
+        logger.error("PR creation failed.")
         if result.stderr:
-            print(result.stderr.strip())
+            logger.error(result.stderr.strip())
         return result.returncode
 
-    print("✅ PR created successfully:")
-    print(result.stdout.strip())
+    logger.info("PR created successfully:")
+    logger.info(result.stdout.strip())
     return 0
 
 

@@ -2,9 +2,17 @@
 Validation script for compliance-tracker.html
 Checks for data integrity, required elements, and calculation accuracy
 """
+import logging
 import re
 import sys
 from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 def validate_compliance_tracker(file_path):
@@ -116,35 +124,35 @@ def validate_compliance_tracker(file_path):
 
 
 def main():
-    print("🧪 Running Compliance Tracker Validation Tests\n")
+    logger.info("Running Compliance Tracker Validation Tests\n")
 
     tracker_path = Path(__file__).parent.parent / 'compliance-tracker.html'
 
     if not tracker_path.exists():
-        print(f"❌ ERROR: {tracker_path} not found")
+        logger.error(f"ERROR: {tracker_path} not found")
         return 1
 
-    print("📋 Validating compliance-tracker.html structure and calculations...")
+    logger.info("Validating compliance-tracker.html structure and calculations...")
     issues = validate_compliance_tracker(tracker_path)
 
-    print()
+    logger.info("")
 
     if not issues:
-        print("✅ All validation checks passed!")
+        logger.info("All validation checks passed!")
         return 0
     else:
-        print("Issues found:\n")
+        logger.info("Issues found:\n")
         for issue in issues:
-            print(f"  {issue}")
-        print()
+            logger.info(f"  {issue}")
+        logger.info("")
 
         # Critical issues fail the test
         critical = [i for i in issues if 'CRITICAL' in i]
         if critical:
-            print(f"❌ {len(critical)} critical issue(s) - FAILED")
+            logger.error(f"{len(critical)} critical issue(s) - FAILED")
             return 1
         else:
-            print(f"⚠️  {len(issues)} warning(s) - PASSED with warnings")
+            logger.warning(f"{len(issues)} warning(s) - PASSED with warnings")
             return 0
 
 

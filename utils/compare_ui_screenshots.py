@@ -233,8 +233,8 @@ def main() -> int:
     try:
         changed_files = run_git_diff(args.base_sha, args.head_sha)
     except subprocess.CalledProcessError as exc:
-        print("❌ Failed to list changed files")
-        print(exc.stderr)
+        logger.error("Failed to list changed files")
+        logger.error(exc.stderr)
         return 1
 
     ui_changed_files = [f for f in changed_files if is_ui_file(f)]
@@ -242,7 +242,7 @@ def main() -> int:
 
     if not ui_changed_files or not comparable_pages:
         write_summary(output_markdown, ui_changed_files, comparable_pages, [])
-        print(output_markdown.read_text(encoding="utf-8"))
+        logger.info(output_markdown.read_text(encoding="utf-8"))
         return 0
 
     work_dir = Path(tempfile.mkdtemp(prefix="ui-diff-"))
@@ -290,18 +290,18 @@ def main() -> int:
                         page=page, status="error", diff_percent=0.0, notes=str(exc)))
 
     except subprocess.CalledProcessError as exc:
-        print("❌ Failed to export git revisions")
-        print(exc.stderr)
+        logger.error("Failed to export git revisions")
+        logger.error(exc.stderr)
         return 1
     finally:
         write_summary(output_markdown, ui_changed_files,
                       comparable_pages, results)
         shutil.rmtree(work_dir, ignore_errors=True)
 
-    print(output_markdown.read_text(encoding="utf-8"))
+    logger.info(output_markdown.read_text(encoding="utf-8"))
 
     if any(result.status == "error" for result in results):
-        print("❌ One or more pages failed screenshot comparison")
+        logger.error("One or more pages failed screenshot comparison")
         return 1
 
     return 0

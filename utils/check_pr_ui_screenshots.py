@@ -73,45 +73,45 @@ def main() -> int:
     try:
         changed_files = run_git_diff(args.base_sha, args.head_sha)
     except subprocess.CalledProcessError as exc:
-        print("❌ Unable to determine changed files for PR policy check.")
-        print(exc.stderr)
+        logger.error("Unable to determine changed files for PR policy check.")
+        logger.error(exc.stderr)
         return 1
 
     ui_changed_files = [f for f in changed_files if is_ui_file(f)]
 
     if not ui_changed_files:
-        print("✅ No UI-facing file changes detected; screenshot policy not required.")
+        logger.info("No UI-facing file changes detected; screenshot policy not required.")
         return 0
 
     pr_body = os.environ.get("PR_BODY", "")
     if not pr_body.strip():
-        print("❌ UI changes detected, but PR body is empty.")
-        print("UI-changed files:")
+        logger.error("UI changes detected, but PR body is empty.")
+        logger.error("UI-changed files:")
         for file in ui_changed_files:
-            print(f"  - {file}")
-        print("Add BEFORE/AFTER screenshots in the PR description.")
+            logger.error(f"  - {file}")
+        logger.error("Add BEFORE/AFTER screenshots in the PR description.")
         return 1
 
     image_count = count_images(pr_body)
     labeled = has_before_after_labels(pr_body)
 
     if not labeled or image_count < 2:
-        print("❌ UI changes detected, but screenshot evidence is incomplete.")
-        print("UI-changed files:")
+        logger.error("UI changes detected, but screenshot evidence is incomplete.")
+        logger.error("UI-changed files:")
         for file in ui_changed_files:
-            print(f"  - {file}")
-        print()
-        print("Required in PR body:")
-        print("  - BEFORE label")
-        print("  - AFTER label")
-        print("  - At least two screenshot images")
-        print(f"Detected images: {image_count}")
+            logger.error(f"  - {file}")
+        logger.error("")
+        logger.error("Required in PR body:")
+        logger.error("  - BEFORE label")
+        logger.error("  - AFTER label")
+        logger.error("  - At least two screenshot images")
+        logger.error(f"Detected images: {image_count}")
         return 1
 
-    print("✅ UI screenshot policy satisfied.")
-    print("UI-changed files:")
+    logger.info("UI screenshot policy satisfied.")
+    logger.info("UI-changed files:")
     for file in ui_changed_files:
-        print(f"  - {file}")
+        logger.info(f"  - {file}")
     return 0
 
 

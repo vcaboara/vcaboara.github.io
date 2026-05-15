@@ -110,11 +110,11 @@ def create_comparison_image(
             output_path.parent.mkdir(parents=True, exist_ok=True)
             canvas.save(output_path, quality=95)
             
-            print(f"✅ Created comparison: {output_path}")
+            logger.info(f"Created comparison: {output_path}")
             return True
 
     except Exception as exc:
-        print(f"❌ Failed to create comparison for {base_path.name}: {exc}")
+        logger.error(f"Failed to create comparison for {base_path.name}: {exc}")
         return False
 
 
@@ -150,27 +150,27 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.base_dir.exists():
-        print(f"❌ Base directory not found: {args.base_dir}")
+        logger.error(f"Base directory not found: {args.base_dir}")
         return 1
 
     if not args.head_dir.exists():
-        print(f"❌ Head directory not found: {args.head_dir}")
+        logger.error(f"Head directory not found: {args.head_dir}")
         return 1
 
     # Find all base images
     base_images = list(args.base_dir.glob("*.png"))
     if not base_images:
-        print(f"❌ No PNG images found in {args.base_dir}")
+        logger.error(f"No PNG images found in {args.base_dir}")
         return 1
 
-    print(f"Found {len(base_images)} base images to process")
+    logger.info(f"Found {len(base_images)} base images to process")
     
     all_ok = True
     for base_path in base_images:
         head_path = args.head_dir / base_path.name
         
         if not head_path.exists():
-            print(f"⚠️  Skipping {base_path.name} - no matching head image")
+            logger.warning(f"Skipping {base_path.name} - no matching head image")
             continue
 
         output_path = args.output_dir / base_path.name
@@ -179,10 +179,10 @@ def main() -> int:
         all_ok = all_ok and ok
 
     if all_ok:
-        print(f"\n✅ All comparison images created in {args.output_dir}")
+        logger.info(f"\nAll comparison images created in {args.output_dir}")
         return 0
     else:
-        print("\n⚠️  Some comparisons failed")
+        logger.warning("\nSome comparisons failed")
         return 1
 
 

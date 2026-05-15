@@ -10,10 +10,18 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import logging
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 def start_http_server(port: int, cwd: Path) -> subprocess.Popen[bytes]:
@@ -52,7 +60,7 @@ def capture_screenshot(url: str, output_path: Path, full_page: bool, viewport_wi
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        print("❌ Playwright not installed. Run: pip install playwright; python -m playwright install chromium")
+        logger.error("Playwright not installed. Run: pip install playwright; python -m playwright install chromium")
         return False
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -66,10 +74,10 @@ def capture_screenshot(url: str, output_path: Path, full_page: bool, viewport_wi
             page.goto(url, wait_until="networkidle")
             page.screenshot(path=str(output_path), full_page=full_page)
             browser.close()
-        print(f"✅ Saved: {output_path}")
+        logger.info(f"Saved: {output_path}")
         return True
     except (OSError, RuntimeError, ValueError) as exc:
-        print(f"❌ Failed screenshot for {url}: {exc}")
+        logger.error(f"Failed screenshot for {url}: {exc}")
         return False
 
 
@@ -89,7 +97,7 @@ def generate_screenshots(
         for page, output_name in targets:
             page_path = repo_root / page
             if not page_path.exists():
-                print(f"❌ Page not found: {page}")
+                logger.error(f"Page not found: {page}")
                 all_ok = False
                 continue
             target_path = output_dir / output_name
@@ -103,8 +111,8 @@ def generate_screenshots(
             all_ok = all_ok and ok
 
         if all_ok:
-            print(
-                f"\n✅ Screenshot generation complete. Output dir: {output_dir}")
+            logger.info(
+                f"Screenshot generation complete. Output dir: {output_dir}")
         return all_ok
     finally:
         server.terminate()

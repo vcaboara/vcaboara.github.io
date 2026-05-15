@@ -3,6 +3,14 @@ import email.utils
 import re
 from datetime import datetime
 import json
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Parse the MBOX file
 mbox_path = r"d:\Dev\Repos\vcaboara.github.io\gmail_takeout\Takeout\Mail\ACS.mbox"
@@ -93,16 +101,16 @@ for message in mbox:
 notices.sort(key=lambda x: x['date'])
 
 # Print results
-print(f"\n=== Found {len(notices)} notice emails ===\n")
+logger.info(f"\n=== Found {len(notices)} notice emails ===\n")
 for notice in notices:
-    status = "❌ BOUNCED" if notice['bounced'] else "✓ Delivered"
-    print(
+    status = "BOUNCED" if notice['bounced'] else "Delivered"
+    logger.info(
         f"{status} | {notice['entity']:<20} | {notice['date']} | {notice['subject']}")
-    print(f"   To: {notice['to']}")
-    print()
+    logger.info(f"   To: {notice['to']}")
+    logger.info("")
 
 # Save to JSON
 with open('notices_extracted.json', 'w') as f:
     json.dump(notices, f, indent=2)
 
-print(f"\nSaved to notices_extracted.json")
+logger.info(f"\nSaved to notices_extracted.json")

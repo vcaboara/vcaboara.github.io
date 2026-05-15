@@ -2,9 +2,17 @@
 Validation script for stable deep-link anchor IDs across site pages.
 Ensures required section/heading IDs exist and warns on duplicate IDs.
 """
+import logging
 import re
 import sys
 from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 ANCHOR_REQUIREMENTS = {
@@ -95,7 +103,7 @@ def validate_file(file_path, required_ids):
 
 
 def main():
-    print("🧪 Running Anchor ID Validation\n")
+    logger.info("Running Anchor ID Validation\n")
 
     root = Path(__file__).parent.parent
     all_issues = {}
@@ -111,15 +119,15 @@ def main():
             all_issues[file_name] = issues
 
     if not all_issues:
-        print("✅ All anchor ID checks passed!")
+        logger.info("All anchor ID checks passed!")
         return 0
 
-    print("Issues found:\n")
+    logger.info("Issues found:\n")
     for file_name, issues in all_issues.items():
-        print(f"{file_name}:")
+        logger.info(f"{file_name}:")
         for issue in issues:
-            print(f"  {issue}")
-        print()
+            logger.info(f"  {issue}")
+        logger.info("")
 
     critical_count = sum(
         1 for issues in all_issues.values() for issue in issues if "❌" in issue
@@ -129,10 +137,10 @@ def main():
     )
 
     if critical_count > 0:
-        print(f"❌ {critical_count} critical issue(s)")
+        logger.error(f"{critical_count} critical issue(s)")
         return 1
 
-    print(f"⚠️  {warning_count} warning(s) - PASSED with warnings")
+    logger.warning(f"{warning_count} warning(s) - PASSED with warnings")
     return 0
 
 
