@@ -1,18 +1,31 @@
 #!/usr/bin/env python3
 """Multi-AI agent conversation system for evaluating and refining documents.
 
-This tool runs alternating conversations between two AI agents (Gemini, OpenAI, or
-Claude) with different roles until they converge on a consensus document. The first
-agent sees your input, the second agent sees the first's response, and they iterate
-back and forth, refining based on each other's feedback.
+Supports two conversation modes:
+
+  roundrobin (default)
+    Agents take turns in sequence: A → B → C → A → B → C …
+    Each agent sees the previous agent's response and builds on it.
+    Best for iterative document refinement where each perspective adds
+    friction and successive critique improves quality.
+
+  vote
+    All agents respond independently to the same prompt (no anchoring).
+    A judge agent (the last configured agent, or the most capable available)
+    then reads every independent response and synthesises a consensus.
+    Best for strategic questions where you want to surface disagreement
+    before forcing convergence.
 
 QUICK START
 -----------
-    # Basic usage
-    python ai_conversation.py --prompt "your prompt or question"
+    # Two-agent round-robin (default behaviour, unchanged)
+    python ai_conversation.py --prompt "your prompt"
 
-    # From file
-    python ai_conversation.py --prompt input.md
+    # Three-agent round-robin: Gemini optimist → GPT-4o skeptic → Claude synthesiser
+    python ai_conversation.py --prompt brief.md --agents gemini,openai,anthropic
+
+    # Three-agent vote (independent responses, then consensus)
+    python ai_conversation.py --prompt question.md --agents gemini,openai,anthropic --mode vote
 
     # With knowledge base context
     python ai_conversation.py --prompt input.md --context ../../knowledge-base/ip-context
@@ -30,23 +43,23 @@ SETUP
     Set GEMINI_API_KEY, OPENAI_API_KEY, and/or ANTHROPIC_API_KEY in .env.
     Copy .env.example to .env to get started.
 
-HOW IT WORKS
-------------
-    Agent 1 (Technical Evaluator):
-      - Receives your initial prompt
-      - Analyzes technical details, accuracy, innovation
-      - Generates initial evaluation
+HOW IT WORKS — ROUND-ROBIN
+---------------------------
+    Agent roles (assigned in provider order):
+      1. Technical Evaluator  — accuracy, innovation, patent risk
+      2. Critical Reviewer    — adversarial skeptic, flags overclaims
+      3. Strategic Analyst    — market, IP strategy, synthesis (3-agent only)
 
-    Agent 2 (Strategic Analyst):
-      - Receives Agent 1's response (not your original prompt)
-      - Evaluates business value, IP strategy, market positioning
-      - Provides critique and refinement suggestions
+    Each agent receives the previous agent's full response and iterates.
+    Convergence is detected when agreement phrases appear across consecutive
+    responses. With 3 agents, all three must signal agreement before stopping.
 
-    Iteration continues until:
-      - Both agents agree (detect phrases like "approved", "looks good")
-      - Maximum rounds reached (default: 10, configurable with --rounds)
-
-    See CONVERSATION_FLOW.md for visual diagram.
+HOW IT WORKS — VOTE
+--------------------
+    Round 1: All agents receive the original prompt simultaneously (independent).
+    Round 2: A designated judge agent receives all Round 1 responses and
+             produces a synthesised consensus document.
+    Output: The judge's synthesis is the final document.
 
 OUTPUT
 ------
@@ -57,30 +70,39 @@ OUTPUT
 
 CONFIGURATION
 -------------
-    Agent provider diversity:
-      - Script auto-selects different providers for each agent when possible
-      - Agent 1 prefers: Gemini > OpenAI > Anthropic
-      - Agent 2 prefers: Different provider than Agent 1
-      - Falls back to same provider if only one API key configured
+    --agents   Comma-separated provider list in role order.
+               Valid values: gemini, openai, anthropic
+               Default: auto-select two providers from available API keys
+               Example: --agents gemini,openai,anthropic
 
-    Model defaults:
-      - Gemini: gemini-2.0-flash-exp (default, override with --model)
-      - OpenAI: gpt-4o
-      - Anthropic: claude-3-5-sonnet-20241022
+    --mode     Conversation mode. Default: roundrobin
+               roundrobin  — sequential critique loop
+               vote        — independent responses then judge synthesis
+
+    Model overrides (env vars or --model flag for primary agent):
+      - GEMINI_MODEL    / --model  (primary agent only)
+      - OPENAI_MODEL    (env var only)
+      - ANTHROPIC_MODEL (env var only)
 
 EXAMPLES
 --------
-    # Quick analysis with default settings
+    # Default two-agent run (auto-selects providers)
     python ai_conversation.py --prompt "Analyze patent US 19/424,106"
 
-    # Extended conversation with more rounds
-    python ai_conversation.py --prompt brief.md --rounds 15
+    # Three-agent round-robin (Gemini optimist, GPT-4o skeptic, Claude synthesiser)
+    python ai_conversation.py --prompt brief.md --agents gemini,openai,anthropic --rounds 6
 
-    # With persistent knowledge base context
+    # Three-agent vote on a strategic question
+    python ai_conversation.py --prompt strategy.md --agents gemini,openai,anthropic --mode vote
+
+    # With knowledge base context and custom output directory
     python ai_conversation.py \\
-        --prompt strategy.md \\
+        --prompt brief.md \\
         --context ../../knowledge-base/ip-context \\
-        --rounds 20
+        --agents gemini,openai,anthropic \\
+        --mode roundrobin \\
+        --rounds 6 \\
+        --output results/
 
 REQUIREMENTS
 ------------
@@ -199,126 +221,139 @@ class AIAgent:
 
 
 class ConversationManager:
-    """Manages the conversation between two AI agents."""
+    """Manages a round-robin conversation between two or more AI agents.
 
-    def __init__(self, agent1: AIAgent, agent2: AIAgent,
-                 initial_prompt: str, max_rounds: int = 10):
-        self.agent1 = agent1
-        self.agent2 = agent2
+    Agents take turns in sequence: A → B → C → A → B → C …
+    Each agent sees the previous agent's full response before replying.
+    Convergence is detected when agreement phrases appear across consecutive
+    responses from the last two speakers.
+
+    With 3+ agents the minimum number of rounds before convergence can be
+    detected is n+1 (one full cycle plus one), preventing premature agreement
+    between the first two agents before the third has had a chance to object.
+    """
+
+    def __init__(self, agents: list, initial_prompt: str,
+                 max_rounds: int = 10):
+        if len(agents) < 2:
+            raise ValueError(
+                "ConversationManager requires at least 2 agents."
+            )
+        self.agents = agents
+        # Preserve legacy attributes for backward compatibility
+        self.agent1 = agents[0]
+        self.agent2 = agents[1]
         self.initial_prompt = initial_prompt
         self.max_rounds = max_rounds
         self.conversation_history: list[dict] = []
 
     def check_convergence(self, response1: str, response2: str) -> bool:
-        """
-        Check if the two responses have converged (are similar enough).
-        Uses agreement phrase detection only to avoid premature convergence
-        based on length similarity alone.
-        """
-        response1_lower = response1.lower()
-        response2_lower = response2.lower()
+        """Check whether two consecutive responses signal mutual agreement.
 
-        # Check for explicit agreement
+        Requires at least 2 agreement phrases to avoid premature convergence
+        on incidental phrasing.
+        """
+        r1 = response1.lower()
+        r2 = response2.lower()
+
         agreement_phrases = [
             "i agree", "agreed", "looks good", "that works",
             "perfect", "approved", "accepted", "final version",
-            "no changes needed", "we have consensus"
+            "no changes needed", "we have consensus",
         ]
 
         agreement_count = sum(
             1 for phrase in agreement_phrases
-            if phrase in response1_lower or phrase in response2_lower
+            if phrase in r1 or phrase in r2
         )
 
-        # Require strong agreement signal (at least 2 agreement phrases)
-        # Removed length-ratio heuristic to prevent premature convergence
         return agreement_count >= 2
 
     def run_conversation(self) -> dict:
-        """Run the conversation loop between the two agents."""
-        logger.info("="*80)
-        logger.info(
-            f"Starting conversation between {self.agent1.name} and "
-            f"{self.agent2.name}")
-        logger.info("="*80)
+        """Run the round-robin conversation loop.
+
+        Returns a result dict with keys:
+          mode ('roundrobin'), converged (bool), rounds (int),
+          final_document (str), conversation_history (list[dict])
+        """
+        agent_names = " → ".join(a.name for a in self.agents)
+        logger.info("=" * 80)
+        logger.info(f"Starting round-robin: {agent_names}")
+        logger.info("=" * 80)
 
         current_message = self.initial_prompt
-        current_speaker = self.agent1
-        other_speaker = self.agent2
-
         converged = False
         round_num = 0
+        n = len(self.agents)
 
         while round_num < self.max_rounds and not converged:
             round_num += 1
+            current_agent = self.agents[(round_num - 1) % n]
+
             logger.info(f"--- Round {round_num} ---")
-            logger.info(f"{current_speaker.name} is responding...")
+            logger.info(f"{current_agent.name} is responding...")
 
-            # Get response from current speaker
-            response = current_speaker.respond(current_message)
+            response = current_agent.respond(current_message)
 
-            # Log the exchange
             self.conversation_history.append({
                 "round": round_num,
-                "speaker": current_speaker.name,
+                "speaker": current_agent.name,
                 "message": response,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             })
 
-            logger.info(f"{current_speaker.name}: {response[:200]}...")
+            logger.info(f"{current_agent.name}: {response[:200]}...")
             if len(response) > 200:
                 logger.info(f"  ... ({len(response)} characters total)")
 
-            # Check for convergence if we have at least 2 rounds
-            if round_num >= 2:
+            # Require at least one full cycle (n rounds) before checking
+            # convergence so every agent has contributed at least once.
+            if round_num > n:
                 prev_response = self.conversation_history[-2]["message"]
                 if self.check_convergence(prev_response, response):
                     converged = True
                     logger.info(
-                        f"✓ Convergence detected after {round_num} rounds!")
+                        f"✓ Convergence detected after {round_num} rounds!"
+                    )
                     break
 
-            # Prepare next message and swap speakers
             current_message = (
-                f"Here is the current version from {current_speaker.name}:\n\n"
+                f"Here is the current version from {current_agent.name}:\n\n"
                 f"{response}\n\nPlease review, provide feedback, and suggest "
                 f"improvements or confirm if this is ready."
             )
-            current_speaker, other_speaker = other_speaker, current_speaker
 
-            # Small delay to avoid rate limits
             time.sleep(1)
 
         if not converged:
             logger.warning(
-                f"Reached maximum rounds ({self.max_rounds}) without full "
-                f"convergence.")
+                f"Reached maximum rounds ({self.max_rounds}) without "
+                f"full convergence."
+            )
 
-        # Extract final document (last response)
         final_document = (
             self.conversation_history[-1]["message"]
             if self.conversation_history else ""
         )
 
         return {
+            "mode": "roundrobin",
             "converged": converged,
             "rounds": round_num,
             "final_document": final_document,
-            "conversation_history": self.conversation_history
+            "conversation_history": self.conversation_history,
         }
 
     def save_results(self, results: dict, output_dir: str = "ai_conversations"):
-        """Save the conversation results to files."""
+        """Save conversation results to timestamped files in output_dir."""
         os.makedirs(output_dir, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        # Save full conversation log
         log_file = os.path.join(output_dir, f"conversation_{timestamp}.json")
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
         logger.info(f"✓ Conversation log saved to: {log_file}")
 
-        # Save final document
         doc_file = os.path.join(
             output_dir, f"final_document_{timestamp}.txt"
         )
@@ -326,25 +361,172 @@ class ConversationManager:
             f.write(results["final_document"])
         logger.info(f"✓ Final document saved to: {doc_file}")
 
-        # Save readable transcript
         transcript_file = os.path.join(
             output_dir, f"transcript_{timestamp}.txt"
         )
+        agent_names = " and ".join(a.name for a in self.agents)
         with open(transcript_file, 'w', encoding='utf-8') as f:
-            f.write(
-                f"Conversation between {self.agent1.name} and "
-                f"{self.agent2.name}\n"
-            )
-            f.write(
-                f"Started: {self.conversation_history[0]['timestamp']}\n"
-            )
+            f.write(f"Conversation between {agent_names}\n")
+            f.write(f"Started: {datetime.now().isoformat()}\n")
+            f.write("Mode: roundrobin\n")
             f.write(f"Rounds: {results['rounds']}\n")
             f.write(f"Converged: {results['converged']}\n")
-            f.write("="*80 + "\n\n")
+            f.write("=" * 80 + "\n\n")
 
             for entry in self.conversation_history:
                 f.write(f"Round {entry['round']} - {entry['speaker']}:\n")
-                f.write("-"*80 + "\n")
+                f.write("-" * 80 + "\n")
+                f.write(f"{entry['message']}\n\n")
+
+        logger.info(f"✓ Transcript saved to: {transcript_file}")
+
+
+class VoteConversationManager:
+    """Manages a vote-mode conversation between two or more AI agents.
+
+    All agents respond independently to the original prompt (Round 1),
+    preventing anchoring from earlier responses. A designated judge agent
+    (the last agent in the list) then reads all independent responses and
+    synthesises a consensus document (Round 2).
+
+    Best for strategic or factual questions where you want to surface genuine
+    disagreement before forcing convergence. The judge explicitly notes where
+    agents disagreed and explains the tiebreak logic.
+    """
+
+    def __init__(self, agents: list, initial_prompt: str,
+                 max_rounds: int = 10):
+        if len(agents) < 2:
+            raise ValueError(
+                "VoteConversationManager requires at least 2 agents."
+            )
+        self.agents = agents
+        self.initial_prompt = initial_prompt
+        self.max_rounds = max_rounds
+        self.conversation_history: list[dict] = []
+
+    def run_conversation(self) -> dict:
+        """Run the vote conversation: independent responses then judge synthesis.
+
+        Returns a result dict with keys:
+          mode ('vote'), converged (True), rounds (int),
+          final_document (str), conversation_history (list[dict])
+        """
+        agent_names = ", ".join(a.name for a in self.agents)
+        logger.info("=" * 80)
+        logger.info(f"Starting vote mode with agents: {agent_names}")
+        logger.info("=" * 80)
+
+        # --- Round 1: All agents respond independently ---
+        logger.info("--- Round 1: Independent responses (no anchoring) ---")
+        independent_responses: list[dict] = []
+
+        for agent in self.agents:
+            logger.info(f"{agent.name} is responding independently...")
+            response = agent.respond(self.initial_prompt)
+
+            entry = {
+                "round": 1,
+                "speaker": agent.name,
+                "message": response,
+                "timestamp": datetime.now().isoformat(),
+                "phase": "independent",
+            }
+            self.conversation_history.append(entry)
+            independent_responses.append(
+                {"name": agent.name, "response": response}
+            )
+
+            logger.info(f"{agent.name}: {response[:200]}...")
+            if len(response) > 200:
+                logger.info(f"  ... ({len(response)} characters total)")
+
+            time.sleep(1)
+
+        # --- Round 2: Judge synthesises all independent responses ---
+        # The judge is the last agent in the list (conventionally the
+        # "synthesiser" role, e.g. Claude when using gemini,openai,anthropic).
+        judge = self.agents[-1]
+        logger.info(
+            f"--- Round 2: Judge synthesis ({judge.name}) ---"
+        )
+
+        votes_text = "\n\n".join(
+            f"=== {r['name']} ===\n{r['response']}"
+            for r in independent_responses
+        )
+        judge_prompt = (
+            f"You are acting as the consensus judge. Below are independent "
+            f"responses from {len(self.agents)} AI agents to the same prompt. "
+            f"Your tasks:\n"
+            f"1. Identify where agents agreed and where they disagreed.\n"
+            f"2. Explain your tiebreak reasoning for any disagreements.\n"
+            f"3. Produce a final synthesised document incorporating the "
+            f"strongest elements from all responses.\n\n"
+            f"ORIGINAL PROMPT:\n{self.initial_prompt}\n\n"
+            f"INDEPENDENT RESPONSES:\n{votes_text}\n\n"
+            f"Please produce the final consensus document now."
+        )
+
+        synthesis = judge.respond(judge_prompt)
+
+        entry = {
+            "round": 2,
+            "speaker": f"{judge.name} (Judge)",
+            "message": synthesis,
+            "timestamp": datetime.now().isoformat(),
+            "phase": "synthesis",
+        }
+        self.conversation_history.append(entry)
+
+        logger.info(f"{judge.name} (Judge): {synthesis[:200]}...")
+        if len(synthesis) > 200:
+            logger.info(f"  ... ({len(synthesis)} characters total)")
+
+        logger.info("✓ Vote complete — judge synthesis produced.")
+
+        return {
+            "mode": "vote",
+            "converged": True,
+            "rounds": 2,
+            "final_document": synthesis,
+            "conversation_history": self.conversation_history,
+        }
+
+    def save_results(self, results: dict, output_dir: str = "ai_conversations"):
+        """Save vote results to timestamped files in output_dir."""
+        os.makedirs(output_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        log_file = os.path.join(output_dir, f"conversation_{timestamp}.json")
+        with open(log_file, 'w', encoding='utf-8') as f:
+            json.dump(results, f, indent=2, ensure_ascii=False)
+        logger.info(f"✓ Conversation log saved to: {log_file}")
+
+        doc_file = os.path.join(
+            output_dir, f"final_document_{timestamp}.txt"
+        )
+        with open(doc_file, 'w', encoding='utf-8') as f:
+            f.write(results["final_document"])
+        logger.info(f"✓ Final document saved to: {doc_file}")
+
+        transcript_file = os.path.join(
+            output_dir, f"transcript_{timestamp}.txt"
+        )
+        agent_names = ", ".join(a.name for a in self.agents)
+        with open(transcript_file, 'w', encoding='utf-8') as f:
+            f.write(f"Vote conversation — agents: {agent_names}\n")
+            f.write(f"Started: {datetime.now().isoformat()}\n")
+            f.write("Mode: vote\n")
+            f.write("=" * 80 + "\n\n")
+
+            for entry in self.conversation_history:
+                phase = entry.get("phase", "")
+                f.write(
+                    f"Round {entry['round']} - {entry['speaker']}"
+                    f"{' [' + phase + ']' if phase else ''}:\n"
+                )
+                f.write("-" * 80 + "\n")
                 f.write(f"{entry['message']}\n\n")
 
         logger.info(f"✓ Transcript saved to: {transcript_file}")
@@ -353,68 +535,44 @@ class ConversationManager:
 def main():
     """Main entry point for the AI conversation script."""
 
-    # Parse command line arguments
-    description = """
-AI Conversation Agent - Iterative Multi-Agent Refinement System
-
-Two AI agents (Technical Evaluator and Strategic Analyst) converse and iterate
-on content until they reach consensus. Supports OpenAI, Google Gemini, and
-Anthropic Claude with automatic multi-provider diversity.
-
-The system automatically selects different AI providers when multiple API keys
-are configured to ensure diverse perspectives. Agent 1 (Technical Evaluator)
-analyzes technical accuracy, innovation, and patentability. Agent 2 (Strategic
-Analyst) evaluates market opportunity, IP strategy, and business value.
-"""
+    description = "AI Conversation Agent - Multi-Agent Iterative Refinement"
 
     epilog = """
 SETUP:
   1. Install dependencies:
      pip install -r ai_conversation_requirements.txt
 
-  2. Set at least one API key (in .env file or environment):
+  2. Set API keys in .env:
      OPENAI_API_KEY=your-key      # https://platform.openai.com/api-keys
      GEMINI_API_KEY=your-key      # https://aistudio.google.com/app/apikey
      ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
 
 EXAMPLES:
-  # Use default template (warning shown):
-  python ai_conversation.py
+  # Two-agent run (auto-selects providers, unchanged default):
+  python ai_conversation.py --prompt brief.md
 
-  # Provide inline prompt:
-  python ai_conversation.py --prompt "Evaluate this invention: [description]"
+  # Three-agent round-robin (Gemini → GPT-4o → Claude → repeat):
+  python ai_conversation.py --prompt brief.md --agents gemini,openai,anthropic
 
-  # Load prompt from file:
-  python ai_conversation.py --prompt tech_brief.md
+  # Three-agent vote (independent responses, then Claude synthesises):
+  python ai_conversation.py --prompt question.md --agents gemini,openai,anthropic --mode vote
 
-  # Load knowledge base context and limit rounds:
-  python ai_conversation.py --prompt brief.md --context knowledge-base/ip-context --rounds 5
+  # With knowledge-base context and custom output dir:
+  python ai_conversation.py \\
+      --prompt brief.md \\
+      --context knowledge-base/ip-context \\
+      --agents gemini,openai,anthropic \\
+      --rounds 6 \\
+      --output results/
 
-  # Custom output directory:
-  python ai_conversation.py --prompt brief.md --output results/
-
-OUTPUT:
-  Creates timestamped files in output directory (default: output/):
-    - conversation_YYYYMMDD_HHMMSS.json  (Full conversation log)
-    - final_document_YYYYMMDD_HHMMSS.txt (Final agreed document)
-    - transcript_YYYYMMDD_HHMMSS.txt     (Human-readable transcript)
+MODES:
+  roundrobin (default)  Each agent critiques the previous; best for documents.
+  vote                  Independent responses + judge synthesis; best for Q&A.
 
 SUPPORTED MODELS:
   OpenAI:    gpt-4o, gpt-4-turbo, gpt-3.5-turbo
-  Gemini:    models/gemini-3-flash-preview, gemini-1.5-pro, gemini-1.5-flash
-  Anthropic: claude-3-5-sonnet-20241022, claude-3-opus-20240229
-
-CONVERGENCE:
-  Conversation ends when:
-    - Both agents use agreement phrases (e.g., "I agree", "Looks good")
-    - Maximum rounds reached (configurable with --rounds)
-
-USE CASES:
-  - Tech brief evaluation for patents
-  - Document refinement and iteration
-  - Content creation with diverse perspectives
-  - Strategic analysis and validation
-  - Code review and improvement
+  Gemini:    gemini-2.5-flash, gemini-1.5-pro, gemini-1.5-flash
+  Anthropic: claude-opus-4-5, claude-3-5-sonnet-20241022
 """
 
     parser = argparse.ArgumentParser(
@@ -461,6 +619,28 @@ USE CASES:
              'Examples: gemini-2.0-flash-exp, gpt-4o, claude-3-5-sonnet-20241022. '
              'Use the GEMINI_MODEL / OPENAI_MODEL / ANTHROPIC_MODEL env vars to '
              'override individual provider models without this restriction.'
+    )
+    parser.add_argument(
+        '--agents', '-a',
+        metavar='PROVIDER_LIST',
+        default=None,
+        help='Ordered, comma-separated list of providers to use as agents. '
+             'Valid values: gemini, openai, anthropic. '
+             'Determines agent role order: first = Technical Evaluator, '
+             'second = Critical Reviewer, third = Strategic Analyst. '
+             'Example: --agents gemini,openai,anthropic. '
+             'When omitted, auto-selects two providers from available API keys '
+             '(legacy default behaviour).'
+    )
+    parser.add_argument(
+        '--mode', '-m',
+        choices=['roundrobin', 'vote'],
+        default='roundrobin',
+        help='Conversation mode (default: roundrobin). '
+             'roundrobin: agents critique each other sequentially — best for '
+             'iterative document refinement. '
+             'vote: all agents respond independently then a judge (last agent) '
+             'synthesises — best for strategic or factual questions.'
     )
     args = parser.parse_args()
 
@@ -509,7 +689,7 @@ USE CASES:
 
 # PERSISTENT IP & BUSINESS CONTEXT
 
-You have access to pre-loaded knowledge base context. Reference this without requiring re-explanation:
+You have access to pre-loaded knowledge base context. Reference this freely:  # noqa: E501
 
 {''.join(kb_content)}
 
@@ -528,101 +708,141 @@ Integrate this knowledge naturally when relevant.
         else:
             logger.warning(f"Knowledge base directory not found: {kb_dir}")
 
-    # Define the two AI agents with different roles and providers for
-    # diverse perspectives. Prefer multi-provider diversity when keys are
-    # configured
+    # Define the available provider configs keyed by provider name
+    available_keys = {
+        "gemini": GEMINI_API_KEY,
+        "openai": OPENAI_API_KEY,
+        "anthropic": ANTHROPIC_API_KEY,
+    }
+    available_models = {
+        "gemini": GEMINI_MODEL,
+        "openai": OPENAI_MODEL,
+        "anthropic": ANTHROPIC_MODEL,
+    }
 
-    # Agent 1: Primary provider (prefer Gemini if available)
-    if GEMINI_API_KEY:
-        agent1_config = {
-            "provider": "gemini",
-            "model": GEMINI_MODEL,
-            "api_key": GEMINI_API_KEY
-        }
-    elif OPENAI_API_KEY:
-        agent1_config = {
-            "provider": "openai",
-            "model": OPENAI_MODEL,
-            "api_key": OPENAI_API_KEY
-        }
-    else:
-        agent1_config = {
-            "provider": "anthropic",
-            "model": ANTHROPIC_MODEL,
-            "api_key": ANTHROPIC_API_KEY
-        }
-
-    # Apply --model override only to agent1's selected provider so a
-    # provider-specific model ID isn't accidentally sent to a different client.
-    if args.model:
-        agent1_config["model"] = args.model
-
-    agent1 = AIAgent(
-        name="Technical Evaluator",
-        **agent1_config,
-        system_prompt=(
+    # Agent role names and system prompts for up to 3 agents.
+    # Roles are assigned positionally from the ordered provider list.
+    ROLE_NAMES = ["Technical Evaluator", "Critical Reviewer", "Strategic Analyst"]
+    ROLE_PROMPTS = [
+        # Role 0 — Technical Evaluator
+        (
             "You are a technical evaluator specializing in intellectual "
             "property and technology assessment. Your role is to analyze "
-            "tech briefs for technical accuracy, innovation potential, "
+            "content for technical accuracy, innovation potential, "
             "patentability, prior art concerns, and commercial viability. "
             "Provide detailed technical critique and identify strengths, "
             "weaknesses, and areas needing clarification. When you believe "
-            "the brief is comprehensive and accurate, clearly state your "
-            "approval."
-        ) + kb_context
-    )
+            "the content is comprehensive and technically sound, clearly "
+            "state your approval."
+        ),
+        # Role 1 — Critical Reviewer (adversarial skeptic)
+        (
+            "You are a critical reviewer and adversarial skeptic. Your role "
+            "is to challenge every claim, surface hidden assumptions, flag "
+            "overclaims or unsupported assertions, and identify logical gaps "
+            "or risks the other agents may have missed. Do not accept "
+            "premises at face value. Push back hard on anything that lacks "
+            "evidence or rigour. When — and only when — you are satisfied "
+            "that all your concerns have been addressed, explicitly state "
+            "your approval."
+        ),
+        # Role 2 — Strategic Analyst
+        (
+            "You are a strategic analyst focused on IP strategy, market "
+            "positioning, and business value. Your role is to evaluate "
+            "content for market opportunity, competitive advantage, strategic "
+            "alignment, and implementation feasibility. Ensure the content "
+            "clearly articulates its value proposition and differentiation. "
+            "When the content meets strategic requirements, explicitly "
+            "confirm your approval."
+        ),
+    ]
 
-    # Agent 2: Secondary provider (prefer diversity - use different
-    # provider than agent1)
-    if agent1_config["provider"] != "anthropic" and ANTHROPIC_API_KEY:
-        agent2_config = {
-            "provider": "anthropic",
-            "model": ANTHROPIC_MODEL,
-            "api_key": ANTHROPIC_API_KEY
+    def _build_config(provider: str) -> dict:
+        """Return provider config dict, applying --model override to agent 0."""
+        model = available_models[provider]
+        return {
+            "provider": provider,
+            "model": model,
+            "api_key": available_keys[provider],
         }
-    elif agent1_config["provider"] != "openai" and OPENAI_API_KEY:
-        agent2_config = {
-            "provider": "openai",
-            "model": OPENAI_MODEL,
-            "api_key": OPENAI_API_KEY
-        }
+
+    # --- Determine ordered provider list ---
+    if args.agents:
+        # Explicit --agents flag: validate and use as-is
+        requested = [
+            p.strip().lower() for p in args.agents.split(",") if p.strip()
+        ]
+        valid_providers = {"gemini", "openai", "anthropic"}
+        unknown = [p for p in requested if p not in valid_providers]
+        if unknown:
+            logger.error(f"Unknown provider(s): {', '.join(unknown)}")
+            logger.error(f"Valid choices: {', '.join(sorted(valid_providers))}")
+            sys.exit(1)
+        missing_keys = [p for p in requested if not available_keys[p]]
+        if missing_keys:
+            logger.error(
+                f"No API key configured for: {', '.join(missing_keys)}. "
+                f"Set the corresponding key in your .env file."
+            )
+            sys.exit(1)
+        ordered_providers = requested
     else:
-        # Fall back to same provider if no diversity possible
-        agent2_config = agent1_config.copy()
-        logger.warning(
-            f"Using {agent1_config['provider']} for both agents (configure "
-            f"additional API keys for diversity)"
+        # Auto-select two diverse providers (legacy default behaviour)
+        if GEMINI_API_KEY:
+            p1 = "gemini"
+        elif OPENAI_API_KEY:
+            p1 = "openai"
+        else:
+            p1 = "anthropic"
+
+        if p1 != "anthropic" and ANTHROPIC_API_KEY:
+            p2 = "anthropic"
+        elif p1 != "openai" and OPENAI_API_KEY:
+            p2 = "openai"
+        else:
+            p2 = p1
+            logger.warning(
+                f"Using {p1} for both agents (configure additional API keys "
+                f"for provider diversity)."
+            )
+        ordered_providers = [p1, p2]
+
+    # --- Build AIAgent objects ---
+    agents: list[AIAgent] = []
+    for idx, provider in enumerate(ordered_providers):
+        cfg = _build_config(provider)
+        # Apply --model override to the primary (first) agent only
+        if idx == 0 and args.model:
+            cfg["model"] = args.model
+        # Wrap roles beyond the defined list back to the last defined role
+        role_idx = min(idx, len(ROLE_NAMES) - 1)
+        role_name = ROLE_NAMES[role_idx]
+        # Disambiguate names when the same role repeats (>3 agents)
+        if idx >= len(ROLE_NAMES):
+            role_name = f"{role_name} {idx + 1}"
+        agent = AIAgent(
+            name=role_name,
+            system_prompt=ROLE_PROMPTS[role_idx] + kb_context,
+            **cfg,
+        )
+        agents.append(agent)
+        logger.info(
+            f"Agent {idx + 1}: {role_name} ({provider} / {cfg['model']})"
         )
 
-    agent2 = AIAgent(
-        name="Strategic Analyst",
-        **agent2_config,
-        system_prompt=(
-            "You are a strategic analyst focused on IP strategy, market "
-            "positioning, and business value. Your role is to evaluate tech "
-            "briefs for market opportunity, competitive advantage, strategic "
-            "alignment, and implementation feasibility. Ensure the brief "
-            "clearly articulates the invention's value proposition and "
-            "differentiation. When the brief meets strategic requirements, "
-            "explicitly confirm your approval."
-        ) + kb_context
-    )
-
-    # Get initial prompt from command line, file, or use default
+    # Get initial prompt from CLI arg, file, or fall back to default template
     initial_topic = None
 
     if args.prompt:
-        # Check if it's a file path
         prompt_path = Path(args.prompt)
         if prompt_path.exists() and prompt_path.suffix in ['.txt', '.md']:
             logger.info(f"Loading prompt from file: {prompt_path}")
             with open(prompt_path, encoding='utf-8') as f:
                 initial_topic = f.read()
         else:
-            # Treat as direct prompt text
             initial_topic = args.prompt
 
-    # Use default template if no prompt provided
     if not initial_topic:
         initial_topic = """
 Please evaluate and refine the following technology brief:
@@ -649,7 +869,7 @@ Potential Applications:
 - [Application 1]
 - [Application 2]
 
-Please review this brief for technical accuracy, completeness, patentability considerations,
+Please review this brief for technical accuracy, completeness, patentability,
 and business value. Identify gaps, suggest improvements, and help refine it into a
 comprehensive document ready for IP protection.
 """
@@ -660,23 +880,28 @@ comprehensive document ready for IP protection.
             "  python ai_conversation.py --prompt path/to/your_brief.md"
         )
 
-    # Create conversation manager
-    manager = ConversationManager(
-        agent1=agent1,
-        agent2=agent2,
-        initial_prompt=initial_topic,
-        max_rounds=args.rounds,
-    )
+    # --- Instantiate the appropriate manager and run ---
+    if args.mode == "vote":
+        manager: VoteConversationManager | ConversationManager = (
+            VoteConversationManager(
+                agents=agents,
+                initial_prompt=initial_topic,
+                max_rounds=args.rounds,
+            )
+        )
+    else:
+        manager = ConversationManager(
+            agents=agents,
+            initial_prompt=initial_topic,
+            max_rounds=args.rounds,
+        )
 
-    # Run the conversation
     results = manager.run_conversation()
-
-    # Save results
     manager.save_results(results, output_dir=args.output)
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Conversation complete!")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
 
 if __name__ == "__main__":
