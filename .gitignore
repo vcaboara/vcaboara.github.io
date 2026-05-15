@@ -25,10 +25,13 @@ notes.md
 *DEBUG*.md
 debug-logs/
 
-# Duplicate files from tools/ (keep only in tools/)
+# Duplicate files from tools/ or utils/ (keep only in canonical location)
 /AI_TECH_BRIEF_README.md
 /ai_conversation.py
+/create_pr.py
+/generate_pr_screenshots.py
 /archive/site_with_tech_brief.html
+AI_TECH_BRIEF_README.md
 
 # Personal data processing files
 parse_notices.py
