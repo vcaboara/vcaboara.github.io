@@ -15,10 +15,15 @@
 
 ## Current Strategic Position (May 2026)
 
-### Patent Filing
-- **US 19/424,106**: Filed industrial standard for decentralized, carbon-negative manufacturing
-- **Technology**: Specialized pyrolyzer converting ag-waste to virgin timber substitute
+### Patent Filing & Timeline
+- **US 19/424,106**: Filed **12/17/2025** (5 months ago)
+- **Regulatory Context**: USDA/DOE/BETO mandates deadline was 12/30/2025 (13 days after filing)
+- **Technology**: Novel configurations of existing off-the-shelf industrial hardware
+  - Not inventing new machines - arranging existing components in novel sequences
+  - Tech briefs address ~60% of current industrial emissions
 - **Business Model**: 100% licensing via ACS (commercial entity)
+  - "Paper architect" is intentional strategy, not execution failure
+  - Licensing configurations/processes, not manufacturing hardware
 
 ### "Dragon King" Challenge
 - **Problem**: Systemic disruption to incumbent timber and energy monopolies
@@ -83,5 +88,17 @@
 - Established persistent context for AI conversations
 - Extracted PDFs to markdown for version control
 - System allows "refreshing" agents without re-explaining IP
+
+### 2026-05-14: Critical Strategic Review Completed
+- **SEP Framing Issue**: Gemini AI pushed "Standard Essential Patent" language
+  - Reality: Patent filed 12/17/2025 (only 5 months ago)
+  - SEPs require industry adoption + SSO designation (takes years/decades)
+  - **Correction**: Use "Standard-Track IP" instead
+- **"Paper Architect" Is The Strategy**: 100% licensing of configurations, not manufacturing
+  - Configurations use existing off-the-shelf hardware in novel arrangements
+  - Not a failure of execution - this IS the business model
+- **Timeline Context**: USDA/DOE/BETO mandates 12/30/2025 created narrow window (13 days post-filing)
+- **Scope**: Tech briefs address ~60% of current industrial emissions
+- **Key Insight**: Don't judge as if years of development should exist - this is 5-month-old filing
 
 ---
