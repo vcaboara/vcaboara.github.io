@@ -10,11 +10,13 @@ Supports two conversation modes:
     friction and successive critique improves quality.
 
   vote
-    All agents respond independently to the same prompt (no anchoring).
-    A judge agent (the last configured agent, or the most capable available)
-    then reads every independent response and synthesises a consensus.
-    Best for strategic questions where you want to surface disagreement
-    before forcing convergence.
+    Round 1: All agents respond independently in parallel (no anchoring).
+    Rounds 2+: All agents receive the original prompt AND every response from
+    the previous round, then synthesise in parallel — every agent evaluates
+    every peer position before producing their own synthesis. There is no
+    single judge; convergence is declared when all agents independently signal
+    agreement. Best for strategic/factual questions where surfacing genuine
+    disagreement matters before forcing consensus.
 
 QUICK START
 -----------
@@ -120,6 +122,7 @@ import logging
 import os
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 
@@ -406,10 +409,22 @@ class VoteConversationManager:
         self.conversation_history: list[dict] = []
 
     def run_conversation(self) -> dict:
-        """Run the vote conversation: independent responses then judge synthesis.
+        """Run fully-parallel iterative vote rounds.
+
+        Every round all agents respond in parallel.  From Round 2 onward each
+        agent receives the original prompt PLUS every response from the
+        previous round so they can evaluate *all* perspectives before
+        synthesising.  There is no single judge — every agent is an equal
+        evaluator in every round.
+
+        Convergence is declared when all agents in a round include at least
+        one agreement phrase, meaning they have each independently signalled
+        satisfaction with the current synthesis.  The final document is the
+        last agent's response from the converging round (conventionally the
+        Strategic Analyst / most synthesis-oriented role).
 
         Returns a result dict with keys:
-          mode ('vote'), converged (True), rounds (int),
+          mode ('vote'), converged (bool), rounds (int),
           final_document (str), conversation_history (list[dict])
         """
         agent_names = ", ".join(a.name for a in self.agents)
@@ -417,79 +432,147 @@ class VoteConversationManager:
         logger.info(f"Starting vote mode with agents: {agent_names}")
         logger.info("=" * 80)
 
-        # --- Round 1: All agents respond independently ---
-        logger.info("--- Round 1: Independent responses (no anchoring) ---")
-        independent_responses: list[dict] = []
+        agreement_phrases = [
+            "i agree", "agreed", "looks good", "that works",
+            "perfect", "approved", "accepted", "final version",
+            "no changes needed", "we have consensus",
+        ]
 
-        for agent in self.agents:
-            logger.info(f"{agent.name} is responding independently...")
-            response = agent.respond(self.initial_prompt)
+        def _has_agreement(text: str) -> bool:
+            t = text.lower()
+            return any(p in t for p in agreement_phrases)
 
-            entry = {
-                "round": 1,
-                "speaker": agent.name,
-                "message": response,
-                "timestamp": datetime.now().isoformat(),
-                "phase": "independent",
-            }
-            self.conversation_history.append(entry)
-            independent_responses.append(
-                {"name": agent.name, "response": response}
+        def _parallel_round(
+            round_num: int,
+            prompts: dict,  # {agent.name: prompt_text}
+            phase: str,
+        ) -> list[dict]:
+            """Dispatch one parallel round; returns ordered list of entries."""
+
+            def _call(agent: AIAgent) -> tuple:
+                logger.info(
+                    f"[Round {round_num}] {agent.name} is responding..."
+                )
+                response = agent.respond(prompts[agent.name])
+                return agent, response, datetime.now().isoformat()
+
+            with ThreadPoolExecutor(
+                max_workers=len(self.agents),
+                thread_name_prefix=f"vote-r{round_num}",
+            ) as executor:
+                futures = {
+                    executor.submit(_call, agent): agent.name
+                    for agent in self.agents
+                }
+                raw: dict[str, tuple] = {}
+                for future in as_completed(futures):
+                    name = futures[future]
+                    try:
+                        raw[name] = future.result()
+                    except Exception as exc:
+                        logger.error(f"{name} raised: {exc}")
+                        raw[name] = (
+                            next(
+                                a for a in self.agents if a.name == name
+                            ),
+                            f"Error generating response: {exc}",
+                            datetime.now().isoformat(),
+                        )
+
+            entries = []
+            for agent in self.agents:
+                _, response, ts = raw[agent.name]
+                entry = {
+                    "round": round_num,
+                    "speaker": agent.name,
+                    "message": response,
+                    "timestamp": ts,
+                    "phase": phase,
+                }
+                self.conversation_history.append(entry)
+                entries.append(entry)
+                logger.info(f"{agent.name}: {response[:200]}...")
+                if len(response) > 200:
+                    logger.info(f"  ... ({len(response)} characters total)")
+            return entries
+
+        converged = False
+        round_num = 0
+        prev_entries: list[dict] = []
+
+        while round_num < self.max_rounds and not converged:
+            round_num += 1
+
+            if round_num == 1:
+                # Round 1: every agent answers the original prompt cold.
+                logger.info(
+                    f"--- Round 1: Parallel independent responses "
+                    f"({len(self.agents)} agents) ---"
+                )
+                prompts = {
+                    agent.name: self.initial_prompt
+                    for agent in self.agents
+                }
+                phase = "independent"
+            else:
+                # Rounds 2+: every agent receives the original prompt PLUS
+                # all responses from the previous round so they can evaluate
+                # every peer's position before synthesising.
+                logger.info(
+                    f"--- Round {round_num}: Parallel synthesis "
+                    f"(all agents see all Round {round_num - 1} responses) ---"
+                )
+                prev_text = "\n\n".join(
+                    f"=== {e['speaker']} (Round {round_num - 1}) ===\n"
+                    f"{e['message']}"
+                    for e in prev_entries
+                )
+                synthesis_prompt = (
+                    f"ORIGINAL PROMPT:\n{self.initial_prompt}\n\n"
+                    f"RESPONSES FROM ROUND {round_num - 1} (all agents):\n"
+                    f"{prev_text}\n\n"
+                    f"Review the above responses. Identify where agents "
+                    f"agreed and where they diverged. Then produce your own "
+                    f"synthesised answer that incorporates the strongest "
+                    f"elements. If you are satisfied that the synthesis is "
+                    f"complete and accurate, state your approval explicitly."
+                )
+                prompts = {
+                    agent.name: synthesis_prompt for agent in self.agents
+                }
+                phase = "synthesis"
+
+            current_entries = _parallel_round(round_num, prompts, phase)
+            prev_entries = current_entries
+
+            # Convergence: every agent must signal agreement
+            if round_num > 1:
+                all_agree = all(
+                    _has_agreement(e["message"]) for e in current_entries
+                )
+                if all_agree:
+                    converged = True
+                    logger.info(
+                        f"✓ All agents converged after {round_num} rounds!"
+                    )
+
+        if not converged:
+            logger.warning(
+                f"Reached maximum rounds ({self.max_rounds}) without "
+                f"full convergence."
             )
 
-            logger.info(f"{agent.name}: {response[:200]}...")
-            if len(response) > 200:
-                logger.info(f"  ... ({len(response)} characters total)")
+        logger.info("✓ Vote complete.")
 
-            time.sleep(1)
-
-        # --- Round 2: Judge synthesises all independent responses ---
-        # The judge is the last agent in the list (conventionally the
-        # "synthesiser" role, e.g. Claude when using gemini,openai,anthropic).
-        judge = self.agents[-1]
-        logger.info(
-            f"--- Round 2: Judge synthesis ({judge.name}) ---"
-        )
-
-        votes_text = "\n\n".join(
-            f"=== {r['name']} ===\n{r['response']}"
-            for r in independent_responses
-        )
-        judge_prompt = (
-            f"You are acting as the consensus judge. Below are independent "
-            f"responses from {len(self.agents)} AI agents to the same prompt. "
-            f"Your tasks:\n"
-            f"1. Identify where agents agreed and where they disagreed.\n"
-            f"2. Explain your tiebreak reasoning for any disagreements.\n"
-            f"3. Produce a final synthesised document incorporating the "
-            f"strongest elements from all responses.\n\n"
-            f"ORIGINAL PROMPT:\n{self.initial_prompt}\n\n"
-            f"INDEPENDENT RESPONSES:\n{votes_text}\n\n"
-            f"Please produce the final consensus document now."
-        )
-
-        synthesis = judge.respond(judge_prompt)
-
-        entry = {
-            "round": 2,
-            "speaker": f"{judge.name} (Judge)",
-            "message": synthesis,
-            "timestamp": datetime.now().isoformat(),
-            "phase": "synthesis",
-        }
-        self.conversation_history.append(entry)
-
-        logger.info(f"{judge.name} (Judge): {synthesis[:200]}...")
-        if len(synthesis) > 200:
-            logger.info(f"  ... ({len(synthesis)} characters total)")
-
-        logger.info("✓ Vote complete — judge synthesis produced.")
+        # Final document: last agent's response from the final round
+        # (conventionally Strategic Analyst — the synthesis-oriented role).
+        final_document = prev_entries[-1]["message"] if prev_entries else ""
 
         return {
             "mode": "vote",
-            "converged": True,
-            "rounds": 2,
-            "final_document": synthesis,
+            "converged": converged,
+            "rounds": round_num,
+            "final_document": final_document,
             "conversation_history": self.conversation_history,
         }
 
