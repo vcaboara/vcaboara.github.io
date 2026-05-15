@@ -109,7 +109,7 @@ Write-Host ""
 Write-Host "Documentation:" -ForegroundColor Yellow
 Write-Host "  - README.md            - Getting started" -ForegroundColor Gray
 Write-Host "  - GET_API_KEYS.md      - How to get API keys" -ForegroundColor Gray
-Write-Host "  - QUICK_REFERENCE.md   - Command reference" -ForegroundColor Gray
+Write-Host "  - python ai_conversation.py --help  - Command reference" -ForegroundColor Gray
 Write-Host ""
 
 $viewDocs = Read-Host "Open GET_API_KEYS.md for instructions? (y/n)"
