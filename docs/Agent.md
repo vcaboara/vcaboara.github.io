@@ -35,7 +35,7 @@ The Freedom: Once the "10/10" candidate appears, they will be the one thanking y
 ## Repository Process Context (Updated 2026-02-22)
 
 - Default development branch is non-`main` (PR workflow required).
-- Local hooks are versioned under `.githooks` and installed via `utils/install_git_hooks.ps1`.
+- Local hooks are versioned under `.githooks` and installed via `tools/install_git_hooks.ps1`.
 - Commits on `main`/`master` and pushes to `main`/`master` are blocked locally.
 - Core validation suite:
   - `test/validate_compliance_tracker.py`

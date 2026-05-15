@@ -1,0 +1,34 @@
+# Environment variables (contains API keys)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# AI conversation outputs
+ai_conversations/
+output/
+results/
+
+# Personal prompt files (working content, not documentation)
+strategy_review_prompt.md
+critical_review_prompt.txt
+*_personal.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

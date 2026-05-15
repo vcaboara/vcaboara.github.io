@@ -10,7 +10,7 @@
 ## Local Guardrails
 
 - Install hooks with:
-  - `powershell -ExecutionPolicy Bypass -File .\utils\install_git_hooks.ps1`
+  - `powershell -ExecutionPolicy Bypass -File .\tools\install_git_hooks.ps1`
 - Hooks enforce:
   - no commits on `main`/`master`
   - no direct pushes to `main`/`master`
@@ -32,7 +32,7 @@
   - AFTER screenshot(s)
 - Enforced by:
   - `.github/workflows/pr-checks.yml`
-  - `utils/check_pr_ui_screenshots.py`
+  - `tools/check_pr_ui_screenshots.py`
 
 ## AI Agent Responsibilities
 

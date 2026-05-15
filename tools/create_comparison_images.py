@@ -11,10 +11,14 @@ Creates a single image with three panels:
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def create_comparison_image(
@@ -36,9 +40,11 @@ def create_comparison_image(
             if base.size != head.size:
                 target_h = max(base.height, head.height)
                 target_w = max(base.width, head.width)
-                
-                base_canvas = Image.new("RGB", (target_w, target_h), (255, 255, 255))
-                head_canvas = Image.new("RGB", (target_w, target_h), (255, 255, 255))
+
+                base_canvas = Image.new(
+                    "RGB", (target_w, target_h), (255, 255, 255))
+                head_canvas = Image.new(
+                    "RGB", (target_w, target_h), (255, 255, 255))
                 base_canvas.paste(base, (0, 0))
                 head_canvas.paste(head, (0, 0))
                 base = base_canvas
@@ -47,16 +53,15 @@ def create_comparison_image(
             # Resize to panel width while maintaining aspect ratio
             aspect = base.height / base.width
             panel_height = int(panel_width * aspect)
-            
-            base_resized = base.resize((panel_width, panel_height), Image.Resampling.LANCZOS)
-            head_resized = head.resize((panel_width, panel_height), Image.Resampling.LANCZOS)
+
+            base_resized = base.resize(
+                (panel_width, panel_height), Image.Resampling.LANCZOS)
+            head_resized = head.resize(
+                (panel_width, panel_height), Image.Resampling.LANCZOS)
 
             # Create diff visualization (enhanced for visibility)
             diff_img = ImageChops.difference(base, head)
-            
-            # Enhance diff by converting to grayscale and inverting for better visibility
-            diff_gray = diff_img.convert("L")
-            
+
             # Create a colored diff overlay
             diff_colored = Image.new("RGB", diff_img.size, (255, 255, 255))
             for y in range(diff_img.height):
@@ -65,16 +70,18 @@ def create_comparison_image(
                     if r > 10 or g > 10 or b > 10:  # Threshold for change detection
                         # Highlight changes in red
                         diff_colored.putpixel((x, y), (255, 0, 0))
-            
+
             # Blend diff with original for context
             diff_overlay = Image.blend(head, diff_colored, 0.5)
-            diff_resized = diff_overlay.resize((panel_width, panel_height), Image.Resampling.LANCZOS)
+            diff_resized = diff_overlay.resize(
+                (panel_width, panel_height), Image.Resampling.LANCZOS)
 
             # Create combined image canvas
             total_width = (panel_width * 3) + (padding * 4)
             total_height = panel_height + label_height + (padding * 3)
-            
-            canvas = Image.new("RGB", (total_width, total_height), (240, 240, 240))
+
+            canvas = Image.new(
+                "RGB", (total_width, total_height), (240, 240, 240))
             draw = ImageDraw.Draw(canvas)
 
             # Try to load a font, fall back to default if not available
@@ -96,7 +103,7 @@ def create_comparison_image(
                 bbox = draw.textbbox((0, 0), label, font=font)
                 text_width = bbox[2] - bbox[0]
                 text_x = x_pos + (panel_width - text_width) // 2
-                
+
                 # Draw label
                 draw.text((text_x, padding), label, fill=(0, 0, 0), font=font)
 
@@ -109,12 +116,13 @@ def create_comparison_image(
             # Save output
             output_path.parent.mkdir(parents=True, exist_ok=True)
             canvas.save(output_path, quality=95)
-            
-            print(f"✅ Created comparison: {output_path}")
+
+            logger.info(f"Created comparison: {output_path}")
             return True
 
     except Exception as exc:
-        print(f"❌ Failed to create comparison for {base_path.name}: {exc}")
+        logger.error(
+            f"Failed to create comparison for {base_path.name}: {exc}")
         return False
 
 
@@ -150,39 +158,41 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.base_dir.exists():
-        print(f"❌ Base directory not found: {args.base_dir}")
+        logger.error(f"Base directory not found: {args.base_dir}")
         return 1
 
     if not args.head_dir.exists():
-        print(f"❌ Head directory not found: {args.head_dir}")
+        logger.error(f"Head directory not found: {args.head_dir}")
         return 1
 
     # Find all base images
     base_images = list(args.base_dir.glob("*.png"))
     if not base_images:
-        print(f"❌ No PNG images found in {args.base_dir}")
+        logger.error(f"No PNG images found in {args.base_dir}")
         return 1
 
-    print(f"Found {len(base_images)} base images to process")
-    
+    logger.info(f"Found {len(base_images)} base images to process")
+
     all_ok = True
     for base_path in base_images:
         head_path = args.head_dir / base_path.name
-        
+
         if not head_path.exists():
-            print(f"⚠️  Skipping {base_path.name} - no matching head image")
+            logger.warning(
+                f"Skipping {base_path.name} - no matching head image")
             continue
 
         output_path = args.output_dir / base_path.name
-        
-        ok = create_comparison_image(base_path, head_path, output_path, args.panel_width)
+
+        ok = create_comparison_image(
+            base_path, head_path, output_path, args.panel_width)
         all_ok = all_ok and ok
 
     if all_ok:
-        print(f"\n✅ All comparison images created in {args.output_dir}")
+        logger.info(f"\nAll comparison images created in {args.output_dir}")
         return 0
     else:
-        print("\n⚠️  Some comparisons failed")
+        logger.warning("\nSome comparisons failed")
         return 1
 
 

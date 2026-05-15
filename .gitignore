@@ -3,8 +3,11 @@ venv*/
 __pycache__/
 *.py[cod]
 *.bak
+*.diff
 *.zip
 *.pdf
+# Exception: Tech brief PDF needed for site download
+!Arboreum_Tech_Brief.pdf
 .vscode/
 pdf_content.txt
 
@@ -14,4 +17,36 @@ pr_body*.txt
 index_main*.html
 notes.md
 
+# Environment files
 .env
+
+# Debug files
+*.log
+*DEBUG*.md
+debug-logs/
+
+# Duplicate files from tools/ (keep only in canonical location)
+/AI_TECH_BRIEF_README.md
+/ai_conversation.py
+/create_pr.py
+/generate_pr_screenshots.py
+/archive/site_with_tech_brief.html
+AI_TECH_BRIEF_README.md
+
+# Personal data processing files
+parse_notices.py
+notices_extracted.json
+gmail_takeout/
+
+# Personal productivity tracking (workrave)
+workrave_stats.*
+data_fetcher.js
+tools/convert_workrave.py
+tools/samples/
+
+# Experimental/unrelated projects
+CIIRL*.html
+psych_notes
+docker/
+docker-compose.yml
+mcpo-config.json

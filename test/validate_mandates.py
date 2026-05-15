@@ -2,14 +2,23 @@
 Validation script for mandates.html
 Checks for required pillar content and HTML structure
 """
+import logging
 import re
 import sys
 from pathlib import Path
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s',
+    stream=sys.stdout
+)
+logger = logging.getLogger(__name__)
+
 
 def validate_mandates(file_path):
     """Validate the mandates.html file"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding='utf-8') as f:
         content = f.read()
 
     issues = []
@@ -113,26 +122,27 @@ if __name__ == '__main__':
     file_path = Path(__file__).parent.parent / 'mandates.html'
 
     if not file_path.exists():
-        print(f"❌ File not found: {file_path}")
+        logger.error(f"File not found: {file_path}")
         sys.exit(1)
 
-    print("🧪 Running Mandates Validation Tests\n")
-    print("📋 Checking pillar structure, content integrity, and HTML validity...\n")
+    logger.info("Running Mandates Validation Tests\n")
+    logger.info(
+        "Checking pillar structure, content integrity, and HTML validity...\n")
 
     issues, critical_count, warning_count = validate_mandates(file_path)
 
     if issues:
-        print("Issues found:\n")
+        logger.info("Issues found:\n")
         for issue in issues:
-            print(f"  {issue}")
-        print()
+            logger.info(f"  {issue}")
+        logger.info("")
 
     if critical_count > 0:
-        print(f"❌ {critical_count} critical issue(s)")
+        logger.error(f"{critical_count} critical issue(s)")
         sys.exit(1)
     elif warning_count > 0:
-        print(f"⚠️  {warning_count} warning(s) - PASSED with warnings")
+        logger.warning(f"{warning_count} warning(s) - PASSED with warnings")
         sys.exit(0)
     else:
-        print("✅ All checks passed!")
+        logger.info("All checks passed!")
         sys.exit(0)

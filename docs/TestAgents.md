@@ -15,7 +15,7 @@ The AI should respond: By referencing the ORC integration and 400°C+ waste heat
 ## Repository Process Context (Updated 2026-02-22)
 
 - Work on branches; do not commit directly to `main`.
-- Install local hooks with `utils/install_git_hooks.ps1`.
+- Install local hooks with `tools/install_git_hooks.ps1`.
 - Hooks block commits/pushes to protected default branches and run safety checks.
 - Run validation scripts for content/layout changes:
   - `test/validate_compliance_tracker.py`

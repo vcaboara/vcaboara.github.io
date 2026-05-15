@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import logging
 import shutil
 import subprocess
 import sys
@@ -24,20 +25,14 @@ from pathlib import Path
 
 from PIL import Image, ImageChops
 
+from ui_utils import is_ui_file, run_git_diff
 
-UI_FILE_PATTERNS = (
-    ".html",
-    ".css",
-    ".scss",
-    ".sass",
-    ".jsx",
-    ".tsx",
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s - %(message)s'
 )
-
-UI_EXCLUDE_PATTERNS = (
-    "test_",
-    "TESTING.md",
-)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -48,22 +43,9 @@ class PageDiffResult:
     notes: str
 
 
-def run_git_diff(base_sha: str, head_sha: str) -> list[str]:
-    cmd = ["git", "diff", "--name-only", f"{base_sha}...{head_sha}"]
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
-
-
-def is_ui_file(path: str) -> bool:
-    lower = path.lower()
-    if not lower.endswith(UI_FILE_PATTERNS):
-        return False
-    return not any(excluded.lower() in lower for excluded in UI_EXCLUDE_PATTERNS)
-
-
 def is_comparable_html(path: str) -> bool:
     lower = path.lower()
-    return lower.endswith(".html") and not any(excluded.lower() in lower for excluded in UI_EXCLUDE_PATTERNS)
+    return lower.endswith(".html") and is_ui_file(path)
 
 
 def export_revision(revision: str, out_dir: Path) -> None:
@@ -103,7 +85,7 @@ class LocalServer:
         self.httpd: ThreadingHTTPServer | None = None
         self.thread: threading.Thread | None = None
 
-    def __enter__(self) -> "LocalServer":
+    def __enter__(self) -> LocalServer:
         handler = functools.partial(
             SimpleHTTPRequestHandler, directory=str(self.directory))
         self.httpd = ThreadingHTTPServer(("127.0.0.1", self.port), handler)
@@ -233,8 +215,8 @@ def main() -> int:
     try:
         changed_files = run_git_diff(args.base_sha, args.head_sha)
     except subprocess.CalledProcessError as exc:
-        print("❌ Failed to list changed files")
-        print(exc.stderr)
+        logger.error("Failed to list changed files")
+        logger.error(exc.stderr)
         return 1
 
     ui_changed_files = [f for f in changed_files if is_ui_file(f)]
@@ -242,7 +224,7 @@ def main() -> int:
 
     if not ui_changed_files or not comparable_pages:
         write_summary(output_markdown, ui_changed_files, comparable_pages, [])
-        print(output_markdown.read_text(encoding="utf-8"))
+        logger.info(output_markdown.read_text(encoding="utf-8"))
         return 0
 
     work_dir = Path(tempfile.mkdtemp(prefix="ui-diff-"))
@@ -290,18 +272,18 @@ def main() -> int:
                         page=page, status="error", diff_percent=0.0, notes=str(exc)))
 
     except subprocess.CalledProcessError as exc:
-        print("❌ Failed to export git revisions")
-        print(exc.stderr)
+        logger.error("Failed to export git revisions")
+        logger.error(exc.stderr)
         return 1
     finally:
         write_summary(output_markdown, ui_changed_files,
                       comparable_pages, results)
         shutil.rmtree(work_dir, ignore_errors=True)
 
-    print(output_markdown.read_text(encoding="utf-8"))
+    logger.info(output_markdown.read_text(encoding="utf-8"))
 
     if any(result.status == "error" for result in results):
-        print("❌ One or more pages failed screenshot comparison")
+        logger.error("One or more pages failed screenshot comparison")
         return 1
 
     return 0

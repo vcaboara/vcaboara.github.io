@@ -2,14 +2,22 @@
 Validation script for off-the-shelf.html
 Checks for required elements, manufacturer data integrity, and structural consistency
 """
+import logging
 import re
 import sys
 from pathlib import Path
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s'
+)
+logger = logging.getLogger(__name__)
+
 
 def validate_off_the_shelf(file_path):
     """Validate the off-the-shelf.html file"""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding='utf-8') as f:
         content = f.read()
 
     issues = []
@@ -174,27 +182,27 @@ def validate_off_the_shelf(file_path):
 def print_report(issues):
     """Print validation report"""
     if not issues:
-        print("✅ All validations passed!")
+        logger.info("All validations passed!")
         return True
 
-    print("📋 Validation Report:")
-    print("-" * 60)
+    logger.info("Validation Report:")
+    logger.info("-" * 60)
 
     critical = [i for i in issues if 'CRITICAL' in i]
     warnings = [i for i in issues if 'WARNING' in i]
 
     if critical:
-        print("\n🔴 CRITICAL ISSUES:")
+        logger.error("\nCRITICAL ISSUES:")
         for issue in critical:
-            print(f"  {issue}")
+            logger.error(f"  {issue}")
 
     if warnings:
-        print("\n🟡 WARNINGS:")
+        logger.warning("\nWARNINGS:")
         for issue in warnings:
-            print(f"  {issue}")
+            logger.warning(f"  {issue}")
 
-    print("-" * 60)
-    print(
+    logger.info("-" * 60)
+    logger.info(
         f"Summary: {len(critical)} critical, {len(warnings)} warning(s)\n")
 
     return len(critical) == 0
@@ -205,10 +213,10 @@ def main():
     file_path = Path(__file__).parent.parent / 'off-the-shelf.html'
 
     if not file_path.exists():
-        print(f"❌ File not found: {file_path}")
+        logger.error(f"File not found: {file_path}")
         sys.exit(1)
 
-    print(f"🔍 Validating: {file_path}\n")
+    logger.info(f"Validating: {file_path}\n")
 
     issues = validate_off_the_shelf(file_path)
     success = print_report(issues)

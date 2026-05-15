@@ -139,7 +139,7 @@ If a PR changes UI-facing files, the PR body must include:
 - **AFTER** section
 - At least two screenshot images total
 
-Enforcement script: `utils/check_pr_ui_screenshots.py`
+Enforcement script: `tools/check_pr_ui_screenshots.py`
 
 ### Important: Hooks vs GitHub Required Checks
 
