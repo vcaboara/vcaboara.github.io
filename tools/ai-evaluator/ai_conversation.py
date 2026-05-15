@@ -263,7 +263,8 @@ def main():
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
-    # Currently using Gemini for both agents (OpenAI key invalid)
+    # Currently using Gemini (verified working with free tier)
+    # OpenAI and Anthropic keys available but may need updating
     if not GEMINI_API_KEY:
         print("Error: GEMINI_API_KEY not found.")
         print("Set GEMINI_API_KEY in your .env file or as an environment variable.")
@@ -305,9 +306,8 @@ Integrate this knowledge naturally when relevant.
         else:
             print(f"⚠ Knowledge base directory not found: {kb_dir}")
 
-    # Define the two AI agents with different roles - optimized for tech brief evaluation
-    # Using Gemini 3 Flash Preview (verified working)
-    # Agent 1: Gemini - Technical Evaluator
+    # Define the two AI agents with different roles and providers for diverse perspectives
+    # Agent 1: Gemini - Technical Evaluator (fast, technically rigorous)
     agent1 = AIAgent(
         name="Technical Evaluator",
         provider="gemini",
@@ -323,6 +323,7 @@ Integrate this knowledge naturally when relevant.
     )
 
     # Agent 2: Gemini - Strategic Analyst
+    # Note: Can be configured to use OpenAI or Claude when valid API keys are available
     agent2 = AIAgent(
         name="Strategic Analyst",
         provider="gemini",
