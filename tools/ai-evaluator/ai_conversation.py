@@ -496,9 +496,6 @@ Integrate this knowledge naturally when relevant.
     # Get initial prompt from command line, file, or use default
     initial_topic = None
 
-    # Get initial prompt from command line, file, or use default
-    initial_topic = None
-
     if args.prompt:
         # Check if it's a file path
         prompt_path = Path(args.prompt)
