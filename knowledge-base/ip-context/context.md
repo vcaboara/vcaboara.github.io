@@ -15,15 +15,34 @@
 
 ## Current Strategic Position (May 2026)
 
-### Patent Filing & Timeline
-- **US 19/424,106**: Filed **12/17/2025** (5 months ago)
+### Patent Filing & Technology Scope
+- **US 19/424,106**: Filed **12/17/2025** (5 months ago) - **THIS IS YOUR CREDIBILITY**
+  - **Phase 1 (Filed Patent)**: Ag-waste bio-refinery at source
+    - Powers pyrolyzers using same ag-waste feedstock
+    - Pulping ag-waste at source
+    - Biochar integration for multiple purposes
+    - Water reclamation system
+    - Generates bio-oils as drop-in fossil fuel replacements (SAF, shipping, etc.)
+  
+- **Phase 2 (Trade Secret - 60% of emissions)**: Heavy industry retrofit
+  - Applying same principles to existing heavy industry
+  - Close-loop, carbon-negative retrofits
+  - Trade secret status until first licensee funds filing of additional patents
+  
 - **Regulatory Context**: USDA/DOE/BETO mandates deadline was 12/30/2025 (13 days after filing)
-- **Technology**: Novel configurations of existing off-the-shelf industrial hardware
+  - Filed to USDA portal 12/31/2025
+  
+- **Technology Basis**: Novel configurations of existing off-the-shelf industrial hardware
   - Not inventing new machines - arranging existing components in novel sequences
-  - Tech briefs address ~60% of current industrial emissions
+  - Process IP, not hardware patents
+  
 - **Business Model**: 100% licensing via ACS (commercial entity)
   - "Paper architect" is intentional strategy, not execution failure
   - Licensing configurations/processes, not manufacturing hardware
+  
+- **Inventor Background**: Computer engineer, no heavy industry history
+  - Individual inventor facing gatekeeping/access challenges
+  - No traditional intake pathway for outlier inventors
 
 ### "Dragon King" Challenge
 - **Problem**: Systemic disruption to incumbent timber and energy monopolies
