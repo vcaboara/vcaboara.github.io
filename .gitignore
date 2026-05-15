@@ -25,7 +25,7 @@ notes.md
 *DEBUG*.md
 debug-logs/
 
-# Duplicate files from tools/ or utils/ (keep only in canonical location)
+# Duplicate files from tools/ (keep only in canonical location)
 /AI_TECH_BRIEF_README.md
 /ai_conversation.py
 /create_pr.py
@@ -41,8 +41,8 @@ gmail_takeout/
 # Personal productivity tracking (workrave)
 workrave_stats.*
 data_fetcher.js
-utils/convert_workrave.py
-utils/samples/
+tools/convert_workrave.py
+tools/samples/
 
 # Experimental/unrelated projects
 CIIRL*.html
