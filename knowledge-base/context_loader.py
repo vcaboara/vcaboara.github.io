@@ -1,4 +1,5 @@
 """Context loader for AI conversations with knowledge base."""
+import importlib.util
 import logging
 import os
 from pathlib import Path
@@ -10,6 +11,20 @@ logging.basicConfig(
     format='%(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+def _load_ai_agent_class():
+    """Load AIAgent from tools/ai-evaluator/ai_conversation.py."""
+    repo_root = Path(__file__).resolve().parents[1]
+    module_path = repo_root / "tools" / "ai-evaluator" / "ai_conversation.py"
+
+    spec = importlib.util.spec_from_file_location("ai_conversation", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load AIAgent from {module_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.AIAgent
 
 
 class KnowledgeBase:
@@ -120,8 +135,7 @@ def create_context_aware_agent(name: str, provider: str, model: str,
     Returns:
         AIAgent with enhanced system prompt
     """
-    # Import here to avoid circular dependency
-    from tools.ai_evaluator.ai_conversation import AIAgent
+    AIAgent = _load_ai_agent_class()
 
     if knowledge_base is None:
         knowledge_base = KnowledgeBase()
