@@ -1,7 +1,94 @@
 #!/usr/bin/env python3
-"""
-Script to facilitate a conversation between two AI agents until they converge
-on a final document.
+"""Multi-AI agent conversation system for evaluating and refining documents.
+
+This tool runs alternating conversations between two AI agents (Gemini, OpenAI, or
+Claude) with different roles until they converge on a consensus document. The first
+agent sees your input, the second agent sees the first's response, and they iterate
+back and forth, refining based on each other's feedback.
+
+QUICK START
+-----------
+    # Basic usage
+    python ai_conversation.py --prompt "your prompt or question"
+    
+    # From file
+    python ai_conversation.py --prompt input.md
+    
+    # With knowledge base context
+    python ai_conversation.py --prompt input.md --context ../../knowledge-base/ip-context
+
+SETUP
+-----
+    1. Install dependencies:
+       pip install -r ai_conversation_requirements.txt
+    
+    2. Create .env file with API keys:
+       GEMINI_API_KEY=your-key-here       # FREE tier available
+       OPENAI_API_KEY=your-key-here       # Optional
+       ANTHROPIC_API_KEY=your-key-here    # Optional
+    
+    See GET_API_KEYS.md for detailed setup instructions.
+
+HOW IT WORKS
+------------
+    Agent 1 (Technical Evaluator):
+      - Receives your initial prompt
+      - Analyzes technical details, accuracy, innovation
+      - Generates initial evaluation
+    
+    Agent 2 (Strategic Analyst):
+      - Receives Agent 1's response (not your original prompt)
+      - Evaluates business value, IP strategy, market positioning
+      - Provides critique and refinement suggestions
+    
+    Iteration continues until:
+      - Both agents agree (detect phrases like "approved", "looks good")
+      - Maximum rounds reached (default: 10, configurable with --rounds)
+    
+    See CONVERSATION_FLOW.md for visual diagram.
+
+OUTPUT
+------
+    Results saved to output/ directory:
+      - final_document_*.txt     Converged final document
+      - transcript_*.txt         Full conversation between agents
+      - conversation_*.json      Complete data log with metadata
+
+CONFIGURATION
+-------------
+    Agent provider diversity:
+      - Script auto-selects different providers for each agent when possible
+      - Agent 1 prefers: Gemini > OpenAI > Anthropic
+      - Agent 2 prefers: Different provider than Agent 1
+      - Falls back to same provider if only one API key configured
+    
+    Model defaults:
+      - Gemini: gemini-2.0-flash-exp
+      - OpenAI: gpt-4o
+      - Anthropic: claude-3-5-sonnet-20241022
+
+EXAMPLES
+--------
+    # Quick analysis with default settings
+    python ai_conversation.py --prompt "Analyze patent US 19/424,106"
+    
+    # Extended conversation with more rounds
+    python ai_conversation.py --prompt brief.md --rounds 15
+    
+    # With persistent knowledge base context
+    python ai_conversation.py \\
+        --prompt strategy.md \\
+        --context ../../knowledge-base/ip-context \\
+        --rounds 20
+
+REQUIREMENTS
+------------
+    - openai>=1.0.0
+    - anthropic>=0.21.0
+    - google-genai>=0.2.0
+    - python-dotenv>=1.0.0
+
+See ai_conversation_requirements.txt for complete list.
 """
 
 import os
