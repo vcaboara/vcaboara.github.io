@@ -13,14 +13,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _find_ai_conversation_path() -> Path:
+    """Locate tools/ai-evaluator/ai_conversation.py from this file upward."""
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "tools" / "ai-evaluator" / "ai_conversation.py"
+        if candidate.exists():
+            return candidate
+
+    raise ImportError(
+        "AIAgent module not found in any parent tools/ai-evaluator directory"
+    )
+
+
 def _load_ai_agent_class():
     """Load AIAgent from tools/ai-evaluator/ai_conversation.py."""
-    repo_root = Path(__file__).resolve().parents[1]
-    module_path = repo_root / "tools" / "ai-evaluator" / "ai_conversation.py"
-    if not module_path.exists():
-        raise ImportError(f"AIAgent module not found at {module_path}")
+    module_path = _find_ai_conversation_path()
 
-    spec = importlib.util.spec_from_file_location("ai_conversation", module_path)
+    spec = importlib.util.spec_from_file_location(
+        "tools_ai_evaluator_ai_conversation", module_path
+    )
     if spec is None or spec.loader is None:
         raise ImportError(
             f"Could not create a module spec for AIAgent from {module_path}"
