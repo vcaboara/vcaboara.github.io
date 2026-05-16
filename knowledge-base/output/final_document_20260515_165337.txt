@@ -1,0 +1,162 @@
+# Consensus Analysis and Synthesis
+
+## PRELIMINARY NOTES
+
+**Responses Available:** 2 of 3 (Critical Reviewer returned an API error)
+- Technical Evaluator: Partial response (truncated at Field 3)
+- Strategic Analyst: Complete response (all 8 fields)
+
+Given the truncated Technical Evaluator response and missing Critical Reviewer, I will synthesize based on available content, noting where I've had to rely primarily on the Strategic Analyst's more complete submission.
+
+---
+
+## FIELD-BY-FIELD ANALYSIS
+
+### FIELD 1 - TITLE
+
+**Technical Evaluator:**
+> Energy-Autonomous Carbon-Negative Bio-Refinery for Agricultural Waste Valorization & Sustainable Fuels
+
+**Strategic Analyst:**
+> Energy-Autonomous Agricultural Waste Bio-Refinery System: Carbon-Negative SAF, Bio-Oil & Biochar Production
+
+**Agreement:** Both lead with "Energy-Autonomous" and include "Carbon-Negative," "Bio-Refinery," and "Agricultural Waste." Both High confidence.
+
+**Disagreement:** Strategic Analyst specifies outputs (SAF, Bio-Oil, Biochar); Technical Evaluator uses broader "Sustainable Fuels" and "Valorization."
+
+**Tiebreak Reasoning:** Strategic Analyst's version is more search-optimized for SWF technical reviewers who search specific terms ("SAF," "bio-oil"). "Valorization" is industry jargon that may not be a primary search term. However, Technical Evaluator's version flows better grammatically.
+
+**SYNTHESIS - FINAL:**
+```
+Energy-Autonomous Agricultural Waste Bio-Refinery: Carbon-Negative SAF, Bio-Oil & Biochar Production
+```
+*(Combined: Strategic Analyst's specificity with smoother flow; 103 characters)*
+
+---
+
+### FIELD 2 - SHORT DESCRIPTION
+
+**Technical Evaluator:**
+> Our patented system converts agricultural waste into carbon-negative bio-oils, biochar, and structural materials. It operates as an energy-autonomous bio-refinery, enabling compliance with global climate mandates and decoupling operational costs from energy market volatility.
+
+**Strategic Analyst:**
+> Patented process configuration enabling agricultural waste conversion to SAF-grade bio-oils, biochar, and pulped materials with zero external power requirements during steady-state operation. Configuration and process licensing only—deployable using existing off-the-shelf industrial equipment.
+
+**Agreement:** Both emphasize patented technology, energy autonomy, and output products. Both High confidence.
+
+**Disagreement:** Technical Evaluator emphasizes compliance and cost decoupling; Strategic Analyst emphasizes licensing model and deployment simplicity.
+
+**Tiebreak Reasoning:** Strategic Analyst's version pre-qualifies inquiries by stating "licensing only" and signals low deployment risk ("off-the-shelf"). However, Technical Evaluator's "decoupling operational costs from energy market volatility" is a strong financial signal. The phrase "SAF-grade" from Strategic Analyst adds credibility.
+
+**SYNTHESIS - FINAL:**
+```
+Patented process configuration converting agricultural waste to SAF-grade bio-oils, biochar, and structural materials with zero external power requirements during steady-state operation. Configuration and process licensing only—deploys on existing industrial equipment, decoupling O&M costs from energy market volatility.
+```
+
+---
+
+### FIELD 3 - FULL DESCRIPTION
+
+**Technical Evaluator:** (Truncated—only partial content available)
+
+**Strategic Analyst:** (Complete structured response)
+
+**Tiebreak Reasoning:** Only Strategic Analyst provided complete content. Their structure addresses all three reviewer types (technical, legal, compliance) per the original prompt requirements. I adopt their response with minor refinements for clarity.
+
+**SYNTHESIS - FINAL:**
+
+```
+TECHNOLOGY OVERVIEW
+
+Arboreum's patented bio-refinery configuration (US 19/424,106, filed December 2025) converts agricultural waste streams into three primary outputs: SAF-grade bio-oils, carbon-sequestering biochar, and pulped structural materials. The system achieves energy autonomy by utilizing a portion of the feedstock to power the conversion process, requiring zero external power input during steady-state operation.
+
+CORE INNOVATION
+
+This is process IP—novel sequencing and configuration of existing industrial hardware components (pyrolyzers, condensers, water reclamation units). No proprietary equipment manufacturing required. Licensees deploy using established supply chains, reducing capital risk and accelerating time-to-operation.
+
+KEY TECHNICAL FEATURES
+
+• Energy-Autonomous Operation: Self-sustaining thermal cycle decouples O&M costs from energy market volatility
+• Feedstock Agnostic Architecture: Validated configuration parameters for rice husk, forestry residue, and mixed agricultural waste with variable moisture content
+• Carbon-Negative Lifecycle: Biochar sequestration combined with fossil fuel displacement achieves net negative emissions profile
+• LCA-Ready Methodology: Documentation structured for third-party Carbon Intensity (CI) verification per ISO 14044 framework
+
+REGULATORY ALIGNMENT
+
+System configuration filed to USDA portal December 2025 in alignment with USDA/DOE/BETO agricultural waste valorization mandates. Outputs compatible with EUDR compliance pathways and CBAM reporting requirements for carbon-intensive material substitution.
+
+BUSINESS MODEL
+
+100% licensing via Arboreum Commercial Solutions, LLC. No hardware sales or manufacturing operations. Licensees receive configuration specifications, process parameters, integration protocols, and compliance documentation. This "shovel-ready IP" model enables rapid regional deployment by qualified operators with existing agricultural waste access.
+
+DEPLOYMENT CONTEXT
+
+Designed for agricultural cooperatives, bio-refinery operators, and sovereign infrastructure projects seeking carbon-negative feedstock production capacity. Phase 2 industrial retrofit applications (addressing approximately 60% of heavy industry emissions) available under NDA for qualified strategic partners.
+```
+
+---
+
+### FIELD 4 - DEVELOPMENT STAGE
+
+**Strategic Analyst only:**
+> Concept | Qualifying Note: Process configuration patented (US 19/424,106); system utilizes established industrial hardware with proven individual component performance. Seeking pilot partnership to validate integrated system performance metrics.
+
+**Confidence:** Medium (acknowledged risk of filtering out Prototype+ seekers)
+
+**Synthesis Reasoning:** Accept Strategic Analyst's recommendation with the documented risk. "Concept" is defensible; overclaiming "Prototype" without evidence would damage credibility with licensing attorneys.
+
+**SYNTHESIS - FINAL:**
+```
+Development Stage: Concept
+
+Qualifying Note: Process configuration patented (US 19/424,106); system utilizes established industrial hardware with proven individual component performance. Seeking pilot partnership to validate integrated system performance metrics.
+```
+**Confidence: Medium** — Accurate but may reduce initial engagement from SWFs filtering for Prototype+ stages.
+
+---
+
+### FIELD 5 - COOPERATION OFFERED
+
+**Strategic Analyst only:**
+> ☑ Licensing, ☑ R&D Collaboration, ☑ Technical Audit, ☐ Joint Venture, ☐ Other
+
+**Synthesis Reasoning:** Accept as-is. Aligns with 100% licensing strategy; R&D Collaboration and Technical Audit signal flexibility without diluting equity via Joint Venture.
+
+**SYNTHESIS - FINAL:**
+```
+☑ Licensing
+☑ R&D Collaboration
+☑ Technical Audit
+☐ Joint Venture
+☐ Other
+```
+**Confidence: High**
+
+---
+
+### FIELD 6 - KEYWORDS
+
+**Strategic Analyst only:**
+> agricultural waste valorization, sustainable aviation fuel, SAF, bio-oil, biochar, carbon-negative, pyrolysis, EUDR compliance, CBAM, energy-autonomous, carbon intensity, LCA, feedstock agnostic, process licensing, decarbonization
+
+**Synthesis Reasoning:** Accept as-is. 15 keywords covering technical, regulatory, and differentiator terms.
+
+**SYNTHESIS - FINAL:**
+```
+agricultural waste valorization, sustainable aviation fuel, SAF, bio-oil, biochar, carbon-negative, pyrolysis, EUDR compliance, CBAM, energy-autonomous, carbon intensity, LCA, feedstock agnostic, process licensing, decarbonization
+```
+**Confidence: High**
+
+---
+
+### FIELD 7 - CATEGORIES
+
+**Strategic Analyst only:**
+> Primary: ENERGY | Secondary: FARMING/FORESTRY, POLLUTION/WASTE, PRODUCTS/MATERIALS/PROCESSES
+
+**Synthesis Reasoning:** Accept as-is. ENERGY primary aligns with council consensus (Energy/Bio-Refinery FIRST). Secondary categories maximize discoverability.
+
+**SYNTHESIS - FINAL:**
+```
+Primary: ENERGY
+Secondary: FARMING/FORESTRY, POLLUTION/

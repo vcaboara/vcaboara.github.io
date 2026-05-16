@@ -1,0 +1,75 @@
+# Critical Reviewer Assessment
+
+## Overall Verdict: **CONDITIONALLY APPROVED — Minor Revisions Required**
+
+The Technical Evaluator has addressed my core concerns effectively. The shift from "demonstrated" to "designed for" language is exactly the kind of epistemic honesty that protects credibility. However, I have **three remaining issues** that must be resolved before final approval.
+
+---
+
+## Issue 1: Field 4 — Incomplete Sentence (BLOCKING)
+
+**Problem:** The draft text ends mid-sentence:
+
+> "Startup requires external fuel (e.g., propane/electric), which is standard"
+
+This is either truncated or submitted incomplete. WIPO reviewers will see this as sloppy at best, technically unverified at worst.
+
+**Required Fix:** Complete the thought within the 250-character limit, or restructure to remove the incomplete clause entirely.
+
+**Suggested Revision (241 characters):**
+> Midstream valorization: Converts ag-residue into industrial feedstock. System designed for self-powered steady-state operation after startup. Outputs align with ASTM D7566 (SAF) and IBI (Biochar) pathways for seamless industry integration.
+
+This removes the incomplete sentence while preserving the technical claim. The "after startup" qualifier handles the cold-start energy requirement without opening a vulnerability.
+
+---
+
+## Issue 2: Field 2 — "12/30 USDA/DOE/BETO mandates" Specificity
+
+**Concern:** I need to verify this reference. The knowledge base mentions the **12/30/2025 deadline** repeatedly, but I want to confirm:
+
+1. Is this a specific regulatory deadline with a citable document?
+2. Or is this shorthand for a policy direction?
+
+**Why This Matters:** Sophisticated SWF due diligence teams will check this reference. If we cite a specific mandate date and they can't find it, our credibility collapses.
+
+**Request for Technical Evaluator:** Provide the specific regulatory citation (e.g., Federal Register number, BETO program announcement) or revise to more defensible language like "2025 USDA/DOE decarbonization targets."
+
+---
+
+## Issue 3: Field 3 — "Consistent Output Quality" Claim
+
+**Observation:** The draft states we "ensure consistent output quality." The justification mentions PLC-controlled feedback loops adjusting based on syngas calorific value.
+
+**Remaining Question:** At TRL 3, have these feedback loops been:
+- (a) Designed on paper?
+- (b) Simulated in process modeling software?
+- (c) Demonstrated in bench-scale testing?
+
+**Why This Matters:** "Ensure" is a strong word. If we're at design stage, "designed to maintain" is more defensible. If we have simulation data showing the control logic works, "ensure" may be acceptable.
+
+**My Recommendation:** Unless there's simulation or empirical data, soften to:
+
+> "We address ag-waste variability through modular process control (temp/residence time) **designed to maintain** consistent output quality for industrial uptake."
+
+---
+
+## Summary of Required Changes
+
+| Field | Issue | Status | Action |
+|-------|-------|--------|--------|
+| Field 1 | None | ✅ APPROVED | No changes |
+| Field 2 | Mandate citation | ⚠️ PENDING | Confirm regulatory source or soften language |
+| Field 3 | "Ensure" claim | ⚠️ MINOR | Consider "designed to maintain" |
+| Field 4 | Incomplete sentence | 🛑 BLOCKING | Must fix before submission |
+
+---
+
+## Conditional Approval Statement
+
+**I will grant full approval once:**
+
+1. Field 4 sentence is completed or restructured (**mandatory**)
+2. Field 2 mandate reference is confirmed or softened (**required**)
+3. Field 3 "ensure" language is either justified with evidence or softened (**recommended**)
+
+The Technical Evaluator has done good work here. These are refinements, not fundamental objections. Address these and you have my sign-off.

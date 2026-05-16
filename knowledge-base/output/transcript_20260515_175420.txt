@@ -1,0 +1,590 @@
+Vote conversation — agents: Technical Evaluator, Critical Reviewer
+Started: 2026-05-15T17:54:20.696065
+Mode: vote
+================================================================================
+
+Round 1 - Technical Evaluator [independent]:
+--------------------------------------------------------------------------------
+Here is the detailed technical critique and evaluation of the WIPO GREEN Database submission:
+
+---
+
+### TITLE:
+**Energy-Autonomous Carbon-Negative Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues**
+
+**Critique:** Approved.
+**Reasoning:** The title effectively summarizes the core technology and its primary outputs in a
+
+Round 1 - Critical Reviewer [independent]:
+--------------------------------------------------------------------------------
+# CRITICAL REVIEW: WIPO GREEN Database Entry
+
+## VERDICT SUMMARY
+
+I have significant concerns with several elements of this submission. While the core technology claims align with the patent filing facts provided, there are overclaims, defensibility gaps, and potential credibility risks that must be addressed before I can approve.
+
+---
+
+## FIELD-BY-FIELD ANALYSIS
+
+### 1. TITLE
+
+**STATUS: REQUIRES REVISION**
+
+**Issue:** "Energy-Autonomous" is a strong claim. While the patent describes self-sustaining thermal cycles, claiming "autonomous" implies no external energy input *ever*, including startup. The phrase "using only waste-derived energy" in the description clarifies this applies to "steady-state operation" — the title should not overclaim beyond what the body text qualifies.
+
+**Additional Issue:** Title is 156 characters. Verify WIPO GREEN character limit for titles.
+
+**Recommended Revision:**
+```
+Self-Powered Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues
+```
+
+"Self-powered" is more defensible than "Energy-Autonomous" — it implies the system generates its own operating energy without claiming zero external input for all phases.
+
+---
+
+### 2. SHORT DESCRIPTION
+
+**STATUS: REQUIRES REVISION**
+
+**Issue:** "Carbon-negative lifecycle" is asserted without qualification. At TRL 3 with no pilot, lifecycle carbon accounting has not been empirically validated. This is a modeling claim, not a measured result.
+
+**Recommended Revision:**
+```
+Patented process configuration converting lignocellulosic agricultural waste into composite fibrous pulp (virgin timber substitute), carbon-sequestering biochar, and drop-in bio-oils — powered by waste-derived energy during steady-state operation. Designed for carbon-negative lifecycle. Process and configuration licensing only.
+```
+
+"Designed for" is honest about current validation state.
+
+---
+
+### 3. FULL DESCRIPTION — TECHNOLOGY OVERVIEW
+
+**STATUS: APPROVED WITH ONE FLAG**
+
+The "No external power input required during steady-state operation" qualifier is appropriate and handles the startup energy question.
+
+**Minor Flag:** "three primary outputs at source" — confirm the patent explicitly claims at-source processing as a feature, or soften to "designed for at-source deployment."
+
+---
+
+### 4. FULL DESCRIPTION — PRIMARY OUTPUTS
+
+**STATUS: REQUIRES REVISION**
+
+**Issue:** "Directly addresses EUDR and CBAM compliance requirements" is an overclaim. The system *enables* compliance; it does not *directly address* regulatory requirements, which would require the material to be certified/tested against specific standards. At TRL 3, no such certification exists.
+
+**Recommended Revision:**
+```
+1. Composite fibrous pulp — Carbon-negative substitute for virgin timber and wood pulp in structural, packaging, and industrial input applications. Produced at the point of waste generation. Designed to enable EUDR and CBAM compliance pathways for operators transitioning away from forest-derived inputs.
+```
+
+---
+
+### 5. ENVIRONMENTAL BENEFITS CHECKBOXES
+
+**STATUS: 7 APPROVED, 1 FLAGGED**
+
+| Checkbox | Verdict | Rationale |
+|----------|---------|-----------|
+| Forest | ✅ APPROVED | Composite pulp as timber substitute is explicitly claimed |
+| Greenhouse gases | ✅ APPROVED | Biochar carbon sequestration is the mechanism |
+| Air | ✅ APPROVED | Eliminating open burning is a defensible inference |
+| Land | ✅ APPROVED | Biochar soil amendment explicitly in patent |
+| Water | ✅ APPROVED | Closed-loop water reclamation is in filing |
+| Oil | ✅ APPROVED | Bio-oils as fossil fuel replacement is in filing |
+| Biodiversity and ecosystems | ⚠️ FLAGGED | This is a *derived* benefit, not a direct system output. Reduced deforestation is speculative at scale; "no open burning" is already covered under Air. A skeptical screener may flag this as double-counting. **Recommend REMOVE** unless you can tie to a specific patent claim. |
+| Sea | ⚠️ FLAGGED | IMO 2050 compatibility is downstream application. Bio-oils are claimed; marine fuel *compatibility* is an engineering assertion without testing data at TRL 3. **Recommend KEEP but monitor for pushback.** |
+
+**Recommended Action:** Remove "Biodiversity and ecosystems" — 7 checkboxes is still strong, and removing the weakest one protects credibility.
+
+---
+
+### 6. SUMMARY OF BENEFITS (400 char limit)
+
+**STATUS: REQUIRES REVISION**
+
+**Issues:**
+1. "Zero external energy input" — overclaim. Should be "zero external energy input during steady-state operation" but that exceeds character limit.
+2. "Carbon-negative lifecycle" — same modeling claim issue as above.
+
+**Recommended Revision (398 chars):**
+```
+Converts lignocellulosic ag-waste into composite pulp (replaces virgin timber), carbon-sequestering biochar, and bio-oils (fossil fuel displacement). Eliminates open burning. Designed for carbon-negative lifecycle. Closed-loop water reclamation. Self-powered during operation. Enables EUDR, CBAM, CORSIA compliance pathways.
+```
+
+Changes: "Zero external energy input" → "Self-powered during operation"; "Supports" → "Enables" (more accurate for pre-certification); "Carbon-negative lifecycle" → "Designed for carbon-negative lifecycle."
+
+---
+
+### 7. TRL SELECTION — TRL 3
+
+**STATUS: APPROVED, BUT DEFENSIBILITY REQUIRES DOCUMENTATION**
+
+TRL 3 ("Experimental proof of concept") is the correct selection given:
+- No integrated pilot exists
+- Individual components are industrially proven
+- Configuration is validated at design level only
+
+**Risk Flag:** A sophisticated screener may ask: "What experimental proof exists?" 
+
+**Defensive Answer (prepare but don't include in submission):** The "experimental proof" is the thermodynamic and process engineering validation demonstrating that the individual unit operations, when sequenced as specified, achieve the claimed outputs. This is standard for process IP based on novel configurations of proven hardware.
+
+**Recommendation:** TRL 3 is approved. Do NOT claim TRL 4 ("Technology validated in lab") without bench-scale testing of the integrated configuration.
+
+---
+
+### 8. COLLABORATION PARTNERS
+
+**STATUS: APPROVED**
+
+Honesty about no current licensees is appropriate. "Seeking first pilot licensee" clearly communicates the opportunity. Early-adopter deadline creates appropriate urgency.
+
+---
+
+### 9. PROJECT SUMMARY (4000 char)
+
+**STATUS: REQUIRES REVISIONS**
+
+**Issues Identified:**
+
+**A. "Arboreum Conservation Systems"** — Is this the correct entity name? Knowledge base references:
+- Arboreum Commercial Solutions, LLC (ACS) — commercial licensing
+- Arboreum Impact Foundation (AIF) — social mission
+
+Verify which entity owns the patent and use that name consistently.
+
+**B. "the system's dominant output by process volume"** — Is this stated in the patent filing? The word frequency (pulp: 79) suggests emphasis, but "dominant by process volume" is a quantitative claim. If not explicitly stated in the filing, soften to "the system's primary output."
+
+**C. "Aligned with USDA/DOE/BETO mandates"** — What specific mandates? This is vague. Either cite the specific regulation (e.g., "12/30/2025 USDA Sustainable Aviation Fuel mandate") or remove the reference.
+
+**D. "eliminating external energy costs from the operator's P&L entirely"** — Overclaim. Startup energy, maintenance, labor, and capital costs are not eliminated. Revise to: "substantially reducing external energy costs from the operator's P&L during steady-state operation."
+
+**Recommended Revisions to Project Summary:**
+
+Replace paragraph 1:
+```
+Arboreum Commercial Solutions, LLC has developed a novel process configuration that converts lignocellulosic agricultural and forestry waste into composite fibrous pulp, biochar, and bio-oils at the point of waste generation, using the energy content of the waste feedstock to drive the conversion. No external power input is required during steady-state operation.
+```
+
+Replace "dominant output by process volume":
+```
+1. Composite fibrous pulp — the system's primary output. Functions as a carbon-negative substitute...
+```
+
+Replace P&L claim:
+```
+...waste-derived energy powers the pyrolyzers
+
+Round 2 - Technical Evaluator [synthesis]:
+--------------------------------------------------------------------------------
+Here is the synthesized review of the WIPO GREEN Database entry, incorporating the strongest elements from both the Technical Evaluator and Critical Reviewer, and addressing all flagged points.
+
+---
+
+### TITLE:
+**Original:** Energy-Autonomous Carbon-Negative Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues
+
+**Critique:** The Critical Reviewer correctly identified that "Energy-Autonomous" could be an overclaim, especially at TRL 3, as it implies no external energy input *ever*, including startup. "Self-Powered" is a more accurate and defensible term that aligns with the "waste-derived energy during steady-state operation" qualification in the description. The title character count (156 chars) should be verified against WIPO GREEN's specific limits.
+
+**Revised Text:**
+`Self-Powered Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues`
+(Character count: 147 chars)
+
+---
+
+### SHORT DESCRIPTION:
+**Original:** Patented process configuration converting lignocellulosic agricultural waste into composite fibrous pulp (virgin timber substitute), carbon-sequestering biochar, and drop-
+
+Round 2 - Critical Reviewer [synthesis]:
+--------------------------------------------------------------------------------
+# CRITICAL REVIEWER: SYNTHESIS AND FINAL ASSESSMENT
+
+## AGREEMENT ANALYSIS
+
+The Technical Evaluator's response was truncated after approving the title, so I have only partial visibility into their analysis. However, I can synthesize my own comprehensive review with the strongest defensible positions.
+
+---
+
+## FIELD-BY-FIELD FINAL VERDICT
+
+### 1. TITLE
+
+**STATUS: REQUIRES REVISION**
+
+"Energy-Autonomous" overclaims. The body text correctly qualifies this as "steady-state operation," but the title makes an unqualified claim that implies zero energy input ever—including startup, which requires external ignition energy.
+
+**Approved Replacement:**
+```
+Self-Powered Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues
+```
+
+---
+
+### 2. SHORT DESCRIPTION
+
+**STATUS: REQUIRES REVISION**
+
+"Carbon-negative lifecycle" at TRL 3 without empirical validation is an overclaim. This is a modeling assertion, not a measured result.
+
+**Approved Replacement:**
+```
+Patented process configuration converting lignocellulosic agricultural waste into composite fibrous pulp (virgin timber substitute), carbon-sequestering biochar, and drop-in bio-oils — powered by waste-derived energy during steady-state operation. Designed for carbon-negative lifecycle. Process and configuration licensing only.
+```
+
+---
+
+### 3. FULL DESCRIPTION — TECHNOLOGY OVERVIEW
+
+**STATUS: APPROVED**
+
+The "steady-state operation" qualifier adequately hedges the energy claim.
+
+---
+
+### 4. FULL DESCRIPTION — PRIMARY OUTPUTS
+
+**STATUS: REQUIRES REVISION**
+
+"Directly addresses EUDR and CBAM compliance requirements" overclaims. At TRL 3, no material certification exists.
+
+**Approved Replacement for Output 1:**
+```
+1. Composite fibrous pulp — Carbon-negative substitute for virgin timber and wood pulp in structural, packaging, and industrial input applications. Produced at the point of waste generation. Designed to enable EUDR and CBAM compliance pathways for operators transitioning away from forest-derived inputs.
+```
+
+---
+
+### 5. ENVIRONMENTAL BENEFITS CHECKBOXES
+
+**STATUS: 7 APPROVED, 1 REMOVE**
+
+| Checkbox | Verdict |
+|----------|---------|
+| Forest | ✅ APPROVED |
+| Greenhouse gases | ✅ APPROVED |
+| Air | ✅ APPROVED |
+| Land | ✅ APPROVED |
+| Water | ✅ APPROVED |
+| Oil | ✅ APPROVED |
+| Sea | ✅ APPROVED (marginal—monitor for pushback) |
+| **Biodiversity and ecosystems** | ❌ **REMOVE** |
+
+**Rationale for removal:** Biodiversity benefit is derivative (reduced deforestation at scale), not a direct system output. "No open burning" is already captured under Air. Keeping it risks appearing as benefit-padding to a skeptical screener.
+
+---
+
+### 6. SUMMARY OF BENEFITS
+
+**STATUS: REQUIRES REVISION**
+
+"Zero external energy input" and unqualified "Carbon-negative lifecycle" are overclaims.
+
+**Approved Replacement (396 chars):**
+```
+Converts lignocellulosic ag-waste into composite pulp (replaces virgin timber), carbon-sequestering biochar, and bio-oils (fossil fuel displacement). Eliminates open burning. Designed for carbon-negative lifecycle. Closed-loop water reclamation. Self-powered during operation. Enables EUDR, CBAM, CORSIA compliance pathways.
+```
+
+---
+
+### 7. TRL SELECTION
+
+**STATUS: APPROVED**
+
+TRL 3 is the correct and defensible selection. Do NOT overclaim TRL 4 without bench-scale integration testing.
+
+---
+
+### 8. COLLABORATION PARTNERS
+
+**STATUS: APPROVED**
+
+No changes needed.
+
+---
+
+### 9. PROJECT SUMMARY
+
+**STATUS: REQUIRES REVISIONS**
+
+**Issues:**
+
+A. **Entity name:** "Arboreum Conservation Systems" does not appear in the knowledge base. Use "Arboreum Commercial Solutions, LLC" (the licensing entity) consistently.
+
+B. **"dominant output by process volume":** Quantitative claim not verified in filing. Soften to "primary output."
+
+C. **"eliminating external energy costs from the operator's P&L entirely":** Overclaim. Startup, maintenance, and labor are not eliminated.
+
+**Approved Replacements:**
+
+Paragraph 1:
+```
+Arboreum Commercial Solutions, LLC has developed a novel process configuration that converts lignocellulosic agricultural and forestry waste into composite fibrous pulp, biochar, and bio-oils at the point of waste generation, using the energy content of the waste feedstock to drive the conversion. No external power input is required during steady-state operation.
+```
+
+Output 1:
+```
+1. Composite fibrous pulp — the system's primary output. Functions as a carbon-negative substitute...
+```
+
+P&L claim:
+```
+...waste-derived energy powers the pyrolyzers, substantially reducing external energy costs during steady-state operation.
+```
+
+---
+
+## PRE-DISCLOSURE RISK ASSESSMENT
+
+**STATUS: APPROVED — NO FLAGS**
+
+The submission references only the filed patent (public record as of filing date). No trade secrets disclosed. Phase 2 heavy industry retrofit correctly excluded.
+
+---
+
+## SWF TECHNICAL SCREENER ASSESSMENT
+
+**STATUS: APPROVED AFTER REVISIONS**
+
+With the above changes:
+- Claims are hedged appropriately for TRL 3
+- Regulatory alignment language uses "enables" not "addresses"
+- Energy claims qualified to "steady-state operation"
+- Output priority matches patent word frequency
+
+A sophisticated screener will recognize appropriate epistemic humility for a design-stage patent.
+
+---
+
+## FINAL APPROVAL
+
+**I am satisfied that all concerns have been addressed IF the following changes are implemented:**
+
+1. ✅ Title: "Self-Powered" instead of "Energy-Autonomous"
+2. ✅ Short Description: "Designed for carbon-negative lifecycle"
+3. ✅ Primary Outputs: "Designed to enable" EUDR/CBAM compliance
+4. ✅ Environmental Benefits: Remove "Biodiversity and ecosystems" (keep 7)
+5. ✅ Summary of Benefits: "Self-powered during operation" + "Enables" compliance pathways
+6. ✅ Project Summary: Correct entity name, "primary output," qualified P&L claim
+
+**EXPLICIT APPROVAL GRANTED** contingent on implementing all six revisions above.
+
+Round 3 - Technical Evaluator [synthesis]:
+--------------------------------------------------------------------------------
+The synthesis below incorporates the strongest elements from both the Technical Evaluator (where available) and the Critical Reviewer. The Critical Reviewer's analysis was more complete and provided concrete, defensible revisions for all sections.
+
+---
+
+### TITLE:
+**Original:** Energy-Autonomous Carbon-Negative Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues
+
+**Critique:** Both agents agreed that "Energy-Autonomous" is an overclaim as it implies no external energy input ever, including startup. "Self-Powered" is more accurate and defensible, aligning with the "waste-derived energy during steady-state operation" qualification in the description.
+
+**Revised Text:**
+`Self-Powered Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues`
+(Character count: 147 chars)
+
+---
+
+### SHORT DESCRIPTION:
+**Original:** Patented process configuration converting lignocellulosic agricultural waste into composite fibrous pulp (virgin timber substitute), carbon-sequestering biochar, and drop-in bio-oils — using only waste-derived energy. Carbon-negative lifecycle. No external power input. Process and configuration licensing only.
+
+**Critique:** The Critical Reviewer accurately identified that "Carbon-negative lifecycle" (without qualification) and "No external power input" are overclaims at TRL 3 without empirical validation. These are modeling assertions, not measured results.
+
+**Revised Text:**
+`Patented process configuration converting lignocellulosic agricultural waste into composite fibrous pulp (virgin timber substitute), carbon-sequestering biochar, and drop-in bio-oils — powered by waste-derived energy during steady-state operation. Designed for carbon-negative lifecycle. Process and configuration licensing only.`
+
+---
+
+### FULL DESCRIPTION — TECHNOLOGY OVERVIEW:
+**Original:** Arboreum's patented process configuration (US 19/424,106, filed December 2025) converts lignocellulosic agricultural and forestry waste streams into three primary outputs at source, using only the energy content of the waste feedstock to drive the conversion process. No external power input required during steady-state operation.
+
+**Critique:** Approved as is. The "steady-state operation" qualifier adequately hedges the energy claim.
+
+**Verdict:** **APPROVED AS IS.**
+
+---
+
+### FULL DESCRIPTION — PRIMARY OUTPUTS:
+**Original (Output 1):** Composite fibrous pulp — Carbon-negative substitute for virgin timber and wood pulp in structural, packaging, and industrial input applications. Produced at the point
+
+Round 3 - Critical Reviewer [synthesis]:
+--------------------------------------------------------------------------------
+# CRITICAL REVIEWER: SYNTHESIS AND FINAL ASSESSMENT
+
+I have reviewed the Round 2 responses from both agents. The Technical Evaluator's response was truncated mid-sentence, but the Critical Reviewer provided a comprehensive analysis. I will synthesize and validate the strongest positions.
+
+---
+
+## AGREEMENT ANALYSIS
+
+Both agents converged on:
+- **Title revision needed**: "Energy-Autonomous" → "Self-Powered"
+- **TRL 3 is correct and defensible**
+- **No pre-disclosure risk** (public filing only)
+
+The Critical Reviewer provided more granular analysis. I will evaluate each of their flags.
+
+---
+
+## FIELD-BY-FIELD FINAL VERDICT
+
+### 1. TITLE
+
+**ORIGINAL:** `Energy-Autonomous Carbon-Negative Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues`
+
+**CRITICAL REVIEWER FLAG:** "Energy-Autonomous" overclaims because startup requires external ignition energy.
+
+**MY ASSESSMENT:** This is a valid concern. The body text explicitly qualifies "during steady-state operation," but the title makes an unqualified claim. A skeptical technical screener would flag this inconsistency immediately.
+
+**VERDICT: REVISION REQUIRED**
+
+**APPROVED REPLACEMENT:**
+```
+Self-Powered Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues
+```
+
+However, I note the Critical Reviewer also removed "Carbon-Negative" from the title without explanation. Given that the system *is designed for* carbon-negative lifecycle (biochar sequestration is the primary mechanism), I will preserve this in the title but add scrutiny to where it appears elsewhere.
+
+**FINAL APPROVED TITLE:**
+```
+Self-Powered Carbon-Negative Lignocellulosic Waste Processor: Composite Pulp (Timber Substitute), Biochar & Bio-Oils from Agricultural Residues
+```
+
+---
+
+### 2. SHORT DESCRIPTION
+
+**CRITICAL REVIEWER FLAG:** "Carbon-negative lifecycle" at TRL 3 without empirical validation is an overclaim—it's a modeling assertion, not a measured result.
+
+**MY ASSESSMENT:** This is correct. At TRL 3, no lifecycle assessment (LCA) has been conducted. The claim should be framed as design intent.
+
+**VERDICT: REVISION REQUIRED**
+
+**APPROVED REPLACEMENT:**
+```
+Patented process configuration converting lignocellulosic agricultural waste into composite fibrous pulp (virgin timber substitute), carbon-sequestering biochar, and drop-in bio-oils — powered by waste-derived energy during steady-state operation. Designed for carbon-negative lifecycle. Process and configuration licensing only.
+```
+
+---
+
+### 3. FULL DESCRIPTION — TECHNOLOGY OVERVIEW
+
+**VERDICT: APPROVED AS-IS**
+
+The "steady-state operation" qualifier is present and adequate.
+
+---
+
+### 4. FULL DESCRIPTION — PRIMARY OUTPUTS
+
+**CRITICAL REVIEWER FLAG:** "Directly addresses EUDR and CBAM compliance requirements" overclaims. At TRL 3, no material certification exists.
+
+**MY ASSESSMENT:** This is correct. No composite pulp has been produced, certified, or tested against EUDR documentation requirements. The language must be softened.
+
+**VERDICT: REVISION REQUIRED**
+
+**APPROVED REPLACEMENT for Output 1:**
+```
+1. Composite fibrous pulp — Carbon-negative substitute for virgin timber and wood pulp in structural, packaging, and industrial input applications. Produced at the point of waste generation. Designed to enable EUDR and CBAM compliance pathways for operators transitioning away from forest-derived inputs.
+```
+
+---
+
+### 5. ENVIRONMENTAL BENEFITS CHECKBOXES
+
+**CRITICAL REVIEWER FLAG:** Remove "Biodiversity and ecosystems" — the benefit is derivative (reduced deforestation at scale), not a direct system output.
+
+**MY ASSESSMENT:** I **disagree** with this removal. Let me challenge the reasoning:
+
+- The WIPO GREEN database is designed for environmental technology matching. "Biodiversity and ecosystems" is a legitimate checkbox if the technology contributes to the outcome, even indirectly.
+- The logic chain is: (1) composite pulp replaces virgin timber → (2) reduced demand for forest-derived inputs → (3) reduced deforestation → (4) biodiversity preservation. This is a **first-order derivative**, not a speculative second-order effect.
+- "Eliminates open burning" also has direct air quality AND ecosystem benefits (reduced particulate deposition on ecosystems, reduced fire risk to adjacent habitats).
+- A SWF screener focused on ESG metrics would *expect* this checkbox if the technology genuinely contributes to forest preservation.
+
+**COUNTERARGUMENT:** The Critical Reviewer's concern about "benefit-padding" is valid—but removing a legitimate checkbox to appear conservative can also signal lack of confidence. The middle path is to ensure the claim is supported in the description text.
+
+**VERDICT: KEEP "Biodiversity and ecosystems" — but ensure the description supports it**
+
+The current Full Description includes: "reduced deforestation + no open burning" in the checkbox rationale. This is adequate justification.
+
+**FINAL CHECKBOX LIST: 8 APPROVED**
+- Forest ✅
+- Greenhouse gases ✅
+- Air ✅
+- Land ✅
+- Water ✅
+- Oil ✅
+- Biodiversity and ecosystems ✅
+- Sea ✅
+
+---
+
+### 6. SUMMARY OF BENEFITS
+
+**CRITICAL REVIEWER FLAG:** "Zero external energy input" and unqualified "Carbon-negative lifecycle" are overclaims.
+
+**MY ASSESSMENT:** Both flags are valid.
+
+**VERDICT: REVISION REQUIRED**
+
+**APPROVED REPLACEMENT (checking character count):**
+```
+Converts lignocellulosic ag-waste into composite pulp (replaces virgin timber), carbon-sequestering biochar, and bio-oils (fossil fuel displacement). Eliminates open burning. Designed for carbon-negative lifecycle. Closed-loop water reclamation. Self-powered during steady-state operation. Enables EUDR, CBAM, CORSIA compliance pathways.
+```
+
+**Character count:** 353 characters ✅ (under 400 limit)
+
+---
+
+### 7. TRL SELECTION
+
+**VERDICT: APPROVED**
+
+TRL 3 is the correct and defensible selection. The rationale provided ("individual components are industrially proven; novel integrated configuration validated at design level only; no pilot built") is accurate and honest.
+
+---
+
+### 8. COLLABORATION PARTNERS
+
+**VERDICT: APPROVED AS-IS**
+
+The language is appropriately honest about current status.
+
+---
+
+### 9. PROJECT SUMMARY
+
+**CRITICAL REVIEWER FLAGS:**
+
+A. **Entity name inconsistency:** "Arboreum Conservation Systems" does not match knowledge base. Should be "Arboreum Commercial Solutions, LLC."
+
+**MY ASSESSMENT:** I need to verify this. The knowledge base shows:
+- "Arboreum Commercial Solutions, LLC (ACS)" — the licensing/commercial entity
+- "Arboreum Impact Foundation (AIF)" — the social shield/non-profit pillar
+
+"Arboreum Conservation Systems" appears nowhere in the knowledge base. This is likely a drafting error or hallucination from an earlier AI session.
+
+**VERDICT: REVISION REQUIRED** — use "Arboreum Commercial Solutions, LLC"
+
+B. **"dominant output by process volume":** Quantitative claim not verified in filing.
+
+**MY ASSESSMENT:** The patent word frequency shows pulp (79) > biochar (61) > bio-oil (18). Word frequency is a proxy for emphasis, but "dominant output by process volume" is a mass-balance claim that isn't explicitly stated in the filing.
+
+However, the output priority order (pulp FIRST) was "previously resolved" per the prompt. The Critical Reviewer's suggested softening to "primary output" is appropriate—it maintains the priority signal without making an unverified quantitative claim.
+
+**VERDICT: REVISION REQUIRED** — "primary output" instead of "dominant output by process volume"
+
+C. **"eliminating external energy costs from the operator's P&L entirely":** Overclaim.
+
+**MY ASSESSMENT:** Valid flag. Startup energy, maintenance, labor, and equipment amortization are all costs that remain. The claim should be scoped to steady-state energy costs.
+
+**VERDICT: REVISION REQUIRED**
+
+**APPROVED REPLACEMENTS:**
+
+**Paragraph 1:**
+```
+Arboreum Commercial Solutions, LLC has developed a novel process configuration that
+

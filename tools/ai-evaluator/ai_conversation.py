@@ -155,7 +155,7 @@ except ImportError:
 
 # Default model identifiers — override via env var (GEMINI_MODEL, OPENAI_MODEL,
 # ANTHROPIC_MODEL), --model CLI flag, or by editing these constants.
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview"
 DEFAULT_OPENAI_MODEL = "gpt-4o"
 DEFAULT_ANTHROPIC_MODEL = "claude-opus-4-5"
 
@@ -654,7 +654,7 @@ MODES:
 
 SUPPORTED MODELS:
   OpenAI:    gpt-4o, gpt-4-turbo, gpt-3.5-turbo
-  Gemini:    gemini-2.5-flash, gemini-1.5-pro, gemini-1.5-flash
+  Gemini:    gemini-3-flash-preview, gemini-2.5-flash, gemini-1.5-pro, gemini-1.5-flash
   Anthropic: claude-opus-4-5, claude-3-5-sonnet-20241022
 """
 
@@ -672,9 +672,9 @@ SUPPORTED MODELS:
     parser.add_argument(
         '--rounds', '-r',
         type=int,
-        default=10,
+        default=5,
         metavar='N',
-        help='Maximum conversation rounds before stopping (default: 10). '
+        help='Maximum conversation rounds before stopping (default: 5). '
              'Conversation may end earlier if agents converge.'
     )
     parser.add_argument(
@@ -738,7 +738,8 @@ SUPPORTED MODELS:
     # ID to the OpenAI client.
     GEMINI_MODEL = os.environ.get("GEMINI_MODEL") or DEFAULT_GEMINI_MODEL
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL
-    ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL") or DEFAULT_ANTHROPIC_MODEL
+    ANTHROPIC_MODEL = os.environ.get(
+        "ANTHROPIC_MODEL") or DEFAULT_ANTHROPIC_MODEL
 
     # Check which providers are available for multi-AI diversity
     if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
@@ -805,7 +806,8 @@ Integrate this knowledge naturally when relevant.
 
     # Agent role names and system prompts for up to 3 agents.
     # Roles are assigned positionally from the ordered provider list.
-    ROLE_NAMES = ["Technical Evaluator", "Critical Reviewer", "Strategic Analyst"]
+    ROLE_NAMES = ["Technical Evaluator",
+                  "Critical Reviewer", "Strategic Analyst"]
     ROLE_PROMPTS = [
         # Role 0 — Technical Evaluator
         (
@@ -860,7 +862,8 @@ Integrate this knowledge naturally when relevant.
         unknown = [p for p in requested if p not in valid_providers]
         if unknown:
             logger.error(f"Unknown provider(s): {', '.join(unknown)}")
-            logger.error(f"Valid choices: {', '.join(sorted(valid_providers))}")
+            logger.error(
+                f"Valid choices: {', '.join(sorted(valid_providers))}")
             sys.exit(1)
         missing_keys = [p for p in requested if not available_keys[p]]
         if missing_keys:
