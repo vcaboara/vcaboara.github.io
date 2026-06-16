@@ -50,3 +50,5 @@ psych_notes
 docker/
 docker-compose.yml
 mcpo-config.json
+
+knowledge-base/output/

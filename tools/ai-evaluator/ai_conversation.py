@@ -237,7 +237,7 @@ class ConversationManager:
     """
 
     def __init__(self, agents: list, initial_prompt: str,
-                 max_rounds: int = 10):
+                 max_rounds: int = 10, round_delay: int = 15):
         if len(agents) < 2:
             raise ValueError(
                 "ConversationManager requires at least 2 agents."
@@ -248,6 +248,7 @@ class ConversationManager:
         self.agent2 = agents[1]
         self.initial_prompt = initial_prompt
         self.max_rounds = max_rounds
+        self.round_delay = round_delay
         self.conversation_history: list[dict] = []
 
     def check_convergence(self, response1: str, response2: str) -> bool:
@@ -326,7 +327,11 @@ class ConversationManager:
                 f"improvements or confirm if this is ready."
             )
 
-            time.sleep(1)
+            if self.round_delay > 0:
+                logger.info(
+                    f"Waiting {self.round_delay}s before next round..."
+                )
+                time.sleep(self.round_delay)
 
         if not converged:
             logger.warning(
@@ -725,6 +730,14 @@ SUPPORTED MODELS:
              'vote: all agents respond independently then a judge (last agent) '
              'synthesises — best for strategic or factual questions.'
     )
+    parser.add_argument(
+        '--delay', '-d',
+        type=int,
+        default=15,
+        metavar='SECONDS',
+        help='Seconds to wait between rounds (default: 15). '
+             'Increase to reduce 503/rate-limit errors from Gemini.'
+    )
     args = parser.parse_args()
 
     # API keys
@@ -980,6 +993,7 @@ comprehensive document ready for IP protection.
             agents=agents,
             initial_prompt=initial_topic,
             max_rounds=args.rounds,
+            round_delay=args.delay,
         )
 
     results = manager.run_conversation()
