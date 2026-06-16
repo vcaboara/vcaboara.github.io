@@ -52,3 +52,9 @@ docker-compose.yml
 mcpo-config.json
 
 knowledge-base/output/
+
+# Cloudflare analytics — raw extracted CSVs and large generated dupes
+data/cloudflare/raw/
+data/cloudflare/collated/cloudflare_events.csv
+data/cloudflare/collated/cloudflare_events.ndjson
+CloudFlareCSVs.zip

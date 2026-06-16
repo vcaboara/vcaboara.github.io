@@ -55,3 +55,35 @@ ACS allocates 85% of its profits to the **Arboreum Impact Foundation (AIF)**.
 ### Legal Notice
 
 *Standard established and patent application filed December 17, 2025. Arboreum Commercial Solutions, LLC and Arboreum Impact Foundation (AIF). All rights reserved.*
+
+---
+
+## Cloudflare CSV Persistence Workflow
+
+Use this when exporting Cloudflare analytics CSVs (24h/72h/7d/30d) so overlapping exports are de-duplicated and retained for long-term review.
+
+### Run the Collator
+
+```powershell
+python tools/cloudflare_collate.py --input CloudFlareCSVs.zip
+```
+
+You can also ingest a folder of CSV files:
+
+```powershell
+python tools/cloudflare_collate.py --input data/cloudflare/raw
+```
+
+### Outputs
+
+* `data/cloudflare/collated/cloudflare_events.csv`: flat collated table for spreadsheet/chart tooling.
+* `data/cloudflare/collated/cloudflare_events.ndjson`: row-wise JSON for scripting and app ingestion.
+* `data/cloudflare/collated/cloudflare_summary.json`: ingest stats and schema counts.
+* `data/cloudflare/collated/cloudflare_dashboard.html`: interactive Plotly dashboard.
+
+### Persistent De-duplication State
+
+* `data/cloudflare/state/fingerprints.txt`: unique row fingerprints used to prevent re-ingesting overlaps.
+* `data/cloudflare/state/events.ndjson`: canonical persisted event store.
+
+If you ingest the same files twice, `new_rows_in_batch` should be `0` in the summary JSON.
