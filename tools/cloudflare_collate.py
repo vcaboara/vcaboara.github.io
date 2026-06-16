@@ -1,4 +1,4 @@
-"""Collate Cloudflare CSV exports into a persistent, de-duplicated dataset.
+﻿"""Collate Cloudflare CSV exports into a persistent, de-duplicated dataset.
 
 This utility accepts a zip archive (or a directory) of Cloudflare CSV exports,
 normalizes known export schemas, and appends only net-new rows to a persistent
@@ -279,13 +279,30 @@ def _materialize_csv(path: Path, rows: list[dict[str, str | int | float | None]]
         writer.writerows(rows)
 
 
-def _aggregate_for_dashboard(rows: list[dict[str, str | int | float | None]]) -> dict[str, list[dict[str, str | int | float]]]:
-    dns_by_label: dict[tuple[str, str], float] = defaultdict(float)
+def _extract_anchor_date_str(source_name: str) -> str | None:
+    """Return ISO date string from a dated filename, or None for UUID names."""
+    if re.search(r"^[0-9a-f-]{36}\.csv$", source_name):
+        return None
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", source_name)
+    return m.group(1) if m else None
+
+
+def _aggregate_for_dashboard(rows: list[dict[str, str | int | float | None]]) -> dict[str, object]:
+    # DNS label: aggregate by day for readability
+    dns_by_label_day: dict[tuple[str, str], float] = defaultdict(float)
     dns_daily_total: dict[str, float] = defaultdict(float)
+
+    # Daily dated metrics (unique_visitors, total_requests, etc.)
     daily_metrics: dict[tuple[str, str], float] = defaultdict(float)
-    intraday_avg_acc: dict[tuple[str, str], tuple[float, int]] = defaultdict(lambda: (0.0, 0))
-    country_totals: dict[str, float] = defaultdict(float)
-    location_totals: dict[str, float] = defaultdict(float)
+
+    # Location snapshots: keyed by export_date for named files, else "undated"
+    loc_snapshots: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+
+    # Country: keyed by export_date
+    country_by_date: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+
+    # Coverage
+    coverage: dict[str, list[str]] = defaultdict(list)
 
     for row in rows:
         metric = str(row.get("metric", ""))
@@ -293,107 +310,129 @@ def _aggregate_for_dashboard(rows: list[dict[str, str | int | float | None]]) ->
         if value is None:
             continue
         numeric = float(value)
+        source_file = str(row.get("source_file", ""))
+        export_date = _extract_anchor_date_str(source_file) or "undated"
 
         if metric == "dns_count_by_label":
             timestamp = str(row.get("timestamp_utc", ""))
             label = str(row.get("label", "")) or "(unlabeled)"
             if timestamp:
-                dns_by_label[(label, timestamp)] += numeric
-                date_utc = str(row.get("date_utc", "")) or timestamp[:10]
-                if date_utc:
-                    dns_daily_total[date_utc] += numeric
-
-        elif metric == "country_requests":
-            country = str(row.get("country", "")) or "(unknown)"
-            country_totals[country] += numeric
+                day = timestamp[:10]
+                dns_by_label_day[(label, day)] += numeric
+                dns_daily_total[day] += numeric
+                coverage["dns_queries"].append(day)
 
         elif metric == "location_value":
             location = str(row.get("location", "")) or "(unknown)"
-            location_totals[location] += numeric
+            loc_snapshots[export_date][location] += numeric
+
+        elif metric == "country_requests":
+            country = str(row.get("country", "")) or "(unknown)"
+            country_by_date[export_date][country] += numeric
 
         else:
             date_utc = str(row.get("date_utc", ""))
             if not date_utc:
-                timestamp = str(row.get("timestamp_utc", ""))
-                if re.match(r"^\d{4}-\d{2}-\d{2}T", timestamp):
-                    date_utc = timestamp[:10]
-
-            clock = str(row.get("clock_time", ""))
+                ts = str(row.get("timestamp_utc", ""))
+                if re.match(r"^\d{4}-\d{2}-\d{2}T", ts):
+                    date_utc = ts[:10]
             if date_utc:
                 daily_metrics[(metric, date_utc)] += numeric
-            elif clock:
-                total, count = intraday_avg_acc[(metric, clock)]
-                intraday_avg_acc[(metric, clock)] = (total + numeric, count + 1)
+                coverage[metric].append(date_utc)
 
-    dns_label_series = [
-        {"label": label, "timestamp": timestamp, "value": value}
-        for (label, timestamp), value in sorted(dns_by_label.items(), key=lambda x: (x[0][0], x[0][1]))
-    ]
+    # --- DNS label daily series: top 8 labels by total ---
+    label_totals: dict[str, float] = defaultdict(float)
+    for (label, _day), val in dns_by_label_day.items():
+        label_totals[label] += val
+    top_labels = [l for l, _ in sorted(label_totals.items(), key=lambda x: x[1], reverse=True)[:8]]
 
+    dns_label_daily = []
+    for label in top_labels:
+        entries = sorted(
+            [(day, val) for (lbl, day), val in dns_by_label_day.items() if lbl == label],
+            key=lambda x: x[0],
+        )
+        dns_label_daily.append({
+            "label": label,
+            "dates": [e[0] for e in entries],
+            "values": [e[1] for e in entries],
+        })
+
+    # --- DNS daily totals ---
     dns_daily_series = [
-        {"date": date_utc, "value": total}
-        for date_utc, total in sorted(dns_daily_total.items(), key=lambda x: x[0])
+        {"date": d, "value": v}
+        for d, v in sorted(dns_daily_total.items())
     ]
 
+    # --- Daily metrics (visitors / requests / etc.) ---
     daily_metric_series = [
-        {"metric": metric, "date": date_utc, "value": total}
-        for (metric, date_utc), total in sorted(daily_metrics.items(), key=lambda x: (x[0][0], x[0][1]))
+        {"metric": m, "date": d, "value": v}
+        for (m, d), v in sorted(daily_metrics.items())
     ]
 
-    metric_totals_acc: dict[str, float] = defaultdict(float)
-    metric_latest_date: dict[str, str] = {}
-    metric_latest_value: dict[str, float] = {}
-    for item in daily_metric_series:
-        metric = str(item["metric"])
-        date_utc = str(item["date"])
-        value = float(item["value"])
-        metric_totals_acc[metric] += value
-        if metric not in metric_latest_date or date_utc > metric_latest_date[metric]:
-            metric_latest_date[metric] = date_utc
-            metric_latest_value[metric] = value
+    # --- Location snapshots for comparison (named dates only) ---
+    named_loc_dates = sorted(d for d in loc_snapshots if d != "undated")
+    loc_all_totals: dict[str, float] = defaultdict(float)
+    for d in named_loc_dates:
+        for loc, v in loc_snapshots[d].items():
+            loc_all_totals[loc] += v
+    top_locs = [l for l, _ in sorted(loc_all_totals.items(), key=lambda x: x[1], reverse=True)[:15]]
 
-    metric_totals = [
-        {
-            "metric": metric,
-            "total": total,
-            "latest_date": metric_latest_date.get(metric, ""),
-            "latest_value": metric_latest_value.get(metric, 0.0),
-        }
-        for metric, total in sorted(metric_totals_acc.items(), key=lambda x: x[1], reverse=True)
-    ]
+    location_snapshot_chart = {
+        "dates": named_loc_dates,
+        "locations": top_locs,
+        "series": [
+            {
+                "date": d,
+                "values": [loc_snapshots[d].get(loc, 0) for loc in top_locs],
+            }
+            for d in named_loc_dates
+        ],
+    }
 
-    intraday_series = [
-        {
-            "metric": metric,
-            "clock_time": clock_time,
-            "avg_value": total / count if count else 0.0,
-            "samples": count,
-        }
-        for (metric, clock_time), (total, count) in sorted(intraday_avg_acc.items(), key=lambda x: (x[0][0], x[0][1]))
-    ]
-
-    country_series = [
-        {"country": country, "total_requests": total}
-        for country, total in sorted(country_totals.items(), key=lambda x: x[1], reverse=True)
-    ]
-
+    # Cumulative location totals (all sources)
+    all_loc_totals: dict[str, float] = defaultdict(float)
+    for snap in loc_snapshots.values():
+        for loc, v in snap.items():
+            all_loc_totals[loc] += v
     location_series = [
-        {"location": location, "total_value": total}
-        for location, total in sorted(location_totals.items(), key=lambda x: x[1], reverse=True)
+        {"location": loc, "total_value": v}
+        for loc, v in sorted(all_loc_totals.items(), key=lambda x: x[1], reverse=True)[:20]
     ]
+
+    # --- Country: latest named date as primary ---
+    named_country_dates = sorted(d for d in country_by_date if d != "undated")
+    latest_country_date = named_country_dates[-1] if named_country_dates else None
+    primary_country = dict(country_by_date.get(latest_country_date or "undated", {}))
+    country_series = [
+        {"country": c, "requests": v, "snapshot_date": latest_country_date or "all"}
+        for c, v in sorted(primary_country.items(), key=lambda x: x[1], reverse=True)[:30]
+    ]
+
+    # --- Coverage summary ---
+    coverage_items = []
+    for metric_name in sorted(coverage):
+        dates = sorted(set(coverage[metric_name]))
+        if dates:
+            coverage_items.append({
+                "metric": metric_name,
+                "first": dates[0],
+                "last": dates[-1],
+                "count": len(dates),
+            })
 
     return {
-        "dns_label_series": dns_label_series,
+        "dns_label_daily": dns_label_daily,
         "dns_daily_series": dns_daily_series,
         "daily_metric_series": daily_metric_series,
-        "metric_totals": metric_totals,
-        "intraday_series": intraday_series,
-        "country_series": country_series,
+        "location_snapshot_chart": location_snapshot_chart,
         "location_series": location_series,
+        "country_series": country_series,
+        "coverage_summary": coverage_items,
     }
 
 
-def _build_dashboard(path: Path, dashboard_data: dict[str, list[dict[str, str | int | float]]], summary: dict[str, object]) -> None:
+def _build_dashboard(path: Path, dashboard_data: dict[str, object], summary: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
     # Script tag JSON must be raw JSON text (not HTML-escaped entities).
@@ -402,232 +441,224 @@ def _build_dashboard(path: Path, dashboard_data: dict[str, list[dict[str, str | 
     summary_json = json.dumps(summary, ensure_ascii=True).replace("</", "<\\/")
 
     html_content = """<!doctype html>
-<html lang=\"en\">
+<html lang="en">
 <head>
-  <meta charset=\"utf-8\" />
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cloudflare Collated Analytics</title>
-  <script src=\"https://cdn.plot.ly/plotly-2.35.2.min.js\"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
-    :root {{
-      --bg: #f5f6f8;
-      --card: #ffffff;
-      --ink: #14171f;
-      --muted: #5c6374;
-      --accent: #f38020;
-      --accent-2: #0f766e;
-      --border: #d9deea;
-    }}
-    body {{
-      margin: 0;
-      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-      color: var(--ink);
-      background: radial-gradient(circle at 0 0, #ffffff 0, #eef2ff 35%, var(--bg) 100%);
-    }}
-    .wrap {{
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
-      display: grid;
-      gap: 16px;
-    }}
-    .card {{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-    }}
-    .grid {{
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }}
-    h1 {{ margin: 0; font-size: 1.55rem; }}
-    p {{ margin: 4px 0; color: var(--muted); }}
-    .stat-row {{ display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }}
-    .pill {{
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      color: #9a3412;
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 0.85rem;
-    }}
-    .plot {{ min-height: 360px; }}
-        .small-plot {{ min-height: 280px; }}
-        .help {{ color: var(--muted); font-size: 0.9rem; margin-top: 8px; }}
-    @media (max-width: 900px) {{
-      .grid {{ grid-template-columns: 1fr; }}
-    }}
+    :root {
+      --bg: #f2f4f8; --card: #ffffff; --ink: #14171f; --muted: #5c6374;
+      --accent: #f38020; --accent2: #1d4ed8; --green: #0f766e; --border: #d9deea;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI","Helvetica Neue",sans-serif; color: var(--ink); background: var(--bg); }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 20px; display: grid; gap: 14px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: 0 4px 14px rgba(15,23,42,.06); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    h1 { margin: 0 0 4px; font-size: 1.4rem; }
+    h2 { margin: 0 0 10px; font-size: 1.05rem; color: var(--ink); }
+    .sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 10px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .pill { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 999px; padding: 4px 10px; font-size: 0.82rem; }
+    .pill.blue { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+    .pill.green { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+    .plot { min-height: 300px; }
+    .plot-lg { min-height: 380px; }
+    .coverage-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .coverage-table th { text-align: left; padding: 6px 10px; background: #f8fafc; border-bottom: 2px solid var(--border); }
+    .coverage-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+    .gap-note { color: #b45309; font-size: 0.82rem; margin-top: 4px; }
+    @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class=\"wrap\">
-    <section class=\"card\">
-      <h1>Cloudflare Collated Analytics</h1>
-      <p>Persistent, de-duplicated history merged from multiple Cloudflare CSV exports.</p>
-      <div id=\"stats\" class=\"stat-row\"></div>
-    </section>
-    <section class=\"card\">
-            <h2>30-Day Trends (Cloudflare-style)</h2>
-            <div id=\"uniqueVisitorsPlot\" class=\"small-plot\"></div>
-            <div id=\"totalRequestsPlot\" class=\"small-plot\"></div>
-            <p class=\"help\">These trends use day-level CSV rows (for example, "17 MAY") parsed into real dates.</p>
-    </section>
-        <section class=\"card\">
-            <h2>DNS Daily Volume</h2>
-            <div id=\"dnsDailyPlot\" class=\"plot\"></div>
-        </section>
-    <section class=\"grid\">
-      <div class=\"card\">
-        <h2>Country Requests (total)</h2>
-        <div id=\"countryPlot\" class=\"plot\"></div>
-      </div>
-      <div class=\"card\">
-        <h2>Location Values (total)</h2>
-        <div id=\"locationPlot\" class=\"plot\"></div>
-      </div>
-    </section>
-        <section class=\"card\" id=\"intradaySection\" style=\"display:none\">
-            <h2>Intraday Pattern (Only if hourly buckets were exported)</h2>
-            <div id=\"intradayPlot\" class=\"plot\"></div>
-    </section>
-  </div>
+<div class="wrap">
+  <section class="card">
+    <h1>Cloudflare Collated Analytics &mdash; arboreum.net</h1>
+    <p class="sub">Persistent, de-duplicated history from all Cloudflare CSV exports. Updated: __GENERATED_AT__</p>
+    <div class="pills" id="headerPills"></div>
+  </section>
+  <section class="card">
+    <h2>Data Coverage</h2>
+    <table class="coverage-table" id="coverageTable"></table>
+    <p class="gap-note" id="gapNote"></p>
+  </section>
+  <section class="card">
+    <h2>Unique Visitors (daily)</h2>
+    <p class="sub" id="uvSpan"></p>
+    <div id="uvPlot" class="plot-lg"></div>
+  </section>
+  <section class="card">
+    <h2>Total Requests (daily)</h2>
+    <p class="sub" id="trSpan"></p>
+    <div id="trPlot" class="plot-lg"></div>
+  </section>
+  <section class="card">
+    <h2>DNS Queries by Label (Mar&ndash;Apr, top 8 labels)</h2>
+    <p class="sub">Hourly DNS resolution counts aggregated to daily totals per hostname label.</p>
+    <div id="dnsLabelPlot" class="plot-lg"></div>
+  </section>
+  <section class="card">
+    <h2>DNS Data Center Snapshots</h2>
+    <p class="sub">Queries per Cloudflare PoP &mdash; three named export dates compared side by side.</p>
+    <div id="dcSnapshotPlot" class="plot-lg"></div>
+  </section>
+  <section class="grid2">
+    <div class="card">
+      <h2>Country Requests</h2>
+      <p class="sub" id="countryNote"></p>
+      <div id="countryPlot" class="plot"></div>
+    </div>
+    <div class="card">
+      <h2>DNS Data Centers (cumulative)</h2>
+      <p class="sub">Total queries per PoP across all ingested location snapshots.</p>
+      <div id="locationPlot" class="plot"></div>
+    </div>
+  </section>
+</div>
+<script id="dashboard-data" type="application/json">__DASHBOARD_PAYLOAD__</script>
+<script id="dashboard-summary" type="application/json">__DASHBOARD_SUMMARY__</script>
+<script>
+const data    = JSON.parse(document.getElementById('dashboard-data').textContent);
+const summary = JSON.parse(document.getElementById('dashboard-summary').textContent);
+const COLORS  = ['#1d4ed8','#f38020','#0f766e','#7c3aed','#dc2626','#0891b2','#65a30d','#db2777'];
+const PLY     = Plotly;
 
-    <script id=\"dashboard-data\" type=\"application/json\">__DASHBOARD_PAYLOAD__</script>
-    <script id=\"dashboard-summary\" type=\"application/json\">__DASHBOARD_SUMMARY__</script>
-  <script>
-    const data = JSON.parse(document.getElementById("dashboard-data").textContent);
-    const summary = JSON.parse(document.getElementById("dashboard-summary").textContent);
+const pills = [
+  { label: `Total Rows: ${summary.total_rows}` },
+  { label: `Unique Visitors: ${(data.daily_metric_series||[]).filter(r=>r.metric==='unique_visitors').length} days`, cls:'blue' },
+  { label: `Total Requests: ${(data.daily_metric_series||[]).filter(r=>r.metric==='total_requests').length} days`, cls:'blue' },
+  { label: `DNS Label Rows: ${(data.dns_label_daily||[]).reduce((s,t)=>s+t.dates.length,0)}`, cls:'green' },
+  { label: `Location Snapshots: ${(data.location_snapshot_chart&&data.location_snapshot_chart.dates||[]).length} dates`, cls:'green' },
+  { label: `Files Processed: ${summary.files_processed}` },
+];
+const ph = document.getElementById('headerPills');
+pills.forEach(p => {
+  const s = document.createElement('span');
+  s.className = 'pill ' + (p.cls||'');
+  s.textContent = p.label;
+  ph.appendChild(s);
+});
 
-    const statHost = document.getElementById("stats");
-    const stats = [
-      `Rows: ${summary.total_rows}`,
-      `New Rows: ${summary.new_rows_in_batch}`,
-      `Skipped Duplicates: ${summary.skipped_duplicates_in_batch}`,
-      `Files Processed: ${summary.files_processed}`,
-            `Schemas: ${Object.keys(summary.rows_by_schema || {}).length}`,
-    ];
-        for (const item of stats) {
-      const span = document.createElement("span");
-      span.className = "pill";
-      span.textContent = item;
-      statHost.appendChild(span);
-        }
+const cov = data.coverage_summary || [];
+const ct  = document.getElementById('coverageTable');
+ct.innerHTML = '<tr><th>Metric</th><th>Earliest</th><th>Latest</th><th>Days in store</th></tr>'
+  + cov.map(c=>`<tr><td>${c.metric}</td><td>${c.first}</td><td>${c.last}</td><td>${c.count}</td></tr>`).join('');
+document.getElementById('gapNote').textContent =
+  'Note: May 15-16 are missing from unique_visitors and total_requests \u2014 neither 30-day export window covered those two dates.';
 
-        const dailyGroups = new Map();
-        for (const row of data.daily_metric_series || []) {
-            if (!dailyGroups.has(row.metric)) dailyGroups.set(row.metric, []);
-            dailyGroups.get(row.metric).push(row);
-        }
-        for (const rows of dailyGroups.values()) {
-            rows.sort((a, b) => a.date.localeCompare(b.date));
-        }
+const byMetric = new Map();
+(data.daily_metric_series||[]).forEach(r => {
+  if (!byMetric.has(r.metric)) byMetric.set(r.metric,[]);
+  byMetric.get(r.metric).push(r);
+});
+byMetric.forEach(rows => rows.sort((a,b)=>a.date.localeCompare(b.date)));
 
-        function buildTrendPlot(divId, metric, label, color) {
-            const rows = dailyGroups.get(metric) || [];
-            const host = document.getElementById(divId);
-            if (!rows.length) {
-                host.textContent = `No day-level data for ${label}.`;
-                return;
-            }
+function trendPlot(divId, metric, labelText, color, spanElId) {
+    const rows = byMetric.get(metric)||[];
+    // Overlay phone-export daily_value rows for dates not in the named metric
+    const namedDates = new Set(rows.map(r=>r.date));
+    const extRows = (byMetric.get('daily_value')||[]).filter(r=>!namedDates.has(r.date));
+    const allRows = [...extRows,...rows].sort((a,b)=>a.date.localeCompare(b.date));
+    if (!allRows.length) { document.getElementById(divId).textContent='No data.'; return; }
+    if (spanElId) document.getElementById(spanElId).textContent =
+        `${allRows[0].date} \u2192 ${allRows[allRows.length-1].date}  `
+        + `(named: ${rows.length} days + ${extRows.length} phone-export days)`;
+    const traces = [];
+    if (extRows.length) {
+        traces.push({
+            type:'scatter', mode:'lines+markers',
+            x:extRows.map(r=>r.date), y:extRows.map(r=>r.value),
+            line:{width:1.5,color,dash:'dot'}, marker:{size:4,color,symbol:'circle-open'},
+            name:'Phone exports (unconfirmed metric)',
+            hovertemplate:'%{x}: <b>%{y:,}</b><extra>phone export</extra>',
+        });
+    }
+    traces.push({
+        type:'scatter', mode:'lines+markers',
+        x:rows.map(r=>r.date), y:rows.map(r=>r.value),
+        line:{width:2,color}, marker:{size:5,color},
+        fill:'tozeroy', fillcolor:color+'1a', name:labelText,
+        hovertemplate:'%{x}: <b>%{y:,}</b><extra></extra>',
+    });
+    PLY.newPlot(divId, traces, {
+        margin:{t:10,r:10,b:60,l:60},
+        xaxis:{title:'Date',showgrid:true},
+        yaxis:{title:labelText,tickformat:',d'},
+        shapes:[
+            {type:'line',x0:'2026-05-15',x1:'2026-05-15',y0:0,y1:1,yref:'paper',line:{color:'#dc2626',width:1,dash:'dot'}},
+            {type:'line',x0:'2026-05-16',x1:'2026-05-16',y0:0,y1:1,yref:'paper',line:{color:'#dc2626',width:1,dash:'dot'}},
+        ],
+        annotations:[{x:'2026-05-16',y:0.98,yref:'paper',text:'data gap',showarrow:false,font:{color:'#dc2626',size:10},xanchor:'left'}],
+        legend:{orientation:'h',y:-0.22},
+    },{responsive:true});
+}
 
-            Plotly.newPlot(divId, [{
-                type: "scatter",
-                mode: "lines+markers",
-                x: rows.map(r => r.date),
-                y: rows.map(r => r.value),
-                line: { width: 2, color },
-                marker: { size: 6, color },
-                fill: "tozeroy",
-                fillcolor: color + "22",
-                name: label,
-            }], {
-                title: label,
-                margin: { t: 38, r: 16, b: 40, l: 48 },
-                xaxis: { title: "Date" },
-                yaxis: { title: "Value" },
-                showlegend: false,
-            }, {responsive: true});
-        }
+trendPlot('uvPlot','unique_visitors','Unique Visitors','#1d4ed8','uvSpan');
+trendPlot('trPlot','total_requests', 'Total Requests', '#f38020','trSpan');
 
-        buildTrendPlot("uniqueVisitorsPlot", "unique_visitors", "Unique Visitors", "#1d4ed8");
-        buildTrendPlot("totalRequestsPlot", "total_requests", "Total Requests", "#f38020");
+const dnsLabels = data.dns_label_daily||[];
+if (dnsLabels.length) {
+  PLY.newPlot('dnsLabelPlot',
+    dnsLabels.map((s,i)=>({
+      type:'scatter', mode:'lines+markers',
+      x:s.dates, y:s.values, name:s.label,
+      line:{width:2,color:COLORS[i%COLORS.length]}, marker:{size:4},
+      hovertemplate:'%{x}: <b>%{y:,}</b><extra>'+s.label+'</extra>',
+    })),
+    { margin:{t:10,r:10,b:80,l:60}, xaxis:{title:'Date',showgrid:true},
+      yaxis:{title:'DNS Queries (daily)',tickformat:',d'},
+      legend:{orientation:'h',y:-0.28}, hovermode:'x unified' },
+    {responsive:true}
+  );
+} else { document.getElementById('dnsLabelPlot').textContent='No DNS label data.'; }
 
-        const dnsDaily = data.dns_daily_series || [];
-        if (dnsDaily.length) {
-            Plotly.newPlot("dnsDailyPlot", [{
-                type: "scatter",
-                mode: "lines+markers",
-                x: dnsDaily.map(r => r.date),
-                y: dnsDaily.map(r => r.value),
-                line: { width: 2, color: "#0f766e" },
-                marker: { size: 5, color: "#0f766e" },
-                name: "DNS Daily Volume",
-            }], {
-                margin: { t: 16, r: 16, b: 40, l: 48 },
-                xaxis: { title: "Date" },
-                yaxis: { title: "Count" },
-                showlegend: false,
-            }, {responsive: true});
-        } else {
-            document.getElementById("dnsDailyPlot").textContent = "No DNS daily data found.";
-        }
+const snap = data.location_snapshot_chart||{};
+if ((snap.dates||[]).length) {
+  PLY.newPlot('dcSnapshotPlot',
+    (snap.series||[]).map((s,i)=>({
+      type:'bar', name:s.date,
+      x:snap.locations, y:s.values,
+      marker:{color:COLORS[i%COLORS.length]},
+      hovertemplate:'%{x}: <b>%{y:,}</b><extra>'+s.date+'</extra>',
+    })),
+    { barmode:'group', margin:{t:10,r:10,b:140,l:60},
+      xaxis:{title:'Data Center',tickangle:-40},
+      yaxis:{title:'DNS Queries',tickformat:',d'},
+      legend:{title:{text:'Export date'}} },
+    {responsive:true}
+  );
+} else { document.getElementById('dcSnapshotPlot').textContent='No snapshot data.'; }
 
-    const topCountries = data.country_series.slice(0, 20);
-    Plotly.newPlot("countryPlot", [{
-      type: "bar",
-      x: topCountries.map(r => r.country),
-      y: topCountries.map(r => r.total_requests),
-            marker: { color: "#f38020" }
-        }], {
-            margin: { t: 16, r: 16, b: 60, l: 48 },
-            xaxis: { title: "Country" },
-            yaxis: { title: "Total Requests" }
-        }, {responsive: true});
+const countries = data.country_series||[];
+if (countries.length) {
+  document.getElementById('countryNote').textContent =
+    `Snapshot: ${countries[0]&&countries[0].snapshot_date||'all'} \u2014 top ${countries.length} countries`;
+  PLY.newPlot('countryPlot',[{
+    type:'bar', x:countries.map(r=>r.country), y:countries.map(r=>r.requests),
+    marker:{color:'#f38020'}, hovertemplate:'%{x}: <b>%{y:,}</b><extra></extra>',
+  }],{ margin:{t:10,r:10,b:60,l:60}, xaxis:{title:'Country'},
+      yaxis:{title:'Requests',tickformat:',d'}, showlegend:false },{responsive:true});
+}
 
-    const topLocations = data.location_series.slice(0, 20);
-    Plotly.newPlot("locationPlot", [{
-      type: "bar",
-      x: topLocations.map(r => r.location),
-      y: topLocations.map(r => r.total_value),
-            marker: { color: "#0f766e" }
-        }], {
-            margin: { t: 16, r: 16, b: 110, l: 48 },
-            xaxis: { title: "Location", tickangle: -35 },
-            yaxis: { title: "Total Value" }
-        }, {responsive: true});
-
-        const intraday = data.intraday_series || [];
-        if (intraday.length) {
-            document.getElementById("intradaySection").style.display = "block";
-            const intradayMetric = intraday[0].metric;
-            const intradayRows = intraday.filter(r => r.metric === intradayMetric);
-            Plotly.newPlot("intradayPlot", [{
-                type: "scatter",
-                mode: "lines+markers",
-                x: intradayRows.map(r => r.clock_time),
-                y: intradayRows.map(r => r.avg_value),
-                line: { width: 2, color: "#6d28d9" },
-                marker: { size: 5, color: "#6d28d9" },
-                name: intradayMetric,
-            }], {
-                margin: { t: 16, r: 16, b: 50, l: 48 },
-                xaxis: { title: "Clock Time Bucket" },
-                yaxis: { title: "Average Value" },
-                showlegend: false,
-            }, {responsive: true});
-        }
-  </script>
+const locations = data.location_series||[];
+if (locations.length) {
+  PLY.newPlot('locationPlot',[{
+    type:'bar', x:locations.map(r=>r.location), y:locations.map(r=>r.total_value),
+    marker:{color:'#0f766e'}, hovertemplate:'%{x}: <b>%{y:,}</b><extra></extra>',
+  }],{ margin:{t:10,r:10,b:140,l:60}, xaxis:{title:'Data Center',tickangle:-40},
+      yaxis:{title:'Total DNS Queries',tickformat:',d'}, showlegend:false },{responsive:true});
+}
+</script>
 </body>
 </html>
 """
 
-    html_content = html_content.replace("{{", "{").replace("}}", "}")
+    html_content = html_content.replace("__GENERATED_AT__", str(summary.get("generated_at_utc", "")))
     html_content = html_content.replace("__DASHBOARD_PAYLOAD__", payload_json)
     html_content = html_content.replace("__DASHBOARD_SUMMARY__", summary_json)
-
     path.write_text(html_content, encoding="utf-8")
 
 
