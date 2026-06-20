@@ -158,13 +158,16 @@ except ImportError:
 DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview"
 DEFAULT_OPENAI_MODEL = "gpt-4o"
 DEFAULT_ANTHROPIC_MODEL = "claude-opus-4-5"
+DEFAULT_OLLAMA_MODEL = "llama3.1:8b"
+DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
 
 
 class AIAgent:
     """Represents an AI agent with a specific role and personality."""
 
     def __init__(self, name: str, provider: str, model: str,
-                 system_prompt: str, api_key: str):
+                 system_prompt: str, api_key: str,
+                 base_url: str | None = None):
         self.name = name
         self.provider = provider.lower()
         self.model = model
@@ -177,6 +180,11 @@ class AIAgent:
         elif self.provider == "gemini":
             self.client = genai.Client(api_key=api_key)
             self.model_name = model
+        elif self.provider == "ollama":
+            self.client = OpenAI(
+                base_url=(base_url or DEFAULT_OLLAMA_BASE_URL),
+                api_key=(api_key or "ollama")
+            )
         else:
             raise ValueError(f"Unsupported provider: {provider}")
 
@@ -215,6 +223,18 @@ class AIAgent:
                     )
                 )
                 return response.text
+
+            elif self.provider == "ollama":
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": self.system_prompt},
+                        {"role": "user", "content": message}
+                    ],
+                    temperature=0.7,
+                    max_tokens=2000
+                )
+                return response.choices[0].message.content
             else:
                 raise ValueError(
                     f"Unsupported provider in respond(): {self.provider}")
@@ -634,6 +654,8 @@ SETUP:
      OPENAI_API_KEY=your-key      # https://platform.openai.com/api-keys
      GEMINI_API_KEY=your-key      # https://aistudio.google.com/app/apikey
      ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
+      OLLAMA_MODEL=llama3.1:8b     # Optional (local Ollama)
+      OLLAMA_BASE_URL=http://localhost:11434/v1
 
 EXAMPLES:
   # Two-agent run (auto-selects providers, unchanged default):
@@ -641,6 +663,9 @@ EXAMPLES:
 
   # Three-agent round-robin (Gemini → GPT-4o → Claude → repeat):
   python ai_conversation.py --prompt brief.md --agents gemini,openai,anthropic
+
+    # Local-first run with Ollama + cloud providers:
+    python ai_conversation.py --prompt brief.md --agents ollama,openai,anthropic
 
   # Three-agent vote (independent responses, then Claude synthesises):
   python ai_conversation.py --prompt question.md --agents gemini,openai,anthropic --mode vote
@@ -661,6 +686,7 @@ SUPPORTED MODELS:
   OpenAI:    gpt-4o, gpt-4-turbo, gpt-3.5-turbo
   Gemini:    gemini-3-flash-preview, gemini-2.5-flash, gemini-1.5-pro, gemini-1.5-flash
   Anthropic: claude-opus-4-5, claude-3-5-sonnet-20241022
+    Ollama:    any local tag (e.g. llama3.1:8b, qwen2.5:14b, mistral:7b)
 """
 
     parser = argparse.ArgumentParser(
@@ -713,7 +739,7 @@ SUPPORTED MODELS:
         metavar='PROVIDER_LIST',
         default=None,
         help='Ordered, comma-separated list of providers to use as agents. '
-             'Valid values: gemini, openai, anthropic. '
+             'Valid values: gemini, openai, anthropic, ollama. '
              'Determines agent role order: first = Technical Evaluator, '
              'second = Critical Reviewer, third = Strategic Analyst. '
              'Example: --agents gemini,openai,anthropic. '
@@ -744,6 +770,9 @@ SUPPORTED MODELS:
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+    OLLAMA_API_KEY = os.environ.get("OLLAMA_API_KEY", "ollama")
+    OLLAMA_BASE_URL = os.environ.get(
+        "OLLAMA_BASE_URL") or DEFAULT_OLLAMA_BASE_URL
 
     # Model defaults: env var overrides the built-in constant.
     # --model is applied only to the provider that is actually selected
@@ -753,16 +782,7 @@ SUPPORTED MODELS:
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or DEFAULT_OPENAI_MODEL
     ANTHROPIC_MODEL = os.environ.get(
         "ANTHROPIC_MODEL") or DEFAULT_ANTHROPIC_MODEL
-
-    # Check which providers are available for multi-AI diversity
-    if not GEMINI_API_KEY and not OPENAI_API_KEY and not ANTHROPIC_API_KEY:
-        logger.error(
-            "At least one API key is required (GEMINI, OPENAI, or ANTHROPIC)."
-        )
-        logger.error(
-            "Set API keys in your .env file or as environment variables."
-        )
-        sys.exit(1)
+    OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL") or DEFAULT_OLLAMA_MODEL
 
     # Load knowledge base context if specified
     kb_context = ""
@@ -810,11 +830,22 @@ Integrate this knowledge naturally when relevant.
         "gemini": GEMINI_API_KEY,
         "openai": OPENAI_API_KEY,
         "anthropic": ANTHROPIC_API_KEY,
+        "ollama": OLLAMA_API_KEY,
     }
     available_models = {
         "gemini": GEMINI_MODEL,
         "openai": OPENAI_MODEL,
         "anthropic": ANTHROPIC_MODEL,
+        "ollama": OLLAMA_MODEL,
+    }
+    available_base_urls = {
+        "ollama": OLLAMA_BASE_URL,
+    }
+    requires_api_key = {
+        "gemini": True,
+        "openai": True,
+        "anthropic": True,
+        "ollama": False,
     }
 
     # Agent role names and system prompts for up to 3 agents.
@@ -859,11 +890,14 @@ Integrate this knowledge naturally when relevant.
     def _build_config(provider: str) -> dict:
         """Return provider config dict, applying --model override to agent 0."""
         model = available_models[provider]
-        return {
+        config = {
             "provider": provider,
             "model": model,
             "api_key": available_keys[provider],
         }
+        if provider in available_base_urls:
+            config["base_url"] = available_base_urls[provider]
+        return config
 
     # --- Determine ordered provider list ---
     if args.agents:
@@ -871,14 +905,17 @@ Integrate this knowledge naturally when relevant.
         requested = [
             p.strip().lower() for p in args.agents.split(",") if p.strip()
         ]
-        valid_providers = {"gemini", "openai", "anthropic"}
+        valid_providers = {"gemini", "openai", "anthropic", "ollama"}
         unknown = [p for p in requested if p not in valid_providers]
         if unknown:
             logger.error(f"Unknown provider(s): {', '.join(unknown)}")
             logger.error(
                 f"Valid choices: {', '.join(sorted(valid_providers))}")
             sys.exit(1)
-        missing_keys = [p for p in requested if not available_keys[p]]
+        missing_keys = [
+            p for p in requested
+            if requires_api_key[p] and not available_keys[p]
+        ]
         if missing_keys:
             logger.error(
                 f"No API key configured for: {', '.join(missing_keys)}. "
@@ -892,13 +929,22 @@ Integrate this knowledge naturally when relevant.
             p1 = "gemini"
         elif OPENAI_API_KEY:
             p1 = "openai"
-        else:
+        elif ANTHROPIC_API_KEY:
             p1 = "anthropic"
+        else:
+            p1 = "ollama"
+            logger.warning(
+                "No cloud API keys configured; using local Ollama provider."
+            )
 
         if p1 != "anthropic" and ANTHROPIC_API_KEY:
             p2 = "anthropic"
         elif p1 != "openai" and OPENAI_API_KEY:
             p2 = "openai"
+        elif p1 != "gemini" and GEMINI_API_KEY:
+            p2 = "gemini"
+        elif p1 != "ollama":
+            p2 = "ollama"
         else:
             p2 = p1
             logger.warning(
