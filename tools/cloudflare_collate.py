@@ -26,6 +26,7 @@ SCHEMA_TIME_SERIES_LABEL = "time_series_label"
 SCHEMA_TIMESTAMP_VALUE = "timestamp_value"
 SCHEMA_LOCATION_VALUE = "location_value"
 SCHEMA_COUNTRY_REQUESTS = "country_requests"
+SCHEMA_SINGLE_VALUE = "single_value"
 
 
 def _now_utc_iso() -> str:
@@ -46,6 +47,8 @@ def detect_schema(header: list[str]) -> SchemaName | None:
         return SCHEMA_LOCATION_VALUE
     if h == ("name", "requests"):
         return SCHEMA_COUNTRY_REQUESTS
+    if h == ("value",):
+        return SCHEMA_SINGLE_VALUE
     return None
 
 
@@ -70,6 +73,8 @@ def _metric_from_source_name(source_name: str, default_metric: str) -> str:
         "total_data_served": "total_data_served",
         "data_served": "data_served",
         "cached_requests": "cached_requests",
+        "uncached_request": "uncached_requests",
+        "uncached_requests": "uncached_requests",
         "dns": "dns_value",
     }
     for marker, metric in metric_map.items():
@@ -196,6 +201,22 @@ def _normalize_row(
             "location": "",
             "id_code": "",
             "value": _to_number(row.get("requests", "")),
+            "dashed": "",
+        }
+
+    if schema == SCHEMA_SINGLE_VALUE:
+        metric = _metric_from_source_name(source_name, "single_value")
+        return {
+            "schema": schema,
+            "metric": metric,
+            "timestamp_utc": anchor_date.isoformat() + "T00:00:00Z",
+            "date_utc": anchor_date.isoformat(),
+            "clock_time": "",
+            "label": "",
+            "country": "",
+            "location": "",
+            "id_code": "",
+            "value": _to_number(row.get("value", "")),
             "dashed": "",
         }
 
@@ -495,6 +516,11 @@ def _build_dashboard(path: Path, dashboard_data: dict[str, object], summary: dic
     <p class="sub" id="trSpan"></p>
     <div id="trPlot" class="plot-lg"></div>
   </section>
+    <section class="card">
+        <h2>Traffic Time Series (30-day evidence)</h2>
+        <p class="sub">Daily values from the traffic timeseries export family. This is the Feb-Mar coverage you called out.</p>
+        <div id="trafficSeriesPlot" class="plot-lg"></div>
+    </section>
   <section class="card">
     <h2>DNS Queries by Label (Mar&ndash;Apr, top 8 labels)</h2>
     <p class="sub">Hourly DNS resolution counts aggregated to daily totals per hostname label.</p>
@@ -598,6 +624,26 @@ function trendPlot(divId, metric, labelText, color, spanElId) {
 
 trendPlot('uvPlot','unique_visitors','Unique Visitors','#1d4ed8','uvSpan');
 trendPlot('trPlot','total_requests', 'Total Requests', '#f38020','trSpan');
+
+const trafficRows = (byMetric.get('daily_value') || []).slice().sort((a,b)=>a.date.localeCompare(b.date));
+if (trafficRows.length) {
+    PLY.newPlot('trafficSeriesPlot', [{
+        type:'scatter', mode:'lines+markers',
+        x: trafficRows.map(r=>r.date),
+        y: trafficRows.map(r=>r.value),
+        line:{width:2,color:'#0f766e'}, marker:{size:5,color:'#0f766e'},
+        fill:'tozeroy', fillcolor:'#0f766e1a',
+        name:'Traffic Time Series',
+        hovertemplate:'%{x}: <b>%{y:,}</b><extra></extra>',
+    }], {
+        margin:{t:10,r:10,b:50,l:60},
+        xaxis:{title:'Date',showgrid:true},
+        yaxis:{title:'Traffic Value',tickformat:',d'},
+        showlegend:false,
+    }, {responsive:true});
+} else {
+    document.getElementById('trafficSeriesPlot').textContent = 'No traffic timeseries data available.';
+}
 
 const dnsLabels = data.dns_label_daily||[];
 if (dnsLabels.length) {

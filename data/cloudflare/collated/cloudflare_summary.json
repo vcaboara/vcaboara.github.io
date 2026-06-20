@@ -1,15 +1,16 @@
 {
-  "generated_at_utc": "2026-06-16T22:17:59+00:00",
-  "input": "CloudFlareCSVs.zip",
-  "batch": "CloudFlareCSVs",
-  "files_processed": 137,
+  "generated_at_utc": "2026-06-17T20:26:44+00:00",
+  "input": "c:\\Users\\vcabo\\Desktop\\Arboreum\\01_Data_Evidence",
+  "batch": "desktop_evidence",
+  "files_processed": 5,
   "unsupported_files": [],
   "new_rows_in_batch": 0,
-  "skipped_duplicates_in_batch": 5620,
-  "total_rows": 3588,
+  "skipped_duplicates_in_batch": 1019,
+  "total_rows": 3650,
   "rows_by_schema": {
     "country_requests": 235,
-    "location_value": 597,
+    "location_value": 629,
+    "single_value": 30,
     "time_series_label": 1896,
     "timestamp_value": 860
   },
